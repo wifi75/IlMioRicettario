@@ -6,6 +6,13 @@ from extensions import db
 from extensions import login_manager
 
 from models.user import User
+from models.recipe import Recipe
+from models.ingredient import RecipeIngredient
+from models.feature import RecipeFeature
+from models.setting import Setting
+from models.wiki import WikiArticle
+from models.parameter import RecipeParameter
+
 from routes.admin import admin_bp
 
 
@@ -33,20 +40,24 @@ with app.app_context():
 
     db.create_all()
 
-    admin = User.query.filter_by(username="admin").first()
+    admin = User.query.filter_by(
+        username="admin"
+    ).first()
 
     if not admin:
 
         admin = User(
             username="admin",
-            password_hash=generate_password_hash("admin123"),
+            password_hash=generate_password_hash(
+                "admin123"
+            ),
             is_admin=True
         )
 
         db.session.add(admin)
         db.session.commit()
 
-        print("Admin creato:")
+        print("Admin creato")
         print("Username: admin")
         print("Password: admin123")
 

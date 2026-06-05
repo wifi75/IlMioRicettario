@@ -1,0 +1,85 @@
+body{
+    background:#f1f5f9;
+    font-family:Segoe UI, Arial, sans-serif;
+}
+
+.sidebar{
+    position:fixed;
+    top:0;
+    left:0;
+    width:260px;
+    height:100vh;
+    background:#17233a;
+    color:white;
+    padding:20px;
+}
+
+.sidebar h3{
+    margin-bottom:10px;
+    font-weight:700;
+}
+
+.sidebar a{
+    display:block;
+    color:#cbd5e1;
+    text-decoration:none;
+    padding:12px;
+    border-radius:10px;
+    margin-bottom:8px;
+    transition:.2s;
+}
+
+.sidebar a:hover{
+    background:#24344f;
+    color:white;
+}
+
+.main-content{
+    margin-left:280px;
+    padding:40px;
+}
+
+.card{
+    border:none;
+    border-radius:18px;
+    box-shadow:0 4px 18px rgba(0,0,0,.08);
+}
+
+.stat-card{
+    background:white;
+}
+
+.recipe-card{
+    background:white;
+    margin-bottom:20px;
+}
+
+.recipe-list .card-body{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.table{
+    margin-bottom:0;
+}
+
+.table th{
+    font-weight:600;
+}
+
+.form-control{
+    border-radius:10px;
+}
+
+.btn{
+    border-radius:10px;
+}
+
+.alert{
+    border-radius:12px;
+}
+
+h1,h2,h3,h4,h5{
+    font-weight:700;
+}

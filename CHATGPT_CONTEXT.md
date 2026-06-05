@@ -1,15 +1,16 @@
 # CHATGPT CONTEXT
 
-Contesto del progetto Il Mio Ricettario.
+## PROGETTO
 
-# PROGETTO: Il Mio Ricettario
-
-Sto sviluppando un nuovo progetto chiamato "Il Mio Ricettario".
+Il Mio Ricettario
 
 Repository GitHub:
+
 https://github.com/wifi75/IlMioRicettario
 
-Stack tecnologico:
+---
+
+## STACK TECNOLOGICO
 
 * Python 3
 * Flask
@@ -20,69 +21,95 @@ Stack tecnologico:
 * JavaScript
 * Jinja2
 
-Obiettivo:
+---
+
+## OBIETTIVO
 
 Realizzare una piattaforma professionale per la gestione di ricette dinamiche.
 
-Non è un semplice ricettario.
+Il sistema non deve essere un semplice ricettario.
 
-Ogni ricetta può attivare moduli e motori di calcolo configurabili dal backend.
+Ogni ricetta deve poter attivare motori di calcolo e moduli configurabili dal backend.
 
-Moduli previsti:
+---
 
-* Numero pezzi
-* Peso pezzo
-* Teglie
-* Formati teglia
+## ARCHITETTURA
+
+Ogni ricetta può abilitare o disabilitare funzionalità specifiche.
+
+Esempi:
+
+### Panini
+
+* Numero panini
+* Peso panino
+* Tipo lievito
+
+### Focacce
+
+* Numero teglie
+* Formato teglia
+* Tipo lievito
+
+### Pane in cassetta
+
+* Formato stampo
+* Numero stampi
 * Tipo lievito
 * Tangzhong
 
-Esempio:
+---
 
-Una ricetta di panini può consentire:
+## MODULI PREVISTI
 
-* scelta numero panini
-* scelta peso panino
-* scelta tipo lievito
+### Panetti
 
-Una ricetta di focaccia può consentire:
+Permette di scegliere:
 
-* scelta numero teglie
-* scelta formato teglia
-* scelta tipo lievito
+* Numero pezzi
+* Peso pezzo
 
-Motore lievito:
+### Teglie
 
-L'utente può scegliere nel frontend:
+Permette di scegliere:
+
+* Numero teglie
+* Formato teglia
+
+### Lievito
+
+Permette di scegliere:
 
 * Lievito fresco
 * Lievito secco Caputo
 
-La conversione deve essere configurabile dal backend tramite impostazioni globali.
+La conversione deve essere configurabile dal backend.
 
-Motore Tangzhong:
+### Tangzhong
 
-Parametri configurabili dal backend:
+Configurabile da backend:
 
-* percentuale farina
-* moltiplicatore liquido
+* Percentuale farina
+* Moltiplicatore liquido
 
-Esempio standard:
+Valori standard:
 
-5% farina
-5× latte
+* 5%
+* 5×
 
-Quando il Tangzhong è attivato il sistema deve:
+Quando attivato il sistema deve:
 
-* calcolare automaticamente Tangzhong
-* sottrarre farina e latte dagli ingredienti principali
-* mostrare una sezione dedicata Tangzhong
+* calcolare automaticamente il Tangzhong
+* sottrarre farina e liquido dalla ricetta principale
+* mostrare una sezione dedicata
 
-Wiki integrata:
+---
 
-Menu Wiki con articoli gestibili dal backend.
+## WIKI
 
-Esempi:
+Sezione Wiki integrata.
+
+Argomenti previsti:
 
 * Lievito fresco
 * Lievito secco
@@ -91,43 +118,81 @@ Esempi:
 * Biga
 * Idratazione
 
-Database previsto:
+Gestione completa dal backend.
 
-users
+---
 
-recipes
+## DATABASE
 
-recipe_ingredients
+Tabelle principali:
 
-recipe_features
+* users
+* recipes
+* recipe_ingredients
+* recipe_features
+* recipe_parameters
+* recipe_trays
+* settings
+* wiki_articles
 
-recipe_trays
+---
 
-settings
-
-wiki_articles
-
-Regole fondamentali:
+## REGOLE DI SVILUPPO
 
 1. Fornire sempre file completi.
 2. Non fornire patch parziali.
 3. Non rompere funzionalità esistenti.
 4. Indicare sempre il file da modificare.
-5. Se si modifica app.py indicare sempre la sezione corretta.
-6. Architettura semplice e facilmente manutenibile.
-7. Il backend deve poter abilitare/disabilitare i moduli per ogni ricetta.
+5. Se si modifica app.py indicare la sezione esatta.
+6. Architettura semplice e manutenibile.
+7. Backend in grado di attivare/disattivare i moduli per ogni ricetta.
+8. Mobile First.
+9. Compatibilità Smartphone / Tablet / Desktop.
+10. Bootstrap 5 come framework UI principale.
 
-Stato attuale:
+---
 
-* cartella progetto creata
-* repository GitHub creato
-* primo commit eseguito
-* struttura iniziale pronta
+## STATO ATTUALE
 
-Voglio procedere con la V1 professionale partendo da:
+Completato:
 
-* database
-* login amministratore
-* dashboard admin
-* gestione ricette
-* moduli dinamici
+* Login amministratore
+* Dashboard amministrazione
+* Gestione ricette
+* Gestione ingredienti
+* Calcolo farine totali
+* Calcolo liquidi totali
+* Calcolo idratazione
+* RecipeFeature
+* RecipeParameter
+* Setting
+* SQLite
+
+---
+
+## ROADMAP V1
+
+### Backend
+
+* Gestione Feature Ricetta
+* Gestione Parametri Ricetta
+* Gestione Wiki
+* Gestione Impostazioni Globali
+
+### Motori
+
+* Numero panetti
+* Peso panetto
+* Idratazione variabile
+* Conversione lievito
+* Tangzhong
+* Poolish
+* Biga
+* Lievito madre
+
+### Frontend
+
+* Ricette dinamiche
+* Moduli generati automaticamente
+* Calcolo in tempo reale
+* Layout responsive professionale

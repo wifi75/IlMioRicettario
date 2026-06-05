@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h1>Nuova Ricetta</h1>
+
+    <form method="post">
+
+        <div class="mb-3">
+            <label>Nome</label>
+            <input
+                type="text"
+                name="name"
+                class="form-control"
+                required>
+        </div>
+
+        <div class="mb-3">
+            <label>Slug</label>
+            <input
+                type="text"
+                name="slug"
+                class="form-control"
+                required>
+        </div>
+
+        <div class="mb-3">
+            <label>Descrizione</label>
+            <textarea
+                name="description"
+                class="form-control"></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label>Procedimento</label>
+            <textarea
+                name="instructions"
+                class="form-control"
+                rows="8"></textarea>
+        </div>
+
+        <button
+            type="submit"
+            class="btn btn-primary">
+            Salva
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

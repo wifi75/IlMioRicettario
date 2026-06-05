@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Ricette{% endblock %}
+
+{% block page_title %}
+Ricette
+{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div>
+
+        <h1 class="fw-bold mb-0">
+            Ricette
+        </h1>
+
+        <small class="text-muted">
+            Gestione ricette
+        </small>
+
+    </div>
+
+    <a href="/admin/recipes/new"
+       class="btn btn-success btn-lg">
+
+        ➕ Nuova Ricetta
+
+    </a>
+
+</div>
+
+{% if recipes %}
+
+<div class="row">
+
+    {% for recipe in recipes %}
+
+    <div class="col-xl-6">
+
+        <div class="card recipe-card">
+
+            <div class="card-body">
+
+                <div>
+
+                    <div class="mb-2">
+
+                        <span class="badge bg-primary">
+                            ID {{ recipe.id }}
+                        </span>
+
+                        {% if recipe.is_published %}
+
+                        <span class="badge bg-success">
+                            Pubblicata
+                        </span>
+
+                        {% else %}
+
+                        <span class="badge bg-secondary">
+                            Bozza
+                        </span>
+
+                        {% endif %}
+
+                    </div>
+
+                    <h4 class="mb-1">
+                        {{ recipe.name }}
+                    </h4>
+
+                    <div class="text-muted mb-2">
+                        {{ recipe.slug }}
+                    </div>
+
+                    <small class="text-muted">
+                        {{ recipe.ingredient_count() }}
+                        ingredienti
+                    </small>
+
+                </div>
+
+                <div class="mt-3">
+
+                    <a href="/admin/recipe/{{ recipe.id }}"
+                       class="btn btn-primary btn-sm">
+                        Apri
+                    </a>
+
+                    <a href="#"
+                       class="btn btn-warning btn-sm">
+                        Modifica
+                    </a>
+
+                    <a href="/admin/recipes/delete/{{ recipe.id }}"
+                       class="btn btn-danger btn-sm"
+                       onclick="return confirm('Eliminare la ricetta?');">
+                        Elimina
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% else %}
+
+<div class="card recipe-card">
+
+    <div class="card-body text-center p-5">
+
+        <h3>
+            Nessuna ricetta presente
+        </h3>
+
+        <p class="text-muted">
+            Inizia creando la tua prima ricetta.
+        </p>
+
+        <a href="/admin/recipes/new"
+           class="btn btn-success">
+
+            ➕ Crea Ricetta
+
+        </a>
+
+    </div>
+
+</div>
+
+{% endif %}
+
+{% endblock %}
