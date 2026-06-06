@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Wiki Tecnologica{% endblock %}
+
+{% block content %}
+
+<div class="card mb-4">
+
+    <div class="card-body d-flex justify-content-between align-items-center">
+
+        <h2 class="fw-bold mb-0">
+            📚 Wiki Tecnica ed Enciclopedia
+        </h2>
+
+        <a href="/admin/wiki/new" class="btn btn-primary fw-bold shadow-sm">
+            ➕ Nuovo Articolo
+        </a>
+
+    </div>
+
+</div>
+
+<div class="card shadow-sm border-0">
+
+    <div class="card-body p-0">
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle mb-0">
+
+                <thead>
+
+                    <tr class="table-dark text-white" style="font-size: 15px;">
+                        <th class="ps-4">Titolo</th>
+                        <th>Slug</th>
+                        <th>Categoria</th>
+                        <th class="pe-4"></th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% if articles %}
+
+                        {% for article in articles %}
+
+                        <tr>
+
+                            <td class="fw-bold text-dark ps-4">
+                                {{ article.title }}
+                            </td>
+
+                            <td class="text-muted small">
+                                {{ article.slug }}
+                            </td>
+
+                            <td>
+                                {% if article.category == 'Tecniche' or article.category == 'Tecnica' %}
+                                    <span class="badge bg-warning text-dark fw-bold">
+                                        {{ article.category }}
+                                    </span>
+                                {% elif article.category == 'Lieviti' or article.category == 'Fermentazione' %}
+                                    <span class="badge bg-info text-dark fw-bold">
+                                        {{ article.category }}
+                                    </span>
+                                {% elif article.category == 'Ingredienti' %}
+                                    <span class="badge bg-success text-white fw-bold">
+                                        {{ article.category }}
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary text-white fw-bold">
+                                        {{ article.category }}
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td class="text-end pe-4">
+
+                                <a href="/admin/wiki/delete/{{ article.id }}"
+                                   class="btn btn-sm btn-outline-danger shadow-sm"
+                                   onclick="return confirm('Eliminare questo articolo dalla Wiki tecnica?');">
+                                    🗑️ Elimina
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <tr>
+                            <td colspan="4" class="text-center py-5 text-muted bg-light">
+                                <p class="mb-0 fs-5">Nessun articolo presente nella Wiki tecnica.</p>
+                                <small>Clicca su "Nuovo Articolo" in alto per iniziare a scrivere guide scientifiche.</small>
+                            </td>
+                        </tr>
+
+                    {% endif %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

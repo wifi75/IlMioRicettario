@@ -23,6 +23,8 @@ from models.recipe import Recipe
 from models.ingredient import RecipeIngredient
 from models.feature import RecipeFeature
 from models.parameter import RecipeParameter
+from models.setting import Setting
+from models.wiki import WikiArticle
 
 
 admin_bp = Blueprint(
@@ -93,10 +95,12 @@ def logout():
 def dashboard():
 
     recipes_count = Recipe.query.count()
+    wiki_count = WikiArticle.query.count()
 
     return render_template(
         "admin/dashboard.html",
-        recipes_count=recipes_count
+        recipes_count=recipes_count,
+        wiki_count=wiki_count
     )
 
 
@@ -127,26 +131,61 @@ def recipe_new():
             name=request.form["name"],
             slug=request.form["slug"],
             description=request.form["description"],
-            instructions=request.form["instructions"]
+            instructions=request.form["instructions"],
+            is_published="is_published" in request.form,
+            temp_chiusura=float(request.form.get("temp_chiusura", 24.0)) if request.form.get("temp_chiusura") else 24.0,
+            tempo_autolisi=int(request.form.get("tempo_autolisi", 0)) if request.form.get("tempo_autolisi") else 0,
+            tempo_puntata=int(request.form.get("tempo_puntata", 0)) if request.form.get("tempo_puntata") else 0,
+            tempo_appretto=int(request.form.get("tempo_appretto", 0)) if request.form.get("tempo_appretto") else 0
         )
 
         db.session.add(recipe)
         db.session.commit()
 
+        pref_type = request.form.get("preferment_type", "none")
+
         feature = RecipeFeature(
-            recipe_id=recipe.id
+            recipe_id=recipe.id,
+            enable_piece_count="enable_piece_count" in request.form,
+            enable_piece_weight="enable_piece_count" in request.form,
+            enable_yeast_type="enable_yeast_type" in request.form,
+            enable_tangzhong="enable_tangzhong" in request.form,
+            enable_poolish=pref_type == "poolish",
+            enable_biga=pref_type == "biga"
         )
 
         db.session.add(feature)
+
+        ing_names = request.form.getlist("ing_name[]")
+        ing_qtys = request.form.getlist("ing_qty[]")
+        ing_units = request.form.getlist("ing_unit[]")
+        ing_is_flour = request.form.getlist("ing_is_flour[]")
+        ing_is_liquid = request.form.getlist("ing_is_liquid[]")
+
+        for i in range(len(ing_names)):
+            if not ing_names[i].strip():
+                continue
+
+            ingredient = RecipeIngredient(
+                recipe_id=recipe.id,
+                name=ing_names[i],
+                quantity=float(ing_qtys[i]) if ing_qtys[i] else 0.0,
+                unit=ing_units[i],
+                is_flour=ing_is_flour[i] == "true",
+                is_liquid=ing_is_liquid[i] == "true",
+                sort_order=i
+            )
+            db.session.add(ingredient)
+
         db.session.commit()
 
         flash(
-            "Ricetta creata correttamente",
+            "Formula bilanciata e salvata con successo!",
             "success"
         )
 
         return redirect(
-            url_for("admin.recipes")
+                url_for("admin.recipes")
         )
 
     return render_template(
@@ -176,12 +215,15 @@ def recipe_detail(id):
         RecipeParameter.sort_order
     ).all()
 
+    settings_data = Setting.query.first()
+
     return render_template(
         "admin/recipe_detail.html",
         recipe=recipe,
         ingredients=ingredients,
         feature=feature,
-        parameters=parameters
+        parameters=parameters,
+        settings_data=settings_data
     )
 
 
@@ -259,4 +301,160 @@ def recipe_delete(id):
 
     return redirect(
         url_for("admin.recipes")
+    )
+
+
+@admin_bp.route(
+    "/recipe/edit/<int:id>",
+    methods=["GET", "POST"]
+)
+@login_required
+def recipe_edit(id):
+
+    recipe = Recipe.query.get_or_404(id)
+
+    feature = RecipeFeature.query.filter_by(
+        recipe_id=recipe.id
+    ).first()
+
+    if not feature:
+        feature = RecipeFeature(recipe_id=recipe.id)
+        db.session.add(feature)
+        db.session.commit()
+
+    if request.method == "POST":
+
+        recipe.name = request.form["name"]
+        recipe.slug = request.form["slug"]
+        recipe.description = request.form["description"]
+        recipe.instructions = request.form["instructions"]
+        recipe.is_published = "is_published" in request.form
+
+        # Allineamento dei parametri di processo avanzati in modifica
+        recipe.temp_chiusura = float(request.form.get("temp_chiusura", 24.0)) if request.form.get("temp_chiusura") else 24.0
+        recipe.tempo_autolisi = int(request.form.get("tempo_autolisi", 0)) if request.form.get("tempo_autolisi") else 0
+        recipe.tempo_puntata = int(request.form.get("tempo_puntata", 0)) if request.form.get("tempo_puntata") else 0
+        recipe.tempo_appretto = int(request.form.get("tempo_appretto", 0)) if request.form.get("tempo_appretto") else 0
+
+        pref_type = request.form.get("preferment_type", "none")
+
+        # Allineamento degli interruttori di calcolo in modifica
+        feature.enable_piece_count = "enable_piece_count" in request.form
+        feature.enable_piece_weight = "enable_piece_count" in request.form
+        feature.enable_yeast_type = "enable_yeast_type" in request.form
+        feature.enable_tangzhong = "enable_tangzhong" in request.form
+        feature.enable_poolish = pref_type == "poolish"
+        feature.enable_biga = pref_type == "biga"
+
+        RecipeIngredient.query.filter_by(recipe_id=recipe.id).delete()
+
+        ing_names = request.form.getlist("ing_name[]")
+        ing_qtys = request.form.getlist("ing_qty[]")
+        ing_units = request.form.getlist("ing_unit[]")
+        ing_is_flour = request.form.getlist("ing_is_flour[]")
+        ing_is_liquid = request.form.getlist("ing_is_liquid[]")
+
+        for i in range(len(ing_names)):
+            if not ing_names[i].strip():
+                continue
+
+            ingredient = RecipeIngredient(
+                recipe_id=recipe.id,
+                name=ing_names[i],
+                quantity=float(ing_qtys[i]) if ing_qtys[i] else 0.0,
+                unit=ing_units[i],
+                is_flour=ing_is_flour[i] == "true",
+                is_liquid=ing_is_liquid[i] == "true",
+                sort_order=i
+            )
+            db.session.add(ingredient)
+
+        db.session.commit()
+
+        flash(
+            "Ricetta aggiornata e ribilanciata correttamente",
+            "success"
+        )
+
+        return redirect(
+            url_for("admin.recipes")
+        )
+
+    ingredients = RecipeIngredient.query.filter_by(
+        recipe_id=recipe.id
+    ).order_by(
+        RecipeIngredient.sort_order
+    ).all()
+
+    return render_template(
+        "admin/recipe_edit_form.html",
+        recipe=recipe,
+        feature=feature,
+        ingredients=ingredients
+    )
+
+
+@admin_bp.route("/wiki")
+@login_required
+def wiki_list():
+
+    articles = WikiArticle.query.order_by(
+        WikiArticle.title
+    ).all()
+
+    return render_template(
+        "admin/wiki_list.html",
+        articles=articles
+    )
+
+
+@admin_bp.route(
+    "/wiki/new",
+    methods=["GET", "POST"]
+)
+@login_required
+def wiki_new():
+
+    if request.method == "POST":
+
+        article = WikiArticle(
+            title=request.form["title"],
+            slug=request.form["slug"],
+            content=request.form["content"],
+            category=request.form.get("category", "Generale")
+        )
+
+        db.session.add(article)
+        db.session.commit()
+
+        flash(
+            "Articolo della Wiki creato",
+            "success"
+        )
+
+        return redirect(
+            url_for("admin.wiki_list")
+        )
+
+    return render_template(
+        "admin/wiki_form.html"
+    )
+
+
+@admin_bp.route("/wiki/delete/<int:id>")
+@login_required
+def wiki_delete(id):
+
+    article = WikiArticle.query.get_or_404(id)
+
+    db.session.delete(article)
+    db.session.commit()
+
+    flash(
+        "Articolo eliminato dalla Wiki",
+        "warning"
+    )
+
+    return redirect(
+        url_for("admin.wiki_list")
     )

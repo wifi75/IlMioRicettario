@@ -1,0 +1,445 @@
+{% extends "base.html" %}
+
+{% block title %}{{ recipe.name }}{% endblock %}
+
+{% block content %}
+
+<div class="card mb-4 border-0 shadow-sm">
+    <div class="card-body p-4">
+        <h2 class="fw-bold mb-1 text-dark">🍞 {{ recipe.name }}</h2>
+        <p class="text-muted mb-0">{{ recipe.description or "Formula di panificazione bilanciata." }}</p>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card bg-white border-0 shadow-sm">
+            <div class="card-body text-center py-3">
+                <small class="text-muted fw-bold uppercase">Peso Totale Impasto</small>
+                <h3 class="mt-1 fw-bold text-primary" id="live-total-weight">0 g</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-white border-0 shadow-sm">
+            <div class="card-body text-center py-3">
+                <small class="text-muted fw-bold">Farina Totale</small>
+                <h3 class="mt-1 fw-bold text-dark" id="live-total-flour">0 g</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-white border-0 shadow-sm">
+            <div class="card-body text-center py-3">
+                <small class="text-muted fw-bold">Liquidi Totali</small>
+                <h3 class="mt-1 fw-bold text-info" id="live-total-liquids">0 g</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-white border-0 shadow-sm">
+            <div class="card-body text-center py-3">
+                <small class="text-muted fw-bold">Idratazione Reale</small>
+                <h3 class="mt-1 fw-bold text-success" id="live-hydration">{{ recipe.hydration() }}%</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-5">
+        <div class="card bg-white p-4 border-0 shadow-sm rounded-3 h-100">
+            <h4 class="fw-bold mb-4 text-center text-uppercase border-bottom pb-2">RICETTA BASE</h4>
+
+            {% if feature and feature.enable_piece_count %}
+            <div class="mb-3">
+                <label class="form-label small fw-bold text-dark">Metodo di Scalatura</label>
+                <select id="calc-scale-mode" class="form-select fw-bold">
+                    {% if feature and (feature.enable_biga or 'pizza' in recipe.slug or 'teglia' in recipe.slug or 'focaccia' in recipe.slug) %}
+                        <option value="tray">Dimensionamento per Finitura in Teglia</option>
+                        <option value="pieces" selected>Divisione in Panetti / Forme</option>
+                    {% else %}
+                        <option value="pieces" selected>Divisione in Panetti / Forme</option>
+                        <option value="weight">Target Peso Impasto Totale (g)</option>
+                    {% endif %}
+                </select>
+            </div>
+
+            <div id="wrapper-pieces-inputs" class="row g-2 mb-3">
+                <div class="col-6">
+                    <label class="form-label small text-dark fw-bold">Pezzi</label>
+                    <input type="number" id="calc-pieces-count" class="form-control text-center fw-bold fs-5" value="6" min="1">
+                </div>
+                <div class="col-6">
+                    <label class="form-label small text-dark fw-bold">Peso per pezzo (g)</label>
+                    <input type="number" id="calc-pieces-weight" class="form-control text-center fw-bold fs-5" value="140" min="1">
+                </div>
+            </div>
+            {% else %}
+                <select id="calc-scale-mode" class="d-none"><option value="weight" selected></option></select>
+                <input type="hidden" id="calc-target-weight" value="1000">
+            {% endif %}
+
+            <div id="wrapper-weight-input" class="mb-3 d-none">
+                <label class="form-label small text-dark fw-bold">Grammi di Impasto Desiderati (g)</label>
+                <input type="number" id="calc-target-weight" class="form-control text-center fw-bold fs-5" value="1000" step="50">
+            </div>
+
+            <div id="wrapper-tray-inputs" class="row g-2 mb-3 d-none">
+                <div class="col-4">
+                    <label class="form-label small text-muted fw-bold">Forma</label>
+                    <select id="calc-tray-type" class="form-select small">
+                        <option value="rect" selected>Rettangolo</option>
+                        <option value="round">Tonda</option>
+                    </select>
+                </div>
+                <div class="col-4">
+                    <label class="form-label small text-muted fw-bold" id="label-dim1">Base (cm)</label>
+                    <input type="number" id="calc-tray-dim1" class="form-control text-center" value="40">
+                </div>
+                <div class="col-4" id="box-dim2">
+                    <label class="form-label small text-muted fw-bold">Altezza (cm)</label>
+                    <input type="number" id="calc-tray-dim2" class="form-control text-center" value="30">
+                </div>
+            </div>
+
+            {% if feature and feature.enable_yeast_type %}
+            <div class="mb-3">
+                <label class="form-label small text-dark fw-bold">Tipo di lievito</label>
+                <select id="calc-yeast-select" class="form-select fw-semibold">
+                    <option value="base" selected>Lievito fresco</option>
+                    <option value="dry">Lievito secco</option>
+                </select>
+            </div>
+            {% else %}
+                <select id="calc-yeast-select" class="d-none"><option value="base" selected></option></select>
+            {% endif %}
+
+            {% if feature and feature.enable_tangzhong %}
+            <div class="mb-3">
+                <label class="form-label small text-dark fw-bold">Tecnica Water Roux</label>
+                <select id="calc-tangzhong-select" class="form-select fw-semibold">
+                    <option value="no">Disattivato</option>
+                    <option value="yes" selected>Attivo (Tangzhong)</option>
+                </select>
+            </div>
+            {% else %}
+                <select id="calc-tangzhong-select" class="d-none"><option value="no" selected></option></select>
+            {% endif %}
+
+            {% if feature and feature.enable_piece_count %}
+            <div class="text-center bg-light text-dark rounded py-2 small my-3 fw-bold border">
+                Pezzi: <span id="summary-pieces">6</span> · 
+                Peso: <span id="summary-weight-piece">140</span> g · 
+                Totale: <span id="summary-total">0</span> g
+                {% if feature and feature.enable_yeast_type %} · <span id="summary-yeast">Lievito fresco</span>{% endif %}
+            </div>
+            {% endif %}
+
+            <div class="mb-4 border-top pt-3">
+                <div class="d-flex justify-content-between">
+                    <label class="form-label small fw-bold text-secondary">Forza Idratazione Desiderata</label>
+                    <span class="text-success fw-bold fs-5" id="label-current-hydro-target">70%</span>
+                </div>
+                <input type="range" class="form-range" id="calc-slider-hydration" min="45" max="95" value="{{ recipe.hydration()|int }}">
+                <div class="form-check form-switch mt-2">
+                    <input class="form-check-input" type="checkbox" id="calc-override-hydration">
+                    <label class="form-check-label small text-muted" for="calc-override-hydration">Consenti ricalcolo idratazione personalizzato</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <h4 class="fw-bold mb-3 text-dark">📋 Formula Finale Ribilanciata</h4>
+                
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr class="table-light text-secondary small">
+                                <th>Materia Prima</th>
+                                <th class="text-end text-success">% Panettiere</th>
+                                <th class="text-end text-primary fw-bold" style="width: 30%;">Grammi Necessari</th>
+                            </tr>
+                        </thead>
+                        <tbody id="calculated-ingredients-tbody">
+                            {% for ing in ingredients %}
+                            <tr class="output-ingredient-row"
+                                data-name="{{ ing.name }}"
+                                data-base-qty="{{ ing.quantity }}"
+                                data-is-flour="{{ 'true' if ing.is_flour else 'false' }}"
+                                data-is-liquid="{{ 'true' if ing.is_liquid else 'false' }}"
+                                data-is-yeast="{% if 'lievito' in ing.name.lower() %}true{% else %}false{% endif %}">
+                                <td class="fw-semibold">
+                                    {{ ing.name }}
+                                    {% if ing.is_flour %}<span class="badge bg-warning text-dark small ms-1" style="font-size:10px">F</span>{% endif %}
+                                    {% if ing.is_liquid %}<span class="badge bg-info text-dark small ms-1" style="font-size:10px">L</span>{% endif %}
+                                </td>
+                                <td class="text-end text-success fw-bold output-baker-pct">0%</td>
+                                <td class="text-end text-primary fw-bold fs-5 output-final-weight">0 g</td>
+                            </tr>
+                            {% endfor %}
+
+                            <tr id="output-row-tangzhong" class="table-warning d-none">
+                                <td class="fw-bold">🥣 Roux / Tangzhong (Preparazione a parte):</td>
+                                <td colspan="2" class="text-end fw-bold text-dark" id="output-cell-tangzhong-details">0g farina + 0g liquido</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-4 pt-3 border-top">
+                    <h5 class="fw-bold text-secondary mb-3">🌡️ Tempistiche e Temperature Raccomandate</h5>
+                    <div class="row text-center bg-light py-2 rounded-3 g-2">
+                        <div class="col-3">
+                            <small class="text-muted d-block">T. Chiusura</small>
+                            <span class="fw-bold text-danger">{{ recipe.temp_chiusura or 24 }}°C</span>
+                        </div>
+                        <div class="col-3">
+                            <small class="text-muted d-block">Autolisi</small>
+                            <span class="fw-bold">{{ recipe.tempo_autolisi or 0 }} min</span>
+                        </div>
+                        <div class="col-3">
+                            <small class="text-muted d-block">Puntata</small>
+                            <span class="fw-bold">{{ recipe.tempo_puntata or 120 }} min</span>
+                        </div>
+                        <div class="col-3">
+                            <small class="text-muted d-block">Appretto</small>
+                            <span class="fw-bold">{{ recipe.tempo_appretto or 60 }} min</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-4">
+        <h4 class="fw-bold mb-3">Procedimento Operativo</h4>
+        <div style="white-space: pre-line;" class="text-dark fs-6 lh-base">{{ recipe.instructions }}</div>
+    </div>
+</div>
+
+<div class="text-center mb-5">
+    <a href="/" class="btn btn-outline-secondary px-4">⬅ Ritorna al Catalogo Formule</a>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const freshToDryRatio = parseFloat("{{ settings_data.fresh_to_dry_ratio if settings_data else 3.0 }}");
+    const tzFlourPctGlobal = parseFloat("{{ settings_data.tangzhong_flour_percent if settings_data else 5.0 }}") / 100;
+    const tzLiquidMultGlobal = parseFloat("{{ settings_data.tangzhong_liquid_multiplier if settings_data else 5.0 }}");
+
+    const scaleModeSelect = document.getElementById('calc-scale-mode');
+    const sliderHydration = document.getElementById('calc-slider-hydration');
+    const overrideHydrationCheck = document.getElementById('calc-override-hydration');
+    const labelCurrentHydroTarget = document.getElementById('label-current-hydro-target');
+    const yeastSelect = document.getElementById('calc-yeast-select');
+    const tangzhongSelect = document.getElementById('calc-tangzhong-select');
+
+    const wrapperPieces = document.getElementById('wrapper-pieces-inputs');
+    const wrapperWeight = document.getElementById('wrapper-weight-input');
+    const wrapperTray = document.getElementById('wrapper-tray-inputs');
+
+    const liveTotalWeight = document.getElementById('live-total-weight');
+    const liveTotalFlour = document.getElementById('live-total-flour');
+    const liveTotalLiquids = document.getElementById('live-total-liquids');
+    const liveHydration = document.getElementById('live-hydration');
+
+    const ingredientRows = document.querySelectorAll('.output-ingredient-row');
+
+    if (scaleModeSelect) {
+        scaleModeSelect.addEventListener('change', function() {
+            if (wrapperPieces) wrapperPieces.classList.add('d-none');
+            if (wrapperWeight) wrapperWeight.classList.add('d-none');
+            if (wrapperTray) wrapperTray.classList.add('d-none');
+
+            if (this.value === 'pieces' && wrapperPieces) wrapperPieces.classList.remove('d-none');
+            else if (this.value === 'weight' && wrapperWeight) wrapperWeight.classList.remove('d-none');
+            else if (this.value === 'tray' && wrapperTray) {
+                wrapperTray.classList.remove('d-none');
+                document.getElementById('calc-tray-type').dispatchEvent(new Event('change'));
+            }
+            calculateFormula();
+        });
+    }
+
+    const trayTypeEl = document.getElementById('calc-tray-type');
+    if (trayTypeEl) {
+        trayTypeEl.addEventListener('change', function() {
+            if (this.value === 'round') {
+                document.getElementById('label-dim1').textContent = 'Diametro (cm)';
+                document.getElementById('box-dim2').classList.add('d-none');
+            } else {
+                document.getElementById('label-dim1').textContent = 'Base (cm)';
+                document.getElementById('box-dim2').classList.remove('d-none');
+            }
+            calculateFormula();
+        });
+    }
+
+    const inputTriggers = ['calc-pieces-count', 'calc-pieces-weight', 'calc-target-weight', 'calc-tray-dim1', 'calc-tray-dim2'];
+    inputTriggers.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', calculateFormula);
+    });
+
+    sliderHydration.addEventListener('input', function() {
+        labelCurrentHydroTarget.textContent = this.value + '%';
+        calculateFormula();
+    });
+    overrideHydrationCheck.addEventListener('change', calculateFormula);
+    if (yeastSelect) yeastSelect.addEventListener('change', calculateFormula);
+    if (tangzhongSelect) tangzhongSelect.addEventListener('change', calculateFormula);
+
+    function calculateFormula() {
+        let recipeTotalFlourBase = 0;
+        let recipeTotalWeightBase = 0;
+        let originalIngredients = [];
+
+        ingredientRows.forEach(row => {
+            const baseQty = parseFloat(row.getAttribute('data-base-qty')) || 0;
+            const isFlour = row.getAttribute('data-is-flour') === 'true';
+            const isLiquid = row.getAttribute('data-is-liquid') === 'true';
+            const isYeast = row.getAttribute('data-is-yeast') === 'true';
+
+            if (isFlour) recipeTotalFlourBase += baseQty;
+            recipeTotalWeightBase += baseQty;
+
+            originalIngredients.push({
+                rowElement: row,
+                name: row.getAttribute('data-name'),
+                baseQty: baseQty,
+                isFlour: isFlour,
+                isLiquid: isLiquid,
+                isYeast: isYeast
+            });
+        });
+
+        if (recipeTotalFlourBase === 0) return;
+
+        let targetTotalWeight = 1000;
+        const mode = scaleModeSelect ? scaleModeSelect.value : 'weight';
+
+        const pCountEl = document.getElementById('calc-pieces-count');
+        const pWeightEl = document.getElementById('calc-pieces-weight');
+        const tWeightEl = document.getElementById('calc-target-weight');
+
+        if (mode === 'pieces' && pCountEl && pWeightEl) {
+            const count = parseFloat(pCountEl.value) || 1;
+            const weight = parseFloat(pWeightEl.value) || 80;
+            targetTotalWeight = count * weight;
+        } else if (mode === 'weight' && tWeightEl) {
+            targetTotalWeight = parseFloat(tWeightEl.value) || 1000;
+        } else if (mode === 'tray') {
+            let area = 0;
+            const dim1 = parseFloat(document.getElementById('calc-tray-dim1').value) || 0;
+            if (document.getElementById('calc-tray-type').value === 'round') {
+                area = Math.PI * Math.pow(dim1 / 2, 2);
+            } else {
+                area = dim1 * (parseFloat(document.getElementById('calc-tray-dim2').value) || 0);
+            }
+            targetTotalWeight = area * 0.6;
+        }
+
+        let targetHydrationPct = (recipeTotalWeightBase > 0) ? (originalIngredients.filter(i => i.isLiquid).reduce((sum, i) => sum + i.baseQty, 0) / recipeTotalFlourBase) : 0.70;
+        
+        if (overrideHydrationCheck.checked) {
+            targetHydrationPct = parseFloat(sliderHydration.value) / 100;
+        } else {
+            sliderHydration.value = Math.round(targetHydrationPct * 100);
+            labelCurrentHydroTarget.textContent = sliderHydration.value + '%';
+        }
+
+        let totalBakerPercentageSum = 0;
+
+        originalIngredients.forEach(ing => {
+            if (ing.isFlour) {
+                ing.bakerPct = ing.baseQty / recipeTotalFlourBase;
+            } else if (ing.isLiquid) {
+                ing.bakerPct = targetHydrationPct * (ing.baseQty / originalIngredients.filter(i => i.isLiquid).reduce((sum, i) => sum + i.baseQty, 0));
+            } else {
+                ing.bakerPct = ing.baseQty / recipeTotalFlourBase;
+            }
+
+            if (ing.isYeast && yeastSelect && yeastSelect.value === 'dry') {
+                ing.bakerPct = ing.bakerPct / freshToDryRatio;
+            }
+
+            totalBakerPercentageSum += ing.bakerPct;
+        });
+
+        let finalTotalFlourFlawless = targetTotalWeight / totalBakerPercentageSum;
+
+        let liveFlourSum = 0;
+        let liveLiquidSum = 0;
+
+        originalIngredients.forEach(ing => {
+            ing.finalWeight = finalTotalFlourFlawless * ing.bakerPct;
+
+            if (ing.isFlour) liveFlourSum += ing.finalWeight;
+            if (ing.isLiquid) liveLiquidSum += ing.finalWeight;
+
+            const pctCell = ing.rowElement.querySelector('.output-baker-pct');
+            const weightCell = ing.rowElement.querySelector('.output-final-weight');
+
+            if (pctCell) pctCell.textContent = (ing.bakerPct * 100).toFixed(1).replace('.0', '') + '%';
+            if (weightCell) weightCell.textContent = Math.max(0, ing.finalWeight).toFixed(1).replace('.0', '') + ' g';
+        });
+
+        const tzRow = document.getElementById('output-row-tangzhong');
+        if (tzRow && tangzhongSelect) {
+            if (tangzhongSelect.value === 'yes') {
+                tzRow.classList.remove('d-none');
+                let tzFlour = liveFlourSum * tzFlourPctGlobal;
+                let tzLiquid = tzFlour * tzLiquidMultGlobal;
+
+                document.getElementById('output-cell-tangzhong-details').innerHTML = 
+                    `<span class="badge bg-dark fs-6">${tzFlour.toFixed(1)} g Farina</span> ` +
+                    `<span class="badge bg-dark fs-6">${tzLiquid.toFixed(1)} g Acqua/Latte</span> <br>` +
+                    `<small class="text-muted d-block mt-1">(Nota: queste quantità sono già state sottratte dalle voci principali della lista sopra)</small>`;
+                
+                originalIngredients.forEach(ing => {
+                    const weightCell = ing.rowElement.querySelector('.output-final-weight');
+                    if (ing.isFlour && liveFlourSum > 0) {
+                        let netWeight = ing.finalWeight - (ing.finalWeight / liveFlourSum) * tzFlour;
+                        weightCell.textContent = Math.max(0, netWeight).toFixed(1).replace('.0', '') + ' g';
+                    }
+                    if (ing.isLiquid && liveLiquidSum > 0) {
+                        let netWeight = ing.finalWeight - (ing.finalWeight / liveLiquidSum) * tzLiquid;
+                        weightCell.textContent = Math.max(0, netWeight).toFixed(1).replace('.0', '') + ' g';
+                    }
+                });
+            } else {
+                tzRow.classList.add('d-none');
+            }
+        }
+
+        if (liveTotalWeight) liveTotalWeight.textContent = Math.round(targetTotalWeight) + ' g';
+        if (liveTotalFlour) liveTotalFlour.textContent = Math.round(liveFlourSum) + ' g';
+        if (liveTotalLiquids) liveTotalLiquids.textContent = Math.round(liveLiquidSum) + ' g';
+        if (liveHydration && liveFlourSum > 0) liveHydration.textContent = Math.round((liveLiquidSum / liveFlourSum) * 100) + '%';
+
+        const sumPiecesEl = document.getElementById('summary-pieces');
+        const sumWeightEl = document.getElementById('summary-weight-piece');
+        const sumTotalEl = document.getElementById('summary-total');
+
+        if (sumPiecesEl && pCountEl) sumPiecesEl.textContent = pCountEl.value;
+        if (sumWeightEl && pWeightEl) sumWeightEl.textContent = pWeightEl.value;
+        if (sumTotalEl) sumTotalEl.textContent = Math.round(targetTotalWeight) + ' g';
+        
+        const summaryYeast = document.getElementById('summary-yeast');
+        if (summaryYeast && yeastSelect) {
+            summaryYeast.textContent = yeastSelect.options[yeastSelect.selectedIndex].text;
+        }
+    }
+
+    calculateFormula();
+});
+</script>
+
+{% endblock %}

@@ -24,3 +24,9 @@ class WikiArticle(db.Model):
     content = db.Column(
         db.Text
     )
+
+    category = db.Column(
+        db.String(100),
+        nullable=False,
+        default="Generale"
+    )
