@@ -165,11 +165,37 @@
                         <div class="alert alert-warning border-0 small mb-3 text-dark rounded-3 fw-semibold">
                             <strong>Gelificazione Roux:</strong> Cuocere i seguenti grammi controllati a 65°C fino a consistenza gelatinosa, poi raffreddare prima di inserire nell'impasto.
                         </div>
-                        <div class="p-3 bg-light rounded-3 border text-center" style="border-color: #e2e8f0 !important;">
+                        <div class="p-3 bg-light rounded-3 border text-center mb-4" style="border-color: #e2e8f0 !important;">
                             <div class="row g-2 fw-bold text-dark">
                                 <div class="col-6 border-end"><small class="text-muted d-block fw-bold tracking-wider mb-1" style="font-size: 10px;">FARINA PER ROUX</small><span id="pub-tz-flour" class="fs-5 text-primary">0 g</span></div>
                                 <div class="col-6"><small class="text-muted d-block fw-bold tracking-wider mb-1" style="font-size: 10px;">LIQUIDI PER ROUX</small><span id="pub-tz-liquid" class="fs-5 text-info">0 g</span></div>
                             </div>
+                        </div>
+
+                        <h6 class="fw-bold mb-2 text-dark text-uppercase tracking-wide" style="font-size: 12px;">🥣 Tang zhong (Roux)</h6>
+                        <p class="text-secondary small lh-base mb-3">
+                            È una tecnica di panificazione famosa in Cina e si prepara unendo in padella farina e acqua oppure latte per un risultato più soffice e saporito, ottenendo quindi un <strong>ROUX</strong>.
+                        </p>
+
+                        <div class="p-3 bg-white border rounded-3 mb-3">
+                            <span class="small text-uppercase fw-bold text-secondary d-block mb-2" style="font-size: 10px;">🧪 Ingredienti Dinamici (Calcolati):</span>
+                            <span class="fw-bold text-dark fs-6">
+                                🥣 <span id="desc-tz-flour" class="text-primary">25g</span> farina + <span id="desc-tz-liquid" class="text-info">125g</span> latte/acqua
+                            </span>
+                        </div>
+
+                        <h6 class="fw-bold mb-2 text-dark small text-uppercase">How-to / Come si prepara:</h6>
+                        <ol class="text-secondary small ps-3 mb-4 lh-lg">
+                            <li>A fuoco spento aggiungi la <strong>farina</strong> in padella.</li>
+                            <li>Versa il <strong>latte/acqua</strong> poco alla volta mescolando per non creare grumi.</li>
+                            <li>Accendi il fuoco e mescola finché ottieni una <strong>crema densa</strong> (roux).</li>
+                            <li>Spegni, fai intiepidire e unisci il <strong>Tang Zhong</strong> all'impasto principale.</li>
+                        </ol>
+
+                        <div class="p-3 bg-light rounded-3 border-0 small text-muted">
+                            <div class="mb-2"><strong class="text-dark">Regola Scientifica:</strong> Tang Zhong = <span id="desc-rule-flour-pct">5%</span> della farina totale e liquidi = <span id="desc-rule-mult">5×</span> la farina del Tang Zhong. Queste quantità vengono sottratte automaticamente da farina e latte della ricetta principale.</div>
+                            <div><strong class="text-dark">Nota tecnica:</strong> Il Tangzhong (conosciuto anche come Water Roux o Yudane) è una tecnica di pre-gelatinizzazione degli amidi. Questo permette all'impasto di trattenere più umidità, rendendo i panini più soffici, elastici e duraturi nel tempo.</div>
+                            <div class="mt-2 text-warning fw-bold">🚨 Nota bene: quando attivi il Tangzhong, le quantità utilizzate per prepararlo non sono incluse direttamente negli ingredienti principali della ricetta a destra, perché vengono sottratte automaticamente per essere cotte a parte.</div>
                         </div>
                     </div>
                 </div>
@@ -358,10 +384,18 @@ document.addEventListener('DOMContentLoaded', function() {
         const isTzActive = tangzhongSelect && tangzhongSelect.value === 'yes';
         let tzFlourQuota = isTzActive ? liveFlourSum * tzFlourPctGlobal : 0;
         let tzLiquidQuota = tzFlourQuota * tzLiquidMultGlobal;
+        
         if (isTzActive && navLiTz) {
             navLiTz.classList.remove('d-none');
+            // Aggiorna i box numerici nel tab
             document.getElementById('pub-tz-flour').textContent = tzFlourQuota.toFixed(1) + ' g';
             document.getElementById('pub-tz-liquid').textContent = tzLiquidQuota.toFixed(1) + ' g';
+            
+            // AGGIORNATO: Sincronizza i grammi calcolati dentro la descrizione e la stringa ingredienti del Roux
+            document.getElementById('desc-tz-flour').textContent = Math.round(tzFlourQuota) + 'g';
+            document.getElementById('desc-tz-liquid').textContent = Math.round(tzLiquidQuota) + 'g';
+            document.getElementById('desc-rule-flour-pct').textContent = (tzFlourPctGlobal * 100) + '%';
+            document.getElementById('desc-rule-mult').textContent = tzLiquidMultGlobal + '×';
         } else if (navLiTz) {
             navLiTz.classList.add('d-none');
         }
