@@ -5,7 +5,6 @@
 
 {% block content %}
 
-<!-- PULSANTI DI AZIONE RAPIDA -->
 <div class="d-flex justify-content-end gap-2 mb-4">
     <a href="{{ url_for('admin.recipes') }}" class="btn btn-outline-secondary fw-semibold">
         ⬅ Torna alla Lista
@@ -17,7 +16,6 @@
 
 <div class="row g-4">
 
-    <!-- 1. PARTE ALTA: INGREDIENTI E NUOVO COMPONENTE (TUTTA LARGHEZZA) -->
     <div class="col-12">
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-header bg-primary text-white fw-bold py-3">
@@ -72,7 +70,6 @@
             </div>
         </div>
 
-        <!-- FORM AGGIUNTA INGREDIENTE -->
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-header bg-dark text-white small fw-bold py-2">
                 ➕ Aggiungi Componente alla Formula
@@ -92,6 +89,7 @@
                         <input type="text" name="unit" class="form-control form-control-sm text-center fw-bold" value="g">
                     </div>
                     <div class="col-md-2">
+                        <label class="form-label small mb-1 fw-bold">Azione</label>
                         <button type="submit" class="btn btn-sm btn-success w-100 fw-bold">Aggiungi</button>
                     </div>
                     <div class="col-12 d-flex gap-4 mt-2 px-2">
@@ -109,15 +107,13 @@
         </div>
     </div>
 
-    <!-- 2. PARTE CENTRALE: PANNELLO DI SIMULAZIONE BILANCIAMENTO -->
     <div class="col-12">
         <div class="card border-0 shadow-sm mb-4 bg-white border border-light">
             <div class="card-header bg-light fw-bold py-3 text-dark d-flex align-items-center gap-2 border-0">
-                <i class="bi bi-sliders text-primary"></i> 🎛 shrink Pannello di Simulazione Bilanciamento
+                <i class="bi bi-sliders text-primary"></i> 🎛️ Pannello di Simulazione Bilanciamento
             </div>
             <div class="card-body p-4 pt-0">
                 <div class="row g-4">
-                    <!-- Configurazione Ridimensionamento -->
                     <div class="col-md-3 border-end">
                         <label class="form-label small fw-bold text-uppercase text-muted mb-2">Scala Impasto</label>
                         <div class="mb-3">
@@ -150,7 +146,6 @@
                         </div>
                     </div>
 
-                    <!-- Configurazione Lievito -->
                     <div class="col-md-3 border-end">
                         <label class="form-label small fw-bold text-uppercase text-muted mb-2">Gestione Lieviti</label>
                         <select id="select-yeast-type" class="form-select form-select-sm fw-semibold mb-3">
@@ -165,7 +160,6 @@
                         </div>
                     </div>
 
-                    <!-- Configurazione Prefermenti -->
                     <div class="col-md-3 border-end">
                         <label class="form-label small fw-bold text-uppercase text-muted mb-2">Prefermentazione</label>
                         <select id="select-preferment" class="form-select form-select-sm fw-semibold">
@@ -175,7 +169,6 @@
                         </select>
                     </div>
 
-                    <!-- Parametri di Processo Interni -->
                     <div class="col-md-3">
                         <label class="form-label small fw-bold text-uppercase text-muted mb-2">Parametri di Processo</label>
                         <div class="row g-2 text-start small">
@@ -190,33 +183,31 @@
         </div>
     </div>
 
-    <!-- 3. PARTE BASSA: COMPONENTI DINAMICHE, TOTALI E PROCEDIMENTO -->
     <div class="col-md-7">
-        <!-- SEZIONE TAB DINAMICI DEL PROCEDIMENTO -->
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-header bg-white pb-0 pt-3 border-0">
                 <ul class="nav nav-tabs card-header-tabs" id="recipeProcessTabs" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active fw-bold small text-uppercase" id="base-tab" data-bs-toggle="tab" data-bs-target="#tab-base" type="button" role="tab">Base / Impasto</button>
+                        <button class="nav-link active fw-bold small text-uppercase" id="base-tab" data-bs-target="#tab-base" type="button" role="tab">Base / Impasto</button>
                     </li>
                     <li class="nav-item d-none" id="tab-li-preferment" role="presentation">
-                        <button class="nav-link fw-bold small text-uppercase text-info" id="pref-tab" data-bs-toggle="tab" data-bs-target="#tab-preferment" type="button" role="tab">🧫 Prefermento</button>
+                        <button class="nav-link fw-bold small text-uppercase text-info" id="pref-tab" data-bs-target="#tab-preferment" type="button" role="tab">🧫 Prefermento</button>
                     </li>
                     <li class="nav-item d-none" id="tab-li-tangzhong" role="presentation">
-                        <button class="nav-link fw-bold small text-uppercase text-warning" id="tz-tab" data-bs-toggle="tab" data-bs-target="#tab-tangzhong" type="button" role="tab">🥣 Tangzhong</button>
+                        <button class="nav-link fw-bold small text-uppercase text-warning" id="tz-tab" data-bs-target="#tab-tangzhong" type="button" role="tab">🥣 Tangzhong</button>
                     </li>
                 </ul>
             </div>
             <div class="card-body p-4 tab-content" id="recipeProcessTabsContent">
-                <!-- Tab Impasto Base -->
+                
                 <div class="tab-pane fade show active" id="tab-base" role="tabpanel">
                     <h5 class="fw-bold mb-3 text-dark">Procedimento Operativo Step-by-Step</h5>
                     <div class="text-dark fs-6 lh-base" style="white-space: pre-line;">
                         {{ recipe.instructions or "Nessun dettaglio operativo inserito." }}
                     </div>
                 </div>
-                <!-- Tab Prefermento Dinamico -->
-                <div class="tab-pane fade" id="tab-preferment" role="tabpanel">
+
+                <div class="tab-pane d-none" id="tab-preferment" role="tabpanel">
                     <div class="alert alert-info border-0 mb-3">
                         <strong>Fase Anticipata:</strong> Da preparare 12-16 ore prima della chiusura finale.
                     </div>
@@ -229,8 +220,8 @@
                     </div>
                     <p class="small text-muted mb-0">Mescolare grossolanamente senza impastare a lungo. Lasciare fermentare alla temperatura controllata prevista dal processo.</p>
                 </div>
-                <!-- Tab Tangzhong Dinamico -->
-                <div class="tab-pane fade" id="tab-tangzhong" role="tabpanel">
+
+                <div class="tab-pane d-none" id="tab-tangzhong" role="tabpanel">
                     <div class="alert alert-warning border-0 mb-3 text-dark">
                         <strong>Water Roux / Tangzhong:</strong> Cuocere i seguenti ingredienti fino a gelificazione (65°C), poi far raffreddare completamente prima di inserire in impasto.
                     </div>
@@ -254,7 +245,6 @@
         </div>
     </div>
 
-    <!-- 4. MONITOR STATISTICHE TOTALI FINALI (POSIZIONATO IN BASSO A DESTRA) -->
     <div class="col-md-5">
         <div class="card bg-white border-0 shadow-sm sticky-top" style="top: 20px;">
             <div class="card-header bg-secondary text-white fw-bold py-3">
@@ -282,7 +272,6 @@
 
 </div>
 
-<!-- ENGINE COMPLETO DI LOGICA DI INTERFACCIA -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const DB_YEAST_RATIO = parseFloat("{{ settings_data.fresh_to_dry_ratio if settings_data and settings_data.fresh_to_dry_ratio else 3.0 }}");
@@ -317,6 +306,54 @@ document.addEventListener('DOMContentLoaded', function() {
     const statHydration = document.getElementById('stat-hydration');
     
     const rows = document.querySelectorAll('.ingredient-row');
+
+    // --- MOTORE DI SCAMBIO TAB ALTERNATIVO CORE ---
+    const allTabButtons = document.querySelectorAll('#recipeProcessTabs button');
+    const allTabPanes = document.querySelectorAll('#recipeProcessTabsContent .tab-pane');
+
+    allTabButtons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const targetSelector = this.getAttribute('data-bs-target');
+            const targetedPane = document.querySelector(targetSelector);
+            
+            if (targetedPane) {
+                // Svuota classi attive dai bottoni e nasconde tutti i pannelli
+                allTabButtons.forEach(b => b.classList.remove('active'));
+                allTabPanes.forEach(p => {
+                    p.classList.remove('show', 'active');
+                    p.classList.add('d-none');
+                });
+                
+                // Attiva l'elemento corrente
+                this.classList.add('active');
+                targetedPane.classList.remove('d-none');
+                // Timeout minimo per far elaborare l'animazione di entrata dissolvenza
+                setTimeout(() => {
+                    targetedPane.classList.add('show', 'active');
+                }, 10);
+            }
+        });
+    });
+
+    function hardcodeSwitchTo(buttonId, paneId) {
+        allTabButtons.forEach(b => b.classList.remove('active'));
+        allTabPanes.forEach(p => {
+            p.classList.remove('show', 'active');
+            p.classList.add('d-none');
+        });
+        
+        const targetBtn = document.getElementById(buttonId);
+        const targetPane = document.getElementById(paneId);
+        if (targetBtn && targetPane) {
+            targetBtn.classList.add('active');
+            targetPane.classList.remove('d-none');
+            targetPane.classList.add('show', 'active');
+        }
+    }
+    // ----------------------------------------------
 
     let baseTotalRecipeWeight = 0;
     rows.forEach(row => { baseTotalRecipeWeight += parseFloat(row.getAttribute('data-base-quantity')) || 0; });
@@ -367,7 +404,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (row.getAttribute('data-is-yeast') === 'true') totalYeastScaled += currentVal;
         });
 
-        // Gestione Visibilità Tab Tangzhong
+        // Gestione Visibilità e attivazione del Tab Tangzhong
         let tzFlourQuota = isTzActive ? totalFlourScaled * DB_TZ_FLOUR_PCT : 0;
         let tzLiquidQuota = tzFlourQuota * DB_TZ_LIQUID_MULT;
         if (isTzActive) {
@@ -376,6 +413,9 @@ document.addEventListener('DOMContentLoaded', function() {
             tzLiquidOutput.textContent = tzLiquidQuota.toFixed(1) + ' g';
         } else {
             tabLiTz.classList.add('d-none');
+            if (document.getElementById('tz-tab').classList.contains('active')) {
+                hardcodeSwitchTo('base-tab', 'tab-base');
+            }
         }
 
         // Gestione Visibilità Tab Prefermento
@@ -397,6 +437,9 @@ document.addEventListener('DOMContentLoaded', function() {
             prefYeastOutput.textContent = prefYeastQuota.toFixed(1) + ' g';
         } else {
             tabLiPref.classList.add('d-none');
+            if (document.getElementById('pref-tab').classList.contains('active')) {
+                hardcodeSwitchTo('base-tab', 'tab-base');
+            }
         }
 
         let liveTotalFlour = 0, liveTotalLiquids = 0;
