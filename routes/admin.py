@@ -25,6 +25,7 @@ from models.feature import RecipeFeature
 from models.parameter import RecipeParameter
 from models.setting import Setting
 from models.wiki import WikiArticle
+from models.ingredient_master import MasterIngredient
 
 
 admin_bp = Blueprint(
@@ -159,20 +160,21 @@ def recipe_new():
         ing_names = request.form.getlist("ing_name[]")
         ing_qtys = request.form.getlist("ing_qty[]")
         ing_units = request.form.getlist("ing_unit[]")
-        ing_is_flour = request.form.getlist("ing_is_flour[]")
-        ing_is_liquid = request.form.getlist("ing_is_liquid[]")
 
         for i in range(len(ing_names)):
             if not ing_names[i].strip():
                 continue
+
+            is_flour_checked = request.form.get(f"ing_is_flour_{i}") == "true"
+            is_liquid_checked = request.form.get(f"ing_is_liquid_{i}") == "true"
 
             ingredient = RecipeIngredient(
                 recipe_id=recipe.id,
                 name=ing_names[i],
                 quantity=float(ing_qtys[i]) if ing_qtys[i] else 0.0,
                 unit=ing_units[i],
-                is_flour=ing_is_flour[i] == "true",
-                is_liquid=ing_is_liquid[i] == "true",
+                is_flour=is_flour_checked,
+                is_liquid=is_liquid_checked,
                 sort_order=i
             )
             db.session.add(ingredient)
@@ -215,15 +217,12 @@ def recipe_detail(id):
         RecipeParameter.sort_order
     ).all()
 
-    settings_data = Setting.query.first()
-
     return render_template(
         "admin/recipe_detail.html",
         recipe=recipe,
         ingredients=ingredients,
         feature=feature,
-        parameters=parameters,
-        settings_data=settings_data
+        parameters=parameters
     )
 
 
@@ -330,7 +329,6 @@ def recipe_edit(id):
         recipe.instructions = request.form["instructions"]
         recipe.is_published = "is_published" in request.form
 
-        # Allineamento dei parametri di processo avanzati in modifica
         recipe.temp_chiusura = float(request.form.get("temp_chiusura", 24.0)) if request.form.get("temp_chiusura") else 24.0
         recipe.tempo_autolisi = int(request.form.get("tempo_autolisi", 0)) if request.form.get("tempo_autolisi") else 0
         recipe.tempo_puntata = int(request.form.get("tempo_puntata", 0)) if request.form.get("tempo_puntata") else 0
@@ -338,7 +336,6 @@ def recipe_edit(id):
 
         pref_type = request.form.get("preferment_type", "none")
 
-        # Allineamento degli interruttori di calcolo in modifica
         feature.enable_piece_count = "enable_piece_count" in request.form
         feature.enable_piece_weight = "enable_piece_count" in request.form
         feature.enable_yeast_type = "enable_yeast_type" in request.form
@@ -351,20 +348,21 @@ def recipe_edit(id):
         ing_names = request.form.getlist("ing_name[]")
         ing_qtys = request.form.getlist("ing_qty[]")
         ing_units = request.form.getlist("ing_unit[]")
-        ing_is_flour = request.form.getlist("ing_is_flour[]")
-        ing_is_liquid = request.form.getlist("ing_is_liquid[]")
 
         for i in range(len(ing_names)):
             if not ing_names[i].strip():
                 continue
+
+            is_flour_checked = request.form.get(f"ing_is_flour_{i}") == "true"
+            is_liquid_checked = request.form.get(f"ing_is_liquid_{i}") == "true"
 
             ingredient = RecipeIngredient(
                 recipe_id=recipe.id,
                 name=ing_names[i],
                 quantity=float(ing_qtys[i]) if ing_qtys[i] else 0.0,
                 unit=ing_units[i],
-                is_flour=ing_is_flour[i] == "true",
-                is_liquid=ing_is_liquid[i] == "true",
+                is_flour=is_flour_checked,
+                is_liquid=is_liquid_checked,
                 sort_order=i
             )
             db.session.add(ingredient)
@@ -457,4 +455,79 @@ def wiki_delete(id):
 
     return redirect(
         url_for("admin.wiki_list")
+    )
+
+
+# --- ROTTE NUOVE AGGIUNTE: GESTIONE ANAGRAFICA CENTRALIZZATA INGREDIENTI LATO PYTHON ---
+
+@admin_bp.route("/ingredients/master", methods=["GET"])
+@login_required
+def master_ingredients_view():
+    return render_template("admin/ingredients_master.html")
+
+
+@admin_bp.route("/ingredients/master/add", methods=["POST"])
+@login_required
+def master_ingredient_add():
+    name = request.form.get("name", "").strip()
+    if name:
+        existing = MasterIngredient.query.filter_by(name=name).first()
+        if not existing:
+            new_ing = MasterIngredient(
+                name=name,
+                is_flour="is_flour" in request.form,
+                is_liquid="is_liquid" in request.form
+            )
+            db.session.add(new_ing)
+            db.session.commit()
+            flash(f"'{name}' aggiunto all'anagrafica di base!", "success")
+        else:
+            flash("Questo ingrediente esiste già nel database", "warning")
+    return redirect(url_for("admin.master_ingredients_view"))
+
+
+@admin_bp.route("/ingredients/master/delete/<int:id>", methods=["GET"])
+@login_required
+def master_ingredient_delete(id):
+    ing = MasterIngredient.query.get_or_404(id)
+    name = ing.name
+    db.session.delete(ing)
+    db.session.commit()
+    flash(f"'{name}' rimosso dall'anagrafica del database", "warning")
+    return redirect(url_for("admin.master_ingredients_view"))
+
+
+@admin_bp.route("/settings/yeast", methods=["GET", "POST"])
+@login_required
+def settings_yeast():
+
+    setting = Setting.query.first()
+
+    if request.method == "POST":
+
+        try:
+
+            ratio_value = float(request.form.get("fresh_to_dry_ratio", 3.0))
+            setting.fresh_to_dry_ratio = ratio_value
+            db.session.commit()
+
+            flash(
+                "Coefficiente di conversione lieviti aggiornato correttamente!",
+                "success"
+            )
+
+        except ValueError:
+
+            flash(
+                "Errore: Inserisci un valore numerico valido (es. 3.0)",
+                "danger"
+            )
+
+        return redirect(
+            url_for("admin.settings_yeast")
+        )
+
+    return render_template(
+        "admin/settings_yeast.html",
+        setting=setting
     )

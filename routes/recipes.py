@@ -5,8 +5,7 @@ from flask import (
 
 from models.recipe import Recipe
 from models.ingredient import RecipeIngredient
-from models.setting import Setting
-from models.feature import RecipeFeature  # <-- AGGIUNTO L'IMPORT DELLA FEATURE!
+from models.feature import RecipeFeature
 
 
 recipes_bp = Blueprint(
@@ -39,9 +38,8 @@ def public_detail(slug):
         recipe_id=recipe.id
     ).all()
 
-    settings_data = Setting.query.first()
+    # Rimosso il vecchio Setting.query.first(), ora ci pensa l'app_context globale!
 
-    # AGGIUNTO: Carichiamo la feature specifica di questa ricetta
     feature = RecipeFeature.query.filter_by(
         recipe_id=recipe.id
     ).first()
@@ -50,6 +48,5 @@ def public_detail(slug):
         "recipe_public_detail.html",
         recipe=recipe,
         ingredients=ingredients,
-        settings_data=settings_data,
-        feature=feature  # <-- PASSIAMO LA FEATURE AL TEMPLATE PUBBLICO!
+        feature=feature
     )

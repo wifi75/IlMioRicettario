@@ -40,6 +40,31 @@ class Recipe(db.Model):
         default=True
     )
 
+    # --- NUOVI CAMPI PARAMETRI DI PROCESSO AVANZATI ---
+    temp_chiusura = db.Column(
+        db.Float,
+        nullable=True,
+        default=24.0
+    )
+
+    tempo_autolisi = db.Column(
+        db.Integer,
+        nullable=True,
+        default=0
+    )
+
+    tempo_puntata = db.Column(
+        db.Integer,
+        nullable=True,
+        default=120
+    )
+
+    tempo_appretto = db.Column(
+        db.Integer,
+        nullable=True,
+        default=60
+    )
+
     created_at = db.Column(
         db.DateTime,
         default=datetime.utcnow
@@ -66,8 +91,10 @@ class Recipe(db.Model):
         lazy=True
     )
 
+
     def ingredient_count(self):
         return len(self.ingredients)
+
 
     def total_flour(self):
 
@@ -77,6 +104,7 @@ class Recipe(db.Model):
             if ingredient.is_flour
         )
 
+
     def total_liquids(self):
 
         return sum(
@@ -84,6 +112,7 @@ class Recipe(db.Model):
             for ingredient in self.ingredients
             if ingredient.is_liquid
         )
+
 
     def hydration(self):
 
@@ -96,6 +125,7 @@ class Recipe(db.Model):
             (self.total_liquids() / flour) * 100,
             1
         )
+
 
     def __repr__(self):
         return f"<Recipe {self.name}>"

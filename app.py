@@ -15,9 +15,11 @@ from models.feature import RecipeFeature
 from models.setting import Setting
 from models.wiki import WikiArticle
 from models.parameter import RecipeParameter
+from models.ingredient_master import MasterIngredient
 
-from routes.admin import admin_bp
+# CORREZIONE: Mancavano le importazioni dei blueprint delle rotte!
 from routes.recipes import recipes_bp
+from routes.admin import admin_bp
 
 
 app = Flask(__name__)
@@ -27,7 +29,7 @@ app.config.from_object(Config)
 db.init_app(app)
 login_manager.init_app(app)
 
-# Registrazione pulita dei due motori di rotte
+# Registrazione dei motori di rotte
 app.register_blueprint(recipes_bp)
 app.register_blueprint(admin_bp)
 
@@ -40,9 +42,17 @@ def load_user(user_id):
     )
 
 
+# PROCESSORE DI CONTESTO GLOBALE PULITO
+@app.context_processor
+def inject_global_settings():
+    # Rimosso master_ingredients_list da qui per eliminare il loop e la pagina bianca
+    return dict(
+        settings_data=Setting.query.first()
+    )
+
+
 @app.route("/")
 def index():
-    # Forza il reindirizzamento alla lista ricette pubblica del frontend
     return redirect(
         url_for("recipes.list_recipes")
     )
@@ -72,6 +82,29 @@ with app.app_context():
         print("Admin creato")
         print("Username: admin")
         print("Password: admin123")
+
+    # Iniezione record di partenza nell'anagrafica
+    if MasterIngredient.query.count() == 0:
+
+        default_ingredients = [
+            MasterIngredient(name="Farina Tipo 0", is_flour=True, is_liquid=False),
+            MasterIngredient(name="Farina Tipo 00", is_flour=True, is_liquid=False),
+            MasterIngredient(name="Farina Manitoba", is_flour=True, is_liquid=False),
+            MasterIngredient(name="Semola Rimacinata", is_flour=True, is_liquid=False),
+            MasterIngredient(name="Acqua", is_flour=False, is_liquid=True),
+            MasterIngredient(name="Latte Intero", is_flour=False, is_liquid=True),
+            MasterIngredient(name="Lievito di Birra Fresco", is_flour=False, is_liquid=False),
+            MasterIngredient(name="Lievito di Birra Secco", is_flour=False, is_liquid=False),
+            MasterIngredient(name="Sale Marino", is_flour=False, is_liquid=False),
+            MasterIngredient(name="Olio EVO", is_flour=False, is_liquid=False),
+            MasterIngredient(name="Burro", is_flour=False, is_liquid=False),
+            MasterIngredient(name="Zucchero", is_flour=False, is_liquid=False),
+            MasterIngredient(name="Malto Diastatico", is_flour=False, is_liquid=False)
+        ]
+
+        db.session.bulk_save_objects(default_ingredients)
+        db.session.commit()
+        print("Anagrafica ingredienti master pre-popolata con successo!")
 
     setting = Setting.query.first()
 

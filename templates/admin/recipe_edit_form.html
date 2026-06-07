@@ -1,115 +1,41 @@
 {% extends "base.html" %}
 
 {% block title %}Modifica Ricetta{% endblock %}
+{% block page_title %}Modifica Formula: {{ recipe.name }}{% endblock %}
 
 {% block content %}
 
-<div class="card mb-4">
-    <div class="card-body">
-        <h2 class="fw-bold mb-0">Modifica Ricetta Avanzata: {{ recipe.name }}</h2>
-    </div>
+<datalist id="global-master-ingredients">
+    {% if master_ingredients_list %}
+        {% for master_ing in master_ingredients_list %}
+        <option value="{{ master_ing.name }}" 
+                data-flour="{{ 'true' if master_ing.is_flour else 'false' }}" 
+                data-liquid="{{ 'true' if master_ing.is_liquid else 'false' }}">
+        {% endfor %}
+    {% endif %}
+</datalist>
+
+<div class="d-flex justify-content-end gap-2 mb-4">
+    <a href="{{ url_for('admin.recipe_detail', id=recipe.id) }}" class="btn btn-outline-secondary fw-semibold">
+        ⬅ Annulla e Torna al Dettaglio
+    </a>
 </div>
 
 <form method="post" id="main-recipe-form">
 
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header bg-dark text-white fw-bold py-3">
-            Premesse e Informazioni Generali
-        </div>
-        <div class="card-body p-4">
-            <div class="mb-3">
-                <label class="form-label fw-bold">Nome</label>
-                <input type="text" 
-                       name="name" 
-                       id="recipe-name" 
-                       class="form-control" 
-                       value="{{ recipe.name }}"
-                       placeholder="es. Pan Brioche Giapponese" 
-                       required>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label fw-bold">Slug</label>
-                <input type="text" 
-                       name="slug" 
-                       id="recipe-slug" 
-                       class="form-control" 
-                       value="{{ recipe.slug }}"
-                       placeholder="es. pan-brioche-giapponese" 
-                       required>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label fw-bold">Descrizione</label>
-                <textarea name="description" 
-                          class="form-control" 
-                          placeholder="Breve introduzione alla ricetta...">{{ recipe.description }}</textarea>
-            </div>
-        </div>
-    </div>
-
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-header bg-warning text-dark fw-bold py-3">
-            ⚙️ Configurazione Funzionalità Calcolatore (Visibilità Frontend)
-        </div>
-        <div class="card-body p-4">
-            <div class="row g-4">
-                <div class="col-md-3 border-end">
-                    <label class="form-label fw-bold d-block mb-3">Visibilità</label>
-                    <div class="form-check form-switch fs-5">
-                        <input class="form-check-input" type="checkbox" name="is_published" id="is_published" {% if recipe.is_published %}checked{% endif %}>
-                        <label class="form-check-label fs-6" for="is_published">Rendi pubblica</label>
-                    </div>
-                </div>
-
-                <div class="col-md-3 border-end">
-                    <label class="form-label fw-bold d-block mb-3">Calcolo Pezzatura</label>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" name="enable_piece_count" id="enable_piece_count" {% if feature.enable_piece_count %}checked{% endif %}>
-                        <label class="form-check-label fw-semibold" for="enable_piece_count">Abilita Pezzi e Peso per Pezzo</label>
-                    </div>
-                </div>
-
-                <div class="col-md-3 border-end">
-                    <label class="form-label fw-bold d-block mb-3">Gestione Lieviti</label>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" name="enable_yeast_type" id="enable_yeast_type" {% if feature.enable_yeast_type %}checked{% endif %}>
-                        <label class="form-check-label fw-semibold" for="enable_yeast_type">Abilita Menu scelta tipo lievito</label>
-                    </div>
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label fw-bold d-block mb-3">Water Roux / Tangzhong</label>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" name="enable_tangzhong" id="enable_tangzhong" {% if feature.enable_tangzhong %}checked{% endif %}>
-                        <label class="form-check-label fw-semibold" for="enable_tangzhong">Abilita opzione Tangzhong</label>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-header bg-info text-dark fw-bold py-3">
-            🌡️ Parametri di Impasto e Temperature di Controllo
+            📝 Scheda Anagrafica ed Identificativi
         </div>
         <div class="card-body p-4">
             <div class="row g-3">
-                <div class="col-md-3">
-                    <label class="form-label small fw-bold">Temp. Chiusura Ottimale (°C)</label>
-                    <input type="number" name="temp_chiusura" class="form-control" value="{{ recipe.temp_chiusura or 24.0 }}" step="0.5">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small text-secondary text-uppercase">Nome Formula</label>
+                    <input type="text" name="name" id="recipe-name" class="form-control" value="{{ recipe.name }}" placeholder="es. Pala Romana Special" required>
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label small fw-bold">Tempo Autolisi (min)</label>
-                    <input type="number" name="tempo_autolisi" class="form-control" value="{{ recipe.tempo_autolisi or 0 }}">
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label small fw-bold">Tempo Prima Lievitazione / Puntata (min)</label>
-                    <input type="number" name="tempo_puntata" class="form-control" value="{{ recipe.tempo_puntata or 120 }}">
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label small fw-bold">Tempo Seconda Lievitazione / Appretto (min)</label>
-                    <input type="number" name="tempo_appretto" class="form-control" value="{{ recipe.tempo_appretto or 60 }}">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small text-secondary text-uppercase">Slug Web (Autogenerato)</label>
+                    <input type="text" name="slug" id="recipe-slug" class="form-control bg-light" value="{{ recipe.slug }}" placeholder="es. pala-romana-special" required>
                 </div>
             </div>
         </div>
@@ -117,37 +43,37 @@
 
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header bg-primary text-white fw-bold py-3 d-flex justify-content-between align-items-center">
-            <span>Ingredienti Bilanciati (Base 100%)</span>
-            <button type="button" class="btn btn-sm btn-light fw-bold" id="btn-add-ingredient">➕ Aggiungi Ingrediente</button>
+            <span>📋 Bilanciamento Ingredienti Base (Su 100% Farina)</span>
+            <button type="button" class="btn btn-sm btn-light fw-bold text-primary" id="btn-add-ingredient">➕ Inserisci Riga</button>
         </div>
-        <div class="card-body p-4">
+        <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-borderless align-middle" id="ingredients-table">
-                    <thead>
-                        <tr class="border-bottom text-muted" style="font-size: 14px;">
-                            <th style="width: 45%;">Nome</th>
-                            <th style="width: 20%;">Peso Base</th>
-                            <th style="width: 15%;">Unità</th>
-                            <th style="width: 10%; text-align: center;">Farina?</th>
-                            <th style="width: 10%; text-align: center;">Liquido?</th>
-                            <th style="width: 5%;"></th>
+                <table class="table table-hover align-middle mb-0" id="ingredients-table">
+                    <thead class="table-light">
+                        <tr class="small text-secondary" style="font-size: 13px;">
+                            <th class="ps-4" style="width: 40%;">Materia Prima (Cerca o Sfoglia)</th>
+                            <th class="text-end" style="width: 20%;">Peso Base</th>
+                            <th class="text-center" style="width: 15%;">Unità</th>
+                            <th class="text-center" style="width: 10%;">Farina</th>
+                            <th class="text-center" style="width: 10%;">Liquido</th>
+                            <th class="text-center" style="width: 5%;"></th>
                         </tr>
                     </thead>
                     <tbody id="ingredients-container">
                         {% if ingredients %}
                             {% for ing in ingredients %}
-                            <tr class="ingredient-row border-bottom py-2">
-                                <td>
-                                    <input type="text" name="ing_name[]" class="form-control form-control-sm" value="{{ ing.name }}" required>
+                            <tr class="ingredient-row border-bottom">
+                                <td class="ps-4">
+                                    <input type="text" name="ing_name[]" class="form-control form-control-sm fw-semibold input-autocomplete-trigger" list="global-master-ingredients" value="{{ ing.name }}" placeholder="Cerca ingrediente..." required>
                                 </td>
                                 <td>
                                     <input type="number" name="ing_qty[]" class="form-control form-control-sm text-end fw-bold text-primary" value="{{ ing.quantity }}" step="0.1" required>
                                 </td>
                                 <td>
-                                    <select name="ing_unit[]" class="form-select form-select-sm">
+                                    <select name="ing_unit[]" class="form-select form-select-sm text-center fw-medium">
                                         <option value="g" {% if ing.unit == 'g' %}selected{% endif %}>g</option>
                                         <option value="kg" {% if ing.unit == 'kg' %}selected{% endif %}>kg</option>
-                                        <option value="%" {% if ing.unit == '%' %}selected{% endif %}>%</option>
+                                        <option value="% Orientativo" {% if ing.unit == '%' %}selected{% endif %}>%</option>
                                     </select>
                                 </td>
                                 <td class="text-center">
@@ -158,38 +84,11 @@
                                     <input type="checkbox" class="form-check-input input-is-liquid" {% if ing.is_liquid %}checked{% endif %}>
                                     <input type="hidden" name="ing_is_liquid[]" value="{{ 'true' if ing.is_liquid else 'false' }}">
                                 </td>
-                                <td>
-                                    <button type="button" class="btn btn-sm btn-outline-danger btn-remove-row">🗑️</button>
+                                <td class="text-center pe-3">
+                                    <button type="button" class="btn btn-sm btn-link text-danger p-0 btn-remove-row"><i class="bi bi-trash fs-5"></i></button>
                                 </td>
                             </tr>
                             {% endfor %}
-                        {% else %}
-                            <tr class="ingredient-row border-bottom py-2">
-                                <td>
-                                    <input type="text" name="ing_name[]" class="form-control form-control-sm" placeholder="es. Farina" required>
-                                </td>
-                                <td>
-                                    <input type="number" name="ing_qty[]" class="form-control form-control-sm text-end fw-bold text-primary" placeholder="0" step="0.1" required>
-                                </td>
-                                <td>
-                                    <select name="ing_unit[]" class="form-select form-select-sm">
-                                        <option value="g" selected>g</option>
-                                        <option value="kg">kg</option>
-                                        <option value="%">%</option>
-                                    </select>
-                                </td>
-                                <td class="text-center">
-                                    <input type="checkbox" class="form-check-input input-is-flour" checked>
-                                    <input type="hidden" name="ing_is_flour[]" value="true">
-                                </td>
-                                <td class="text-center">
-                                    <input type="checkbox" class="form-check-input input-is-liquid">
-                                    <input type="hidden" name="ing_is_liquid[]" value="false">
-                                </td>
-                                <td>
-                                    <button type="button" class="btn btn-sm btn-outline-danger btn-remove-row">🗑️</button>
-                                </td>
-                            </tr>
                         {% endif %}
                     </tbody>
                 </table>
@@ -198,96 +97,208 @@
     </div>
 
     <div class="card shadow-sm border-0 mb-4">
-        <div class="card-header bg-dark text-white fw-bold py-3">
-            Procedimento e Note di Impasto
+        <div class="card-header bg-warning text-dark fw-bold py-3">
+            🎛️ Parametri di Configurazione Tecnica e Feature Toggles
         </div>
         <div class="card-body p-4">
-            <textarea name="instructions" 
-                      class="form-control" 
-                      rows="8" 
-                      placeholder="Inserisci i passaggi dettagliati..."
-                      required>{{ recipe.instructions }}</textarea>
+            <div class="row g-4">
+                <div class="col-md-3 border-end">
+                    <label class="form-label small fw-bold text-uppercase text-muted mb-3">Visibilità e Stato</label>
+                    <div class="form-check form-switch mb-2 shadow-none">
+                        <input class="form-check-input" type="checkbox" name="is_published" id="is_published" {% if recipe.is_published %}checked{% endif %}>
+                        <label class="form-check-label small fw-bold" for="is_published">Pubblica sul Frontend</label>
+                    </div>
+                </div>
+
+                <div class="col-md-3 border-end">
+                    <label class="form-label small fw-bold text-uppercase text-muted mb-3">Geometria e Pezzature</label>
+                    <div class="form-check form-switch mb-2 shadow-none">
+                        <input class="form-check-input" type="checkbox" name="enable_piece_count" id="enable_piece_count" {% if feature.enable_piece_count %}checked{% endif %}>
+                        <label class="form-check-label small fw-bold" for="enable_piece_count">Abilita Input N. Pezzi / Peso</label>
+                    </div>
+                </div>
+
+                <div class="col-md-3 border-end">
+                    <label class="form-label small fw-bold text-uppercase text-muted mb-3">Opzioni Calcolatore Scientifico</label>
+                    <div class="form-check form-switch mb-2 shadow-none">
+                        <input class="form-check-input" type="checkbox" name="enable_yeast_type" id="enable_yeast_type" {% if feature.enable_yeast_type %}checked{% endif %}>
+                        <label class="form-check-label small fw-bold" for="enable_yeast_type">Abilita Menu Tipo Lievito</label>
+                    </div>
+                    <div class="form-check form-switch shadow-none">
+                        <input class="form-check-input" type="checkbox" name="enable_tangzhong" id="enable_tangzhong" {% if feature.enable_tangzhong %}checked{% endif %}>
+                        <label class="form-check-label small fw-bold" for="enable_tangzhong">Abilita Opzione Tangzhong</label>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-uppercase text-muted mb-2">Schema Fermentativo Sottoscritto</label>
+                    <select name="preferment_type" class="form-select form-select-sm fw-semibold">
+                        <option value="none" {% if not feature.enable_biga and not feature.enable_poolish %}selected{% endif %}>Impasto Diretto</option>
+                        <option value="poolish" {% if feature.enable_poolish %}selected{% endif %}>Poolish (100% Idratazione)</option>
+                        <option value="biga" {% if feature.enable_biga %}selected{% endif %}>Biga Standard (44% Idratazione)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-info text-dark fw-bold py-3">
+            🌡️ Parametri Fisici e Tempi di Processo Forzati
+        </div>
+        <div class="card-body p-4">
+            <div class="row g-3 text-center">
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-secondary">Temp. Chiusura Ottimale (°C)</label>
+                    <input type="number" name="temp_chiusura" class="form-control text-center fw-bold text-danger" value="{{ recipe.temp_chiusura or 24.0 }}" step="0.5">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-secondary">Tempo Autolisi (min)</label>
+                    <input type="number" name="tempo_autolisi" class="form-control text-center fw-bold" value="{{ recipe.tempo_autolisi or 0 }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-secondary">Puntata / Prima Liev. (min)</label>
+                    <input type="number" name="tempo_puntata" class="form-control text-center fw-bold" value="{{ recipe.tempo_puntata or 120 }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-secondary">Appretto / Seconda Liev. (min)</label>
+                    <input type="number" name="tempo_appretto" class="form-control text-center fw-bold" value="{{ recipe.tempo_appretto or 60 }}">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-dark text-white fw-bold py-3">
+            📖 Descrizione Breve della Formula
+        </div>
+        <div class="card-body p-3">
+            <textarea name="description" class="form-control" rows="3" placeholder="Breve introduzione commerciale o tecnica alla ricetta...">{{ recipe.description }}</textarea>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-dark text-white fw-bold py-3">
+            📝 Istruzioni di Impasto e Procedimento Completo
+        </div>
+        <div class="card-body p-3">
+            <textarea name="instructions" class="form-control text-dark lh-base" rows="8" placeholder="Inserisci i passaggi dettagliati per la chiusura dell'impasto..." required>{{ recipe.instructions }}</textarea>
         </div>
     </div>
 
     <div class="d-flex justify-content-between mb-5">
-        <a href="/admin/recipes" class="btn btn-outline-secondary px-4">Annulla</a>
-        <button type="submit" class="btn btn-primary px-5 fw-bold">Aggiorna Formula Salva</button>
+        <a href="{{ url_for('admin.recipe_detail', id=recipe.id) }}" class="btn btn-outline-secondary px-4 fw-semibold">Annulla</a>
+        <button type="submit" class="btn btn-primary px-5 fw-bold shadow-sm">💾 Aggiorna e Salva Formula</button>
     </div>
 
 </form>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Generazione automatica dello slug in tempo reale
-    document.getElementById('recipe-name').addEventListener('input', function() {
-        const slug = this.value.toLowerCase()
-            .replace(/[^a-z0-9\s-]/g, '')
-            .replace(/\s+/g, '-')
-            .replace(/-+/g, '-');
-        document.getElementById('recipe-slug').value = slug;
-    });
-
-    // Iniezione nuove righe ingredienti
-    const container = document.getElementById('ingredients-container');
-    document.getElementById('btn-add-ingredient').addEventListener('click', function() {
-        const newRow = document.createElement('tr');
-        newRow.className = 'ingredient-row border-bottom py-2';
-        newRow.innerHTML = `
-            <td>
-                <input type="text" name="ing_name[]" class="form-control form-control-sm" placeholder="Nome ingrediente" required>
-            </td>
-            <td>
-                <input type="number" name="ing_qty[]" class="form-control form-control-sm text-end fw-bold text-primary" placeholder="0" step="0.1" required>
-            </td>
-            <td>
-                <select name="ing_unit[]" class="form-select form-select-sm">
-                    <option value="g" selected>g</option>
-                    <option value="kg">kg</option>
-                    <option value="%">%</option>
-                </select>
-            </td>
-            <td class="text-center">
-                <input type="checkbox" class="form-check-input input-is-flour">
-                <input type="hidden" name="ing_is_flour[]" value="false">
-            </td>
-            <td class="text-center">
-                <input type="checkbox" class="form-check-input input-is-liquid">
-                <input type="hidden" name="ing_is_liquid[]" value="false">
-            </td>
-            <td>
-                <button type="button" class="btn btn-sm btn-outline-danger btn-remove-row">🗑️</button>
-            </td>
-        `;
-        container.appendChild(newRow);
-        bindRowEvents(newRow);
-    });
-
-    // Sincronizzazione controlli booleani per Flask
-    function bindRowEvents(row) {
-        row.querySelector('.btn-remove-row').addEventListener('click', function() {
-            row.remove();
+    const nameInput = document.getElementById('recipe-name');
+    if (nameInput) {
+        nameInput.addEventListener('input', function() {
+            const slug = this.value.toLowerCase()
+                .replace(/[^a-z0-9\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-');
+            document.getElementById('recipe-slug').value = slug;
         });
+    }
 
+    const container = document.getElementById('ingredients-container');
+    const btnAdd = document.getElementById('btn-add-ingredient');
+
+    if (btnAdd && container) {
+        btnAdd.addEventListener('click', function() {
+            const newRow = document.createElement('tr');
+            newRow.className = 'ingredient-row border-bottom';
+            newRow.innerHTML = `
+                <td class="ps-4">
+                    <input type="text" name="ing_name[]" class="form-control form-control-sm fw-semibold input-autocomplete-trigger" list="global-master-ingredients" placeholder="Cerca ingrediente..." required>
+                </td>
+                <td>
+                    <input type="number" name="ing_qty[]" class="form-control form-control-sm text-end fw-bold text-primary" placeholder="0" step="0.1" required>
+                </td>
+                <td>
+                    <select name="ing_unit[]" class="form-select form-select-sm text-center fw-medium">
+                        <option value="g" selected>g</option>
+                        <option value="kg">kg</option>
+                        <option value="%">%</option>
+                    </select>
+                </td>
+                <td class="text-center">
+                    <input type="checkbox" class="form-check-input input-is-flour">
+                    <input type="hidden" name="ing_is_flour[]" value="false">
+                </td>
+                <td class="text-center">
+                    <input type="checkbox" class="form-check-input input-is-liquid">
+                    <input type="hidden" name="ing_is_liquid[]" value="false">
+                </td>
+                <td class="text-center pe-3">
+                    <button type="button" class="btn btn-sm btn-link text-danger p-0 btn-remove-row"><i class="bi bi-trash fs-5"></i></button>
+                </td>
+            `;
+            container.appendChild(newRow);
+            bindRowEvents(newRow);
+        });
+    }
+
+    function bindRowEvents(row) {
+        const nameField = row.querySelector('.input-autocomplete-trigger');
         const flourCheck = row.querySelector('.input-is-flour');
         const flourHidden = row.querySelector('input[name="ing_is_flour[]"]');
-        flourCheck.addEventListener('change', function() {
-            flourHidden.value = this.checked ? "true" : "false";
-            if(this.checked) {
-                row.querySelector('.input-is-liquid').checked = false;
-                row.querySelector('input[name="ing_is_liquid[]"]').value = "false";
-            }
-        });
-
         const liquidCheck = row.querySelector('.input-is-liquid');
         const liquidHidden = row.querySelector('input[name="ing_is_liquid[]"]');
-        liquidCheck.addEventListener('change', function() {
-            liquidHidden.value = this.checked ? "true" : "false";
-            if(this.checked) {
-                row.querySelector('.input-is-flour').checked = false;
-                row.querySelector('input[name="ing_is_flour[]"]').value = "false";
-            }
-        });
+        const datalist = document.getElementById('global-master-ingredients');
+
+        if (nameField) {
+            nameField.addEventListener('input', function() {
+                const val = this.value;
+                if (!datalist) return;
+                
+                const options = datalist.querySelectorAll('option');
+                options.forEach(opt => {
+                    if (opt.value.toLowerCase() === val.trim().toLowerCase()) {
+                        const isFlour = opt.getAttribute('data-flour') === 'true';
+                        const isLiquid = opt.getAttribute('data-liquid') === 'true';
+                        
+                        flourCheck.checked = isFlour;
+                        flourHidden.value = isFlour ? "true" : "false";
+                        
+                        liquidCheck.checked = isLiquid;
+                        liquidHidden.value = isLiquid ? "true" : "false";
+                    }
+                });
+            });
+        }
+
+        const removeBtn = row.querySelector('.btn-remove-row');
+        if (removeBtn) {
+            removeBtn.addEventListener('click', function() {
+                row.remove();
+            });
+        }
+
+        if (flourCheck && flourHidden) {
+            flourCheck.addEventListener('change', function() {
+                flourHidden.value = this.checked ? "true" : "false";
+                if (this.checked && liquidCheck && liquidHidden) {
+                    liquidCheck.checked = false;
+                    liquidHidden.value = "false";
+                }
+            });
+        }
+
+        if (liquidCheck && liquidHidden) {
+            liquidCheck.addEventListener('change', function() {
+                liquidHidden.value = this.checked ? "true" : "false";
+                if (this.checked && flourCheck && flourHidden) {
+                    flourCheck.checked = false;
+                    flourHidden.value = "false";
+                }
+            });
+        }
     }
 
     document.querySelectorAll('.ingredient-row').forEach(row => bindRowEvents(row));
