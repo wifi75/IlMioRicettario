@@ -26,6 +26,12 @@ class MasterIngredient(db.Model):
         default=False
     )
 
+    w_value = db.Column(
+        db.Integer,
+        nullable=True,
+        default=0
+    )
+
 
     def __repr__(self):
         return f"<MasterIngredient {self.name}>"

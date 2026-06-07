@@ -148,7 +148,7 @@ def recipe_new():
         feature = RecipeFeature(
             recipe_id=recipe.id,
             enable_piece_count="enable_piece_count" in request.form,
-            enable_piece_weight="enable_piece_count" in request.form,
+            enable_piece_weight="enable_piece_weight" in request.form,
             enable_yeast_type="enable_yeast_type" in request.form,
             enable_tangzhong="enable_tangzhong" in request.form,
             enable_poolish=pref_type == "poolish",
@@ -187,11 +187,13 @@ def recipe_new():
         )
 
         return redirect(
-                url_for("admin.recipes")
+            url_for("admin.recipes")
         )
 
+    master_ingredients = MasterIngredient.query.order_by(MasterIngredient.name).all()
     return render_template(
-        "admin/recipe_form.html"
+        "admin/recipe_form.html",
+        master_ingredients_list=master_ingredients
     )
 
 
@@ -337,7 +339,7 @@ def recipe_edit(id):
         pref_type = request.form.get("preferment_type", "none")
 
         feature.enable_piece_count = "enable_piece_count" in request.form
-        feature.enable_piece_weight = "enable_piece_count" in request.form
+        feature.enable_piece_weight = "enable_piece_weight" in request.form
         feature.enable_yeast_type = "enable_yeast_type" in request.form
         feature.enable_tangzhong = "enable_tangzhong" in request.form
         feature.enable_poolish = pref_type == "poolish"
@@ -384,11 +386,14 @@ def recipe_edit(id):
         RecipeIngredient.sort_order
     ).all()
 
+    master_ingredients = MasterIngredient.query.order_by(MasterIngredient.name).all()
+
     return render_template(
         "admin/recipe_edit_form.html",
         recipe=recipe,
         feature=feature,
-        ingredients=ingredients
+        ingredients=ingredients,
+        master_ingredients_list=master_ingredients
     )
 
 
@@ -458,12 +463,14 @@ def wiki_delete(id):
     )
 
 
-# --- ROTTE NUOVE AGGIUNTE: GESTIONE ANAGRAFICA CENTRALIZZATA INGREDIENTI LATO PYTHON ---
-
 @admin_bp.route("/ingredients/master", methods=["GET"])
 @login_required
 def master_ingredients_view():
-    return render_template("admin/ingredients_master.html")
+    master_ingredients = MasterIngredient.query.order_by(MasterIngredient.name).all()
+    return render_template(
+        "admin/ingredients_master.html",
+        master_ingredients_list=master_ingredients
+    )
 
 
 @admin_bp.route("/ingredients/master/add", methods=["POST"])

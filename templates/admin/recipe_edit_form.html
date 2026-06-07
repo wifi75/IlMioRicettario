@@ -10,7 +10,7 @@
         {% for master_ing in master_ingredients_list %}
         <option value="{{ master_ing.name }}" 
                 data-flour="{{ 'true' if master_ing.is_flour else 'false' }}" 
-                data-liquid="{{ 'true' if master_ing.is_liquid else 'false' }}">
+                data-liquid="{{ 'true' if master_ing.is_liquid else 'false' }}"></option>
         {% endfor %}
     {% endif %}
 </datalist>
@@ -36,6 +36,25 @@
                 <div class="col-md-6">
                     <label class="form-label fw-bold small text-secondary text-uppercase">Slug Web (Autogenerato)</label>
                     <input type="text" name="slug" id="recipe-slug" class="form-control bg-light" value="{{ recipe.slug }}" placeholder="es. pala-romana-special" required>
+                </div>
+                <div class="col-md-12 mt-3">
+                    <label class="form-label fw-bold small text-secondary text-uppercase">Icona Grafica ed Identificazione Categoria</label>
+                    <select name="icon" class="form-select fw-semibold bg-white text-dark">
+                        <option value="bi-bread-slice" {% if recipe.icon == 'bi-bread-slice' %}selected{% endif %}>🍞 Pane / Pane in Cassetta / Impasti Base</option>
+                        <option value="bi-database" {% if recipe.icon == 'bi-database' %}selected{% endif %}>🍕 Pizza Generica</option>
+                        <option value="bi-disc" {% if recipe.icon == 'bi-disc' %}selected{% endif %}>🎯 Pizza Napoletana</option>
+                        <option value="bi-grid-3x3-gap" {% if recipe.icon == 'bi-grid-3x3-gap' %}selected{% endif %}>📋 Pizza in Teglia Romana</option>
+                        <option value="bi-suit-club" {% if recipe.icon == 'bi-suit-club' %}selected{% endif %}>🪓 Pinsa in Pala</option>
+                        <option value="bi-circle" {% if recipe.icon == 'bi-circle' %}selected{% endif %}>🥯 Focaccia Pugliese / Focacce</option>
+                        <option value="bi-cup-straw" {% if recipe.icon == 'bi-cup-straw' %}selected{% endif %}>🥛 Panini al Latte / all'Olio / Panini</option>
+                        <option value="bi-egg-fried" {% if recipe.icon == 'bi-egg-fried' %}selected{% endif %}>🍔 Panini per Hamburger / Buns</option>
+                        <option value="bi-bag-heart" {% if recipe.icon == 'bi-bag-heart' %}selected{% endif %}>🥟 Panzerotti</option>
+                        <option value="bi-moon-stars" {% if recipe.icon == 'bi-moon-stars' %}selected{% endif %}>🌙 Cornetti / Brioches / Maritozzi</option>
+                        <option value="bi-cookie" {% if recipe.icon == 'bi-cookie' %}selected{% endif %}>🍪 Pangoccioli / Lievitati Dolci da Colazione</option>
+                        <option value="bi-cake2" {% if recipe.icon == 'bi-cake2' %}selected{% endif %}>🎂 Grandi Lievitati (Panettone / Pandoro / Colomba)</option>
+                        <option value="bi-sun" {% if recipe.icon == 'bi-sun' %}selected{% endif %}>🍩 Zeppole / Fritti</option>
+                        <option value="bi-journal-text" {% if recipe.icon == 'bi-journal-text' or not recipe.icon %}selected{% endif %}>📖 Altro / Formula Generica</option>
+                    </select>
                 </div>
             </div>
         </div>
@@ -73,16 +92,16 @@
                                     <select name="ing_unit[]" class="form-select form-select-sm text-center fw-medium">
                                         <option value="g" {% if ing.unit == 'g' %}selected{% endif %}>g</option>
                                         <option value="kg" {% if ing.unit == 'kg' %}selected{% endif %}>kg</option>
-                                        <option value="% Orientativo" {% if ing.unit == '%' %}selected{% endif %}>%</option>
+                                        <option value="%" {% if ing.unit == '%' %}selected{% endif %}>%</option>
                                     </select>
                                 </td>
                                 <td class="text-center">
                                     <input type="checkbox" class="form-check-input input-is-flour" {% if ing.is_flour %}checked{% endif %}>
-                                    <input type="hidden" name="ing_is_flour[]" value="{{ 'true' if ing.is_flour else 'false' }}">
+                                    <input type="hidden" class="hidden-flour-val" name="ing_is_flour_{{ loop.index0 }}" value="{{ 'true' if ing.is_flour else 'false' }}">
                                 </td>
                                 <td class="text-center">
                                     <input type="checkbox" class="form-check-input input-is-liquid" {% if ing.is_liquid %}checked{% endif %}>
-                                    <input type="hidden" name="ing_is_liquid[]" value="{{ 'true' if ing.is_liquid else 'false' }}">
+                                    <input type="hidden" class="hidden-liquid-val" name="ing_is_liquid_{{ loop.index0 }}" value="{{ 'true' if ing.is_liquid else 'false' }}">
                                 </td>
                                 <td class="text-center pe-3">
                                     <button type="button" class="btn btn-sm btn-link text-danger p-0 btn-remove-row"><i class="bi bi-trash fs-5"></i></button>
@@ -114,7 +133,11 @@
                     <label class="form-label small fw-bold text-uppercase text-muted mb-3">Geometria e Pezzature</label>
                     <div class="form-check form-switch mb-2 shadow-none">
                         <input class="form-check-input" type="checkbox" name="enable_piece_count" id="enable_piece_count" {% if feature.enable_piece_count %}checked{% endif %}>
-                        <label class="form-check-label small fw-bold" for="enable_piece_count">Abilita Input N. Pezzi / Peso</label>
+                        <label class="form-check-label small fw-bold" for="enable_piece_count">Abilita Input N. Pezzi</label>
+                    </div>
+                    <div class="form-check form-switch mb-2 shadow-none">
+                        <input class="form-check-input" type="checkbox" name="enable_piece_weight" id="enable_piece_weight" {% if feature.enable_piece_weight %}checked{% endif %}>
+                        <label class="form-check-label small fw-bold" for="enable_piece_weight">Abilita Input Peso Panetto</label>
                     </div>
                 </div>
 
@@ -209,6 +232,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const container = document.getElementById('ingredients-container');
     const btnAdd = document.getElementById('btn-add-ingredient');
 
+    function reindexRows() {
+        const rows = container.querySelectorAll('.ingredient-row');
+        rows.forEach((row, index) => {
+            const flourHidden = row.querySelector('.hidden-flour-val');
+            const liquidHidden = row.querySelector('.hidden-liquid-val');
+            if (flourHidden) flourHidden.setAttribute('name', `ing_is_flour_${index}`);
+            if (liquidHidden) liquidHidden.setAttribute('name', `ing_is_liquid_${index}`);
+        });
+    }
+
     if (btnAdd && container) {
         btnAdd.addEventListener('click', function() {
             const newRow = document.createElement('tr');
@@ -229,11 +262,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 </td>
                 <td class="text-center">
                     <input type="checkbox" class="form-check-input input-is-flour">
-                    <input type="hidden" name="ing_is_flour[]" value="false">
+                    <input type="hidden" class="hidden-flour-val" value="false">
                 </td>
                 <td class="text-center">
                     <input type="checkbox" class="form-check-input input-is-liquid">
-                    <input type="hidden" name="ing_is_liquid[]" value="false">
+                    <input type="hidden" class="hidden-liquid-val" value="false">
                 </td>
                 <td class="text-center pe-3">
                     <button type="button" class="btn btn-sm btn-link text-danger p-0 btn-remove-row"><i class="bi bi-trash fs-5"></i></button>
@@ -241,15 +274,16 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
             container.appendChild(newRow);
             bindRowEvents(newRow);
+            reindexRows();
         });
     }
 
     function bindRowEvents(row) {
         const nameField = row.querySelector('.input-autocomplete-trigger');
         const flourCheck = row.querySelector('.input-is-flour');
-        const flourHidden = row.querySelector('input[name="ing_is_flour[]"]');
+        const flourHidden = row.querySelector('.hidden-flour-val');
         const liquidCheck = row.querySelector('.input-is-liquid');
-        const liquidHidden = row.querySelector('input[name="ing_is_liquid[]"]');
+        const liquidHidden = row.querySelector('.hidden-liquid-val');
         const datalist = document.getElementById('global-master-ingredients');
 
         if (nameField) {
@@ -277,6 +311,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (removeBtn) {
             removeBtn.addEventListener('click', function() {
                 row.remove();
+                reindexRows();
             });
         }
 
@@ -302,6 +337,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     document.querySelectorAll('.ingredient-row').forEach(row => bindRowEvents(row));
+    reindexRows();
 });
 </script>
 

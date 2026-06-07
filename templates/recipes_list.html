@@ -1,87 +1,83 @@
 {% extends "base.html" %}
 
-{% block title %}Le Nostre Ricette{% endblock %}
+{% block title %}Ricettario Pubblico Intellegibile{% endblock %}
 
 {% block content %}
-
-<div class="card mb-4">
-
-    <div class="card-body text-center py-4">
-
-        <h1 class="fw-bold mb-2">
-            📖 Ricettario Pubblico
+<div class="container py-4">
+    
+    <div class="text-center my-5 p-5 bg-white rounded-4 shadow-sm border border-light" 
+         style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border-color: #f1f5f9 !important;">
+        <h1 class="display-5 fw-bold text-dark mb-2 tracking-tight">
+            📖 Ricettario Pubblico Dinamico
         </h1>
-
-        <p class="text-muted mb-0">
-            Esplora le nostre formule e usa i calcolatori scientifici per bilanciare i tuoi impasti.
+        <p class="text-secondary mx-auto fs-5 fw-medium opacity-75" style="max-width: 650px;">
+            Esplora formule bilanciate professionali e impiega i nostri motori di calcolo integrati per ridimensionare istantaneamente ogni impasto.
         </p>
-
     </div>
 
-</div>
+    <div class="row g-4 justify-content-center">
+        {% if recipes %}
+            {% for recipe in recipes %}
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm border-0 bg-white rounded-4 overflow-hidden card-recipe-hover transition-all" 
+                     style="border: 1px solid #f1f5f9 !important;">
+                    
+                    <div class="card-body p-4 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-inline-flex align-items-center justify-content-center rounded-3 bg-primary bg-opacity-10 text-primary mb-3 shadow-none" 
+                                 style="width: 56px; height: 56px;">
+                                <i class="bi {{ recipe.icon or 'bi-journal-text' }}" style="font-size: 28px;"></i>
+                            </div>
+                            
+                            <h4 class="fw-bold text-dark mb-2 tracking-tight">{{ recipe.name }}</h4>
+                            <p class="text-muted small lh-base mb-4 opacity-75">
+                                {{ recipe.description if recipe.description else "Formula tecnica bilanciata per professionisti e amatori della panificazione." }}
+                            </p>
+                        </div>
 
-<div class="row g-4">
-
-    {% if recipes %}
-
-        {% for recipe in recipes %}
-
-        <div class="col-md-6 col-lg-4">
-
-            <div class="card stat-card h-100">
-
-                <div class="card-body d-flex flex-column justify-content-between">
-
-                    <div>
-
-                        <h4 class="fw-bold text-dark mb-2">
-                            {{ recipe.name }}
-                        </h4>
-
-                        <p class="text-muted small">
-                            {{ recipe.description or "Nessuna descrizione disponibile per questa ricetta." }}
-                        </p>
-
-                    </div>
-
-                    <div class="mt-3">
-
-                        <a href="/recipe/{{ recipe.slug }}" 
-                           class="btn btn-outline-primary w-100 fw-bold">
-                            👀 Visualizza e Calcola
+                        <a href="{{ url_for('recipes.public_detail', slug=recipe.slug) }}" 
+                           class="btn btn-outline-primary w-100 fw-bold py-2.5 rounded-3 shadow-none transition-all d-flex align-items-center justify-content-center gap-2">
+                            <span>🔬 Visualizza e Calcola</span>
+                            <i class="bi bi-arrow-right-short fs-5"></i>
                         </a>
-
                     </div>
-
                 </div>
-
             </div>
-
-        </div>
-
-        {% endfor %}
-
-    {% else %}
-
-        <div class="col-12 text-center py-5 text-muted">
-            Nessuna ricetta pubblica disponibile al momento.
-        </div>
-
-    {% endif %}
-
-</div>
-
-<!-- FOOTER DI NAVIGAZIONE CON ACCESSO AMMINISTRAZIONE -->
-<div class="row mt-5 mb-4">
-    <div class="col-12">
-        <hr class="text-muted opacity-25">
-        <div class="d-flex justify-content-between align-items-center text-muted small pt-2">
-            <span>&copy; 2026 Il Mio Ricettario</span>
-            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-sm btn-outline-secondary px-3 py-1">
-                🔑 Area Riservata Admin
-            </a>
-        </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center py-5">
+                <div class="text-muted fs-5">Nessuna formula pubblicata al momento nel database.</div>
+            </div>
+        {% endif %}
     </div>
+
+    <footer class="mt-5 pt-5 pb-4 border-top text-center" style="border-color: #e2e8f0 !important;">
+        <div class="d-flex flex-column align-items-center justify-content-center gap-2">
+            <p class="text-secondary fw-semibold mb-1" style="font-size: 14px;">
+                © 2026 <a href="https://github.com/wifi75/IlMioRicettario" target="_blank" class="text-primary text-decoration-none fw-bold link-hover-underline">Il Mio Ricettario</a>
+            </p>
+            <p class="text-muted mb-3" style="font-size: 13px;">
+                Architettato e sviluppato da <span class="text-dark fw-bold">Tiziano Cassone</span>
+            </p>
+            <div>
+                <a href="/admin/login" class="btn btn-sm btn-light text-secondary border fw-bold px-3 py-1.5 rounded-3 shadow-none d-inline-flex align-items-center gap-2" style="font-size: 12px;">
+                    <i class="bi bi-key-fill text-warning"></i>
+                    <span>Area Riservata Admin</span>
+                </a>
+            </div>
+        </div>
+    </footer>
+
 </div>
 
+<style>
+    /* Animazioni CSS ad alte prestazioni */
+    .card-recipe-hover:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 1rem 2.5rem rgba(148, 163, 184, 0.12) !important;
+    }
+    .link-hover-underline:hover {
+        text-decoration: underline !important;
+    }
+</style>
 {% endblock %}

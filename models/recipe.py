@@ -35,6 +35,12 @@ class Recipe(db.Model):
         db.String(255)
     )
 
+    icon = db.Column(
+        db.String(50),
+        nullable=False,
+        default="bi-journal-text"
+    )
+
     is_published = db.Column(
         db.Boolean,
         default=True

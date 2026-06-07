@@ -3,229 +3,226 @@
 {% block title %}{{ recipe.name }}{% endblock %}
 
 {% block content %}
+<div class="container py-4">
 
-<!-- INTESTAZIONE RICETTA FRONTEND -->
-<div class="card mb-4 border-0 shadow-sm bg-white">
-    <div class="card-body p-4 text-center text-md-start">
-        <h1 class="fw-bold mb-1 text-dark">🍕 {{ recipe.name }}</h1>
-        <p class="text-muted mb-0">{{ recipe.description or "Formula di panificazione bilanciata ad alta precisione." }}</p>
-    </div>
-</div>
-
-<div class="row g-4 mb-4">
-    
-    <!-- COLONNA SINISTRA: INPUT PARAMETRI E SETUP PANETTI (STILE PROFESSIONALE) -->
-    <div class="col-lg-5">
-        <div class="card bg-white p-4 border-0 shadow-sm rounded-3">
-            <h5 class="fw-bold mb-3 text-dark text-uppercase border-bottom pb-2">
-                <i class="bi bi-sliders text-primary"></i> Impostazioni Impasto
-            </h5>
-
-            {% if feature and feature.enable_piece_count %}
-            <!-- SETUP QUANTITÀ E PESO -->
-            <div class="row g-2 mb-3">
-                <div class="col-6">
-                    <label class="form-label small text-secondary fw-bold text-uppercase" style="font-size: 11px;">N. Panetti / Pezzi</label>
-                    <input type="number" id="calc-pieces-count" class="form-control text-center fw-bold fs-5" value="6" min="1">
-                </div>
-                <div class="col-6">
-                    <label class="form-label small text-secondary fw-bold text-uppercase" style="font-size: 11px;">Peso Panetto (g)</label>
-                    <input type="number" id="calc-pieces-weight" class="form-control text-center fw-bold fs-5" value="140" min="1">
-                </div>
+    <div class="card mb-4 border-0 shadow-sm bg-white rounded-4 overflow-hidden">
+        <div class="card-body p-4 d-flex flex-column flex-md-row align-items-center gap-4 text-center text-md-start">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-4 bg-primary bg-opacity-10 text-primary shadow-none flex-shrink-0" 
+                 style="width: 56px; height: 56px;">
+                <i class="bi {{ recipe.icon or 'bi-journal-text' }}" style="font-size: 28px;"></i>
             </div>
-            <!-- SELETTORE MODALITÀ NASCOSTO MA ATTIVO PER IL MOTORE -->
-            <select id="calc-scale-mode" class="d-none"><option value="pieces" selected></option></select>
-            {% else %}
-                <select id="calc-scale-mode" class="d-none"><option value="weight" selected></option></select>
-                <div id="wrapper-weight-input" class="mb-3">
-                    <label class="form-label small text-secondary fw-bold text-uppercase" style="font-size: 11px;">Grammi Impasto Desiderati</label>
-                    <input type="number" id="calc-target-weight" class="form-control text-center fw-bold fs-5" value="1000" step="50">
-                </div>
-            {% endif %}
-
-            <!-- SELETTORE LIEVITO -->
-            {% if feature and feature.enable_yeast_type %}
-            <div class="mb-3">
-                <label class="form-label small text-secondary fw-bold text-uppercase" style="font-size: 11px;">Tipo di Lievito</label>
-                <select id="calc-yeast-select" class="form-select fw-semibold">
-                    <option value="base" selected>Lievito fresco</option>
-                    <option value="dry">Lievito secco disidratato</option>
-                </select>
-            </div>
-            {% else %}
-                <select id="calc-yeast-select" class="d-none"><option value="base" selected></option></select>
-            {% endif %}
-
-            <!-- ATTIVAZIONE TANGZHONG INTERNA SE CONFIGURATA -->
-            {% if feature and feature.enable_tangzhong %}
-            <div class="mb-3">
-                <label class="form-label small text-secondary fw-bold text-uppercase" style="font-size: 11px;">Tecnica Roux / Tangzhong</label>
-                <select id="calc-tangzhong-select" class="form-select fw-semibold">
-                    <option value="no">Escludi Roux</option>
-                    <option value="yes" selected>Attiva Tangzhong</option>
-                </select>
-            </div>
-            {% else %}
-                <select id="calc-tangzhong-select" class="d-none"><option value="no" selected></option></select>
-            {% endif %}
-
-            <!-- SLIDER IDRATAZIONE DINAMICA -->
-            <div class="mb-2 border-top pt-3">
-                <div class="d-flex justify-content-between align-items-center mb-1">
-                    <label class="form-label small fw-bold text-secondary text-uppercase" style="font-size: 11px;">Idratazione Calcolo</label>
-                    <span class="text-success fw-bold fs-5" id="label-current-hydro-target">70%</span>
-                </div>
-                <input type="range" class="form-range" id="calc-slider-hydration" min="45" max="95" value="{{ recipe.hydration()|int }}">
-                <div class="form-check form-switch mt-2">
-                    <input class="form-check-input" type="checkbox" id="calc-override-hydration">
-                    <label class="form-check-label small text-muted" for="calc-override-hydration">Consenti ricalcolo idratazione personalizzato</label>
-                </div>
-            </div>
-
-            <!-- RIEPILOGO GEOMETRIA STRINGA INTEGRATA -->
-            <div class="mt-3 p-3 bg-light rounded text-dark border small fw-medium text-center" id="box-stringa-riepilogo">
-                Parametri Target Selezionati Rilevati
+            <div>
+                <h1 class="fw-bold mb-1 text-dark tracking-tight">{{ recipe.name }}</h1>
+                <p class="text-secondary mb-0 opacity-75 fs-5 fw-medium">
+                    {{ recipe.description or "Formula di panificazione bilanciata ad alta precisione." }}
+                </p>
             </div>
         </div>
     </div>
 
-    <!-- COLONNA DESTRA: FORMULA CALCOLATA E TAB DELLE FASI COMPLESSIVE -->
-    <div class="col-lg-7">
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-body p-4">
-                <h5 class="fw-bold mb-3 text-dark text-uppercase">📋 Formula Calcolata</h5>
-                
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead>
-                            <tr class="table-light text-secondary small">
-                                <th>Materia Prima</th>
-                                <th class="text-end text-success">% Baker</th>
-                                <th class="text-end text-primary fw-bold" style="width: 35%;">Grammi Necessari</th>
-                            </tr>
-                        </thead>
-                        <tbody id="calculated-ingredients-tbody">
-                            {% for ing in ingredients %}
-                            <tr class="output-ingredient-row"
-                                data-name="{{ ing.name }}"
-                                data-base-qty="{{ ing.quantity }}"
-                                data-is-flour="{{ 'true' if ing.is_flour else 'false' }}"
-                                data-is-liquid="{{ 'true' if ing.is_liquid else 'false' }}"
-                                data-is-yeast="{% if 'lievito' in ing.name.lower() %}true{% else %}false{% endif %}">
-                                <td class="fw-bold text-dark">
-                                    {{ ing.name }}
-                                    {% if ing.is_flour %}<span class="badge bg-warning text-dark ms-1" style="font-size:9px">FARINA</span>{% endif %}
-                                    {% if ing.is_liquid %}<span class="badge bg-info text-dark ms-1" style="font-size:9px">LIQUIDO</span>{% endif %}
-                                </td>
-                                <td class="text-end text-success fw-bold output-baker-pct">0%</td>
-                                <td class="text-end text-primary fw-bold fs-5 output-final-weight">0 g</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+    <div class="row g-4 mb-4">
+        
+        <div class="col-lg-5">
+            <div class="card bg-white p-4 border-0 shadow-sm rounded-4">
+                <h5 class="fw-bold mb-3 text-dark text-uppercase border-bottom pb-2 tracking-wide" style="font-size: 14px;">
+                    <i class="bi bi-sliders text-primary me-2"></i> Impostazioni Impasto
+                </h5>
 
-        <!-- SISTEMA A SCHEDE / TAB DINAMICI DEL PROCEDIMENTO PER LE FASI (BIGA/TANGZHONG) -->
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-header bg-white pb-0 pt-3 border-0">
-                <ul class="nav nav-tabs card-header-tabs" id="publicProcessTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active fw-bold small text-uppercase" id="nav-base-tab" data-bs-toggle="tab" data-bs-target="#panel-base" type="button" role="tab">Impasto Finale</button>
-                    </li>
-                    <li class="nav-item {% if not feature or (not feature.enable_biga and not feature.enable_poolish) %}d-none{% endif %}" id="nav-li-preferment" role="presentation">
-                        <button class="nav-link fw-bold small text-uppercase text-info" id="nav-pref-tab" data-bs-toggle="tab" data-bs-target="#panel-preferment" type="button" role="tab">🧫 Prefermento (Biga/Poolish)</button>
-                    </li>
-                    <li class="nav-item d-none" id="nav-li-tangzhong" role="presentation">
-                        <button class="nav-link fw-bold small text-uppercase text-warning" id="nav-tz-tab" data-bs-toggle="tab" data-bs-target="#panel-tangzhong" type="button" role="tab">🥣 Roux / Tangzhong</button>
-                    </li>
-                </ul>
-            </div>
-            <div class="card-body p-4 tab-content">
-                <!-- Tab Impasto Chiusura -->
-                <div class="tab-pane fade show active" id="panel-base" role="tabpanel">
-                    <h6 class="fw-bold mb-2 text-secondary text-uppercase" style="font-size: 11px;">Procedura Operativa di Chiusura</h6>
-                    <div style="white-space: pre-line;" class="text-dark fs-6 lh-base">{{ recipe.instructions }}</div>
-                </div>
-                
-                <!-- Tab Prefermento Dinamico Ricalcolato -->
-                <div class="tab-pane fade" id="panel-preferment" role="tabpanel">
-                    <div class="alert alert-info border-0 small mb-3">
-                        <strong>Fase Anticipata:</strong> Preparare da 12 a 16 ore prima dell'impasto finale.
+                {% if feature and feature.enable_piece_count %}
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label class="form-label small text-secondary fw-bold text-uppercase" style="font-size: 11px;">N. Panetti / Pezzi</label>
+                        <input type="number" id="calc-pieces-count" class="form-control text-center fw-bold fs-5 rounded-3" value="6" min="1">
                     </div>
-                    <div class="p-3 bg-light rounded border mb-2 text-center">
-                        <div class="row g-2 fw-bold text-dark">
-                            <div class="col-4 border-end"><small class="text-muted d-block" style="font-size: 10px;">FARINA PREFERMENTO</small><span id="pub-pref-flour">0 g</span></div>
-                            <div class="col-4 border-end"><small class="text-muted d-block" style="font-size: 10px;">ACQUA PREFERMENTO</small><span id="pub-pref-liquid">0 g</span></div>
-                            <div class="col-4"><small class="text-muted d-block" style="font-size: 10px;">LIEVITO DA INSERIRE</small><span id="pub-pref-yeast">0 g</span></div>
+                    <div class="col-6">
+                        <label class="form-label small text-secondary fw-bold text-uppercase" style="font-size: 11px;">Peso Panetto (g)</label>
+                        <input type="number" id="calc-pieces-weight" class="form-control text-center fw-bold fs-5 rounded-3" value="140" min="1">
+                    </div>
+                </div>
+                <select id="calc-scale-mode" class="d-none"><option value="pieces" selected></option></select>
+                {% else %}
+                    <select id="calc-scale-mode" class="d-none"><option value="weight" selected></option></select>
+                    <div id="wrapper-weight-input" class="mb-3">
+                        <label class="form-label small text-secondary fw-bold text-uppercase" style="font-size: 11px;">Grammi Impasto Desiderati</label>
+                        <input type="number" id="calc-target-weight" class="form-control text-center fw-bold fs-5 rounded-3" value="1000" step="50">
+                    </div>
+                {% endif %}
+
+                {% if feature and feature.enable_yeast_type %}
+                <div class="mb-3">
+                    <label class="form-label small text-secondary fw-bold text-uppercase" style="font-size: 11px;">Tipo di Lievito</label>
+                    <select id="calc-yeast-select" class="form-select fw-semibold rounded-3">
+                        <option value="base" selected>Lievito fresco</option>
+                        <option value="dry">Lievito secco disidratato</option>
+                    </select>
+                </div>
+                {% else %}
+                    <select id="calc-yeast-select" class="d-none"><option value="base" selected></option></select>
+                {% endif %}
+
+                {% if feature and feature.enable_tangzhong %}
+                <div class="mb-3">
+                    <label class="form-label small text-secondary fw-bold text-uppercase" style="font-size: 11px;">Tecnica Roux / Tangzhong</label>
+                    <select id="calc-tangzhong-select" class="form-select fw-semibold rounded-3">
+                        <option value="no">Escludi Roux</option>
+                        <option value="yes" selected>Attiva Tangzhong</option>
+                    </select>
+                </div>
+                {% else %}
+                    <select id="calc-tangzhong-select" class="d-none"><option value="no" selected></option></select>
+                {% endif %}
+
+                <div class="mb-2 border-top pt-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <label class="form-label small fw-bold text-secondary text-uppercase" style="font-size: 11px;">Idratazione Calcolo</label>
+                        <span class="text-success fw-bold fs-5" id="label-current-hydro-target">70%</span>
+                    </div>
+                    <input type="range" class="form-range" id="calc-slider-hydration" min="45" max="95" value="{{ recipe.hydration()|int }}">
+                    <div class="form-check form-switch mt-2 shadow-none">
+                        <input class="form-check-input" type="checkbox" id="calc-override-hydration">
+                        <label class="form-check-label small text-muted fw-medium" for="calc-override-hydration">Consenti ricalcolo idratazione personalizzato</label>
+                    </div>
+                </div>
+
+                <div class="mt-3 p-3 bg-light rounded-3 text-dark border small fw-bold text-center" id="box-stringa-riepilogo" style="border-color: #e2e8f0 !important;">
+                    Parametri Target Selezionati Rilevati
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm mb-4 rounded-4 overflow-hidden">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3 text-dark text-uppercase tracking-wide" style="font-size: 14px;">📋 Formula Calcolata</h5>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr class="table-light text-secondary small">
+                                    <th class="ps-3">Materia Prima</th>
+                                    <th class="text-end text-success">Percentuale Baker</th>
+                                    <th class="text-end text-primary fw-bold pe-3" style="width: 35%;">Grammi Necessari</th>
+                                </tr>
+                            </thead>
+                            <tbody id="calculated-ingredients-tbody">
+                                {% for ing in ingredients %}
+                                <tr class="output-ingredient-row border-bottom"
+                                    data-name="{{ ing.name }}"
+                                    data-base-qty="{{ ing.quantity }}"
+                                    data-is-flour="{{ 'true' if ing.is_flour else 'false' }}"
+                                    data-is-liquid="{{ 'true' if ing.is_liquid else 'false' }}"
+                                    data-is-yeast="{% if 'lievito' in ing.name.lower() %}true{% else %}false{% endif %}">
+                                    <td class="fw-bold text-dark ps-3">
+                                        {{ ing.name }}
+                                        {% if ing.is_flour %}<span class="badge bg-warning text-dark ms-1" style="font-size:9px; font-weight: 800;">FARINA</span>{% endif %}
+                                        {% if ing.is_liquid %}<span class="badge bg-info text-dark ms-1" style="font-size:9px; font-weight: 800;">LIQUIDO</span>{% endif %}
+                                    </td>
+                                    <td class="text-end text-success fw-bold output-baker-pct">0%</td>
+                                    <td class="text-end text-primary fw-bold fs-5 output-final-weight pe-3">0 g</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4 rounded-4 overflow-hidden">
+                <div class="card-header bg-white pb-0 pt-3 border-0">
+                    <ul class="nav nav-tabs card-header-tabs border-bottom-0" id="publicProcessTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active fw-bold small text-uppercase px-3 py-2" id="nav-base-tab" data-bs-toggle="tab" data-bs-target="#panel-base" type="button" role="tab">Impasto Finale</button>
+                        </li>
+                        <li class="nav-item {% if not feature or (not feature.enable_biga and not feature.enable_poolish) %}d-none{% endif %}" id="nav-li-preferment" role="presentation">
+                            <button class="nav-link fw-bold small text-uppercase text-info px-3 py-2" id="nav-pref-tab" data-bs-toggle="tab" data-bs-target="#panel-preferment" type="button" role="tab">🧫 Prefermento (Biga/Poolish)</button>
+                        </li>
+                        <li class="nav-item d-none" id="nav-li-tangzhong" role="presentation">
+                            <button class="nav-link fw-bold small text-uppercase text-warning px-3 py-2" id="nav-tz-tab" data-bs-toggle="tab" data-bs-target="#panel-tangzhong" type="button" role="tab">🥣 Roux / Tangzhong</button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body p-4 tab-content">
+                    <div class="tab-pane fade show active" id="panel-base" role="tabpanel">
+                        <h6 class="fw-bold mb-3 text-secondary text-uppercase tracking-wide" style="font-size: 11px;">Procedura Operativa di Chiusura</h6>
+                        <div style="white-space: pre-line;" class="text-dark fs-6 lh-base fw-medium">{{ recipe.instructions }}</div>
+                    </div>
+                    
+                    <div class="tab-pane fade" id="panel-preferment" role="tabpanel">
+                        <div class="alert alert-info border-0 small mb-3 rounded-3 fw-semibold">
+                            <strong>Fase Anticipata:</strong> Preparare da 12 a 16 ore prima dell'impasto finale.
                         </div>
+                        <div class="p-3 bg-light rounded-3 border mb-2 text-center" style="border-color: #e2e8f0 !important;">
+                            <div class="row g-2 fw-bold text-dark">
+                                <div class="col-4 border-end"><small class="text-muted d-block fw-bold tracking-wider mb-1" style="font-size: 10px;">FARINA PREFERMENTO</small><span id="pub-pref-flour" class="fs-5 text-primary">0 g</span></div>
+                                <div class="col-4 border-end"><small class="text-muted d-block fw-bold tracking-wider mb-1" style="font-size: 10px;">ACQUA PREFERMENTO</small><span id="pub-pref-liquid" class="fs-5 text-info">0 g</span></div>
+                                <div class="col-4"><small class="text-muted d-block fw-bold tracking-wider mb-1" style="font-size: 10px;">LIEVITO DA INSERIRE</small><span id="pub-pref-yeast" class="fs-5 text-dark">0 g</span></div>
+                            </div>
+                        </div>
+                        <small class="text-muted fw-medium">Nota: I pesi sopra indicati sono già scorporati e pronti da prelevare dal quantitativo totale della formula.</small>
                     </div>
-                    <small class="text-muted">Nota: I pesi sopra indicati sono già scorporati e pronti da prelevare dal quantitativo totale della formula.</small>
-                </div>
 
-                <!-- Tab Tangzhong Dinamico Ricalcolato -->
-                <div class="tab-pane fade" id="panel-tangzhong" role="tabpanel">
-                    <div class="alert alert-warning border-0 small mb-3 text-dark">
-                        <strong>Gelificazione Roux:</strong> Cuocere i seguenti grammi controllati a 65°C fino a consistenza gelatinosa, poi raffreddare.
-                    </div>
-                    <div class="p-3 bg-light rounded border text-center">
-                        <div class="row g-2 fw-bold text-dark">
-                            <div class="col-6 border-end"><small class="text-muted d-block" style="font-size: 10px;">FARINA PER ROUX</small><span id="pub-tz-flour">0 g</span></div>
-                            <div class="col-6"><small class="text-muted d-block" style="font-size: 10px;">LIQUIDI PER ROUX</small><span id="pub-tz-liquid">0 g</span></div>
+                    <div class="tab-pane fade" id="panel-tangzhong" role="tabpanel">
+                        <div class="alert alert-warning border-0 small mb-3 text-dark rounded-3 fw-semibold">
+                            <strong>Gelificazione Roux:</strong> Cuocere i seguenti grammi controllati a 65°C fino a consistenza gelatinosa, poi raffreddare prima di inserire nell'impasto.
+                        </div>
+                        <div class="p-3 bg-light rounded-3 border text-center" style="border-color: #e2e8f0 !important;">
+                            <div class="row g-2 fw-bold text-dark">
+                                <div class="col-6 border-end"><small class="text-muted d-block fw-bold tracking-wider mb-1" style="font-size: 10px;">FARINA PER ROUX</small><span id="pub-tz-flour" class="fs-5 text-primary">0 g</span></div>
+                                <div class="col-6"><small class="text-muted d-block fw-bold tracking-wider mb-1" style="font-size: 10px;">LIQUIDI PER ROUX</small><span id="pub-tz-liquid" class="fs-5 text-info">0 g</span></div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card bg-white border-0 shadow-sm text-center py-3 rounded-4">
+                <small class="text-muted fw-bold text-uppercase tracking-wider" style="font-size: 11px;">Peso Totale Impasto</small>
+                <h4 class="mt-1 fw-bold text-primary mb-0" id="live-total-weight">0 g</h4>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card bg-white border-0 shadow-sm text-center py-3 rounded-4">
+                <small class="text-muted fw-bold text-uppercase tracking-wider" style="font-size: 11px;">Farina Totale Reale</small>
+                <h4 class="mt-1 fw-bold text-dark mb-0" id="live-total-flour">0 g</h4>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card bg-white border-0 shadow-sm text-center py-3 rounded-4">
+                <small class="text-muted fw-bold text-uppercase tracking-wider" style="font-size: 11px;">Liquidi Totali Reali</small>
+                <h4 class="mt-1 fw-bold text-info mb-0" id="live-total-liquids">0 g</h4>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card bg-white border-0 shadow-sm text-center py-3 rounded-4">
+                <small class="text-muted fw-bold text-uppercase tracking-wider" style="font-size: 11px;">Idratazione Effettiva</small>
+                <h4 class="mt-1 fw-bold text-success mb-0" id="live-hydration">0%</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4 bg-white rounded-4">
+        <div class="card-body py-3">
+            <div class="row text-center align-items-center g-2 small text-dark fw-bold">
+                <div class="col-3 border-end">🌡️ Chiusura: <span class="text-danger fw-bold ms-1">{{ recipe.temp_chiusura or 24 }}°C</span></div>
+                <div class="col-3 border-end">⏱️ Autolisi: <span class="text-secondary fw-bold ms-1">{{ recipe.tempo_autolisi or 0 }} min</span></div>
+                <div class="col-3 border-end">🧺 Puntata: <span class="text-secondary fw-bold ms-1">{{ recipe.tempo_puntata or 120 }} min</span></div>
+                <div class="col-3">🧺 Appretto: <span class="text-secondary fw-bold ms-1">{{ recipe.tempo_appretto or 60 }} min</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mb-5">
+        <a href="/" class="btn btn-outline-secondary px-4 fw-semibold rounded-3 shadow-none">
+            <i class="bi bi-arrow-left-short fs-5 align-middle me-1"></i> Ritorna al Catalogo Formule
+        </a>
+    </div>
+
 </div>
 
-<!-- BLOCK STATISTICHE E BILANCIO COMPLESSIVO IN BASSO -->
-<div class="row g-3 mb-4">
-    <div class="col-6 col-md-3">
-        <div class="card bg-white border-0 shadow-sm text-center py-3">
-            <small class="text-muted fw-bold text-uppercase" style="font-size: 11px;">Peso Totale Impasto</small>
-            <h4 class="mt-1 fw-bold text-primary mb-0" id="live-total-weight">0 g</h4>
-        </div>
-    </div>
-    <div class="col-6 col-md-3">
-        <div class="card bg-white border-0 shadow-sm text-center py-3">
-            <small class="text-muted fw-bold text-uppercase" style="font-size: 11px;">Farina Totale Reale</small>
-            <h4 class="mt-1 fw-bold text-dark mb-0" id="live-total-flour">0 g</h4>
-        </div>
-    </div>
-    <div class="col-6 col-md-3">
-        <div class="card bg-white border-0 shadow-sm text-center py-3">
-            <small class="text-muted fw-bold text-uppercase" style="font-size: 11px;">Liquidi Totali Reali</small>
-            <h4 class="mt-1 fw-bold text-info mb-0" id="live-total-liquids">0 g</h4>
-        </div>
-    </div>
-    <div class="col-6 col-md-3">
-        <div class="card bg-white border-0 shadow-sm text-center py-3">
-            <small class="text-muted fw-bold text-uppercase" style="font-size: 11px;">Idratazione Effettiva</small>
-            <h4 class="mt-1 fw-bold text-success mb-0" id="live-hydration">0%</h4>
-        </div>
-    </div>
-</div>
-
-<!-- PARAMETRI GENERALI DI PROCESSO DI FIANCO AI BOTTONI -->
-<div class="card border-0 shadow-sm mb-4 bg-light">
-    <div class="card-body py-3">
-        <div class="row text-center align-items-center g-2 small text-dark fw-bold">
-            <div class="col-3 border-end">🌡️ Chiusura: <span class="text-danger">{{ recipe.temp_chiusura or 24 }}°C</span></div>
-            <div class="col-3 border-end">⏱️ Autolisi: <span>{{ recipe.tempo_autolisi or 0 }} min</span></div>
-            <div class="col-3 border-end">🧺 Puntata: <span>{{ recipe.tempo_puntata or 120 }} min</span></div>
-            <div class="col-3">🧺 Appretto: <span>{{ recipe.tempo_appretto or 60 }} min</span></div>
-        </div>
-    </div>
-</div>
-
-<div class="text-center mb-5">
-    <a href="/" class="btn btn-outline-secondary px-4 fw-semibold">⬅ Ritorna al Catalogo Formule</a>
-</div>
-
-<!-- LOGICA MOTORE JAVASCRIPT FRONTEND RIALLINEATO -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const freshToDryRatio = parseFloat("{{ settings_data.fresh_to_dry_ratio if settings_data else 3.0 }}");
@@ -250,7 +247,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const ingredientRows = document.querySelectorAll('.output-ingredient-row');
 
-    // Determinazione automatica se la ricetta possiede la Biga o il Poolish nel DB
     const hasBiga = {% if feature and feature.enable_biga %}true{% else %}false{% endif %};
     const hasPoolish = {% if feature and feature.enable_poolish %}true{% else %}false{% endif %};
     const prefMode = hasBiga ? 'biga' : (hasPoolish ? 'poolish' : 'none');
@@ -359,7 +355,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (ing.isYeast) liveYeastSum += ing.finalWeight;
         });
 
-        // Computazione Quote Tangzhong
         const isTzActive = tangzhongSelect && tangzhongSelect.value === 'yes';
         let tzFlourQuota = isTzActive ? liveFlourSum * tzFlourPctGlobal : 0;
         let tzLiquidQuota = tzFlourQuota * tzLiquidMultGlobal;
@@ -371,7 +366,6 @@ document.addEventListener('DOMContentLoaded', function() {
             navLiTz.classList.add('d-none');
         }
 
-        // Computazione Quote Prefermento Dinamico
         let prefFlourQuota = 0, prefLiquidQuota = 0, prefYeastQuota = 0;
         if (prefMode === 'poolish') {
             prefFlourQuota = liveFlourSum * 0.3;
@@ -390,7 +384,6 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('pub-pref-yeast').textContent = prefYeastQuota.toFixed(1) + ' g';
         }
 
-        // Sottrazione quote e Rendering finale a schermo
         originalIngredients.forEach(ing => {
             let finalDisplayWeight = ing.finalWeight;
 
@@ -421,5 +414,4 @@ document.addEventListener('DOMContentLoaded', function() {
     calculateFormula();
 });
 </script>
-
 {% endblock %}
