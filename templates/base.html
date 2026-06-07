@@ -28,15 +28,12 @@
     <div>
 
         <div class="mb-4 pb-2 border-bottom border-secondary border-opacity-25">
-
             <h3 class="mb-1 text-white fw-bold">
                 🍞 Ricettario
             </h3>
-
             <small class="text-uppercase tracking-wider fw-semibold opacity-50" style="font-size: 10px; color: #94a3b8;">
                 Pannello Amministrazione
             </small>
-
         </div>
 
         <div class="mb-4 p-3 d-flex align-items-center gap-3"
@@ -57,7 +54,6 @@
                     {{ current_user.username }}
                 </div>
             </div>
-
         </div>
 
         <div class="nav flex-column gap-1 mb-4">
@@ -99,8 +95,7 @@
                 <span>Impostazioni Lieviti</span>
             </a>
 
-            <!-- INSERITO CORRETTAMENTE: Collegamento protetto per il cambio password amministratore -->
-            <a href="{{ url_for('admin.change_password') }}" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 opacity-75 hover-sidebar">
+            <a href="/admin/change-password" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 opacity-75 hover-sidebar">
                 <i class="bi bi-shield-lock"></i>
                 <span>Sicurezza Account</span>
             </a>

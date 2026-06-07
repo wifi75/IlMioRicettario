@@ -21,6 +21,7 @@ from models.parameter import RecipeParameter
 from models.ingredient_master import MasterIngredient
 
 from routes.recipes import recipes_bp
+# BLINDATO: Forza il caricamento del Blueprint corretto per evitare conflitti di sotto-cartelle
 from routes.admin import admin_bp
 
 
