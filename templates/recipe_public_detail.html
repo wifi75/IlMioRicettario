@@ -4,7 +4,6 @@
 
 {% block content %}
 
-<!-- LOGICA SERVER-SIDE PER AUTO-RICONOSCIMENTO -->
 {% set has_dry_yeast = namespace(value=false) %}
 {% for ing in ingredients %}
     {% set nome_ing = ing.name.lower() %}
@@ -15,16 +14,12 @@
 
 <div class="container py-4">
 
-    <!-- INTESTAZIONE SCHEDA RICETTA -->
     <div class="card mb-4 border-0 shadow-sm rounded-4 overflow-hidden" style="background-color: #fdfaf6; border: 2px solid #e6dfd3 !important;">
         <div class="card-body p-4 d-flex flex-column flex-md-row align-items-center gap-4 text-center text-md-start">
             
             <div class="d-inline-flex align-items-center justify-content-center rounded-circle flex-shrink-0" 
                  style="width: 80px; height: 80px; background-color: #f4ece1; border: 3px double #8c6d53; box-shadow: 0 0 0 4px #f4ece1;">
-                <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#8c6d53" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 2v20M17 5l-5 4M7 5l5 4M17 10l-5 4M7 10l-5 4M17 15l-5 4M7 15l5 4"/>
-                    <circle cx="12" cy="12" r="10" stroke="#8c6d53" stroke-width="0.75" stroke-dasharray="2,3" fill="none"/>
-                </svg>
+                <i class="bi {{ recipe.icon or 'bi-journal-text' }}" style="font-size: 34px; color: #8c6d53;"></i>
             </div>
 
             <div>
@@ -41,14 +36,12 @@
 
     <div class="row g-4 mb-4">
         
-        <!-- COLONNA IMPOSTAZIONI LATERALE -->
         <div class="col-lg-5">
             <div class="card bg-white p-4 border-0 shadow-sm rounded-4">
                 <h5 class="fw-bold mb-3 text-dark text-uppercase border-bottom pb-2 tracking-wide" style="font-size: 14px;">
                     <i class="bi bi-sliders text-primary me-2"></i> Impostazioni Impasto
                 </h5>
 
-                <!-- SELETTORE METODO DI CALCOLO -->
                 <div class="mb-3">
                     <label class="form-label small text-secondary fw-bold text-uppercase" style="font-size: 11px;">Metodo di Calcolo</label>
                     <select id="calc-scale-mode" class="form-select form-select-sm fw-bold rounded-3" autocomplete="off">
@@ -57,13 +50,11 @@
                     </select>
                 </div>
 
-                <!-- BOX 1: INPUT MANUALE PESO LIBERO IN GRAMMI -->
                 <div id="wrapper-weight-input" class="mb-3 {% if recipe.pans %}d-none{% endif %}">
                     <label class="form-label small text-secondary fw-bold text-uppercase" style="font-size: 11px;">Grammi Impasto Desiderati</label>
                     <input type="number" id="calc-target-weight" class="form-control text-center fw-bold fs-5 rounded-3" value="1000" step="50" autocomplete="off">
                 </div>
 
-                <!-- BOX 2: LISTA VISIBILE DI TUTTE LE TEGLIE ABILITATE CON CONTROLLI + / - -->
                 <div id="wrapper-tray-input" class="mb-3 {% if not recipe.pans %}d-none{% endif %}">
                     <label class="form-label small text-secondary fw-bold text-uppercase d-block mb-2" style="font-size: 11px;">Quantità per Singola Teglia Abilitata</label>
                     
@@ -95,7 +86,6 @@
                 </div>
                 {% endif %}
 
-                <!-- SELETTORE LIEVITO -->
                 <div class="mb-3">
                     <label class="form-label small text-secondary fw-bold text-uppercase" style="font-size: 11px;">Tipo di Lievito</label>
                     <select id="calc-yeast-select" class="form-select fw-semibold rounded-3 text-dark" autocomplete="off">
@@ -134,7 +124,6 @@
             </div>
         </div>
 
-        <!-- COLONNA FORMULA CALCOLATA -->
         <div class="col-lg-7">
             <div class="card border-0 shadow-sm mb-4 rounded-4 overflow-hidden">
                 <div class="card-body p-4">
@@ -180,7 +169,6 @@
                                     <td class="text-end text-primary fw-bold fs-5 output-final-weight pe-3">0 g</td>
                                 </tr>
 
-                                <!-- RIGA COMPLESSIVA DEL TOTALE IMPASTO DINAMICO -->
                                 <tr class="table-light border-top border-dark-subtle fw-bold text-dark">
                                     <td class="ps-3 py-3 fs-5">⚖️ TOTALE IMPASTO</td>
                                     <td class="text-center text-secondary">—</td>
@@ -192,7 +180,6 @@
                 </div>
             </div>
 
-            <!-- TAB ISTRUZIONI DI PRODUZIONE -->
             <div class="card border-0 shadow-sm mb-4 rounded-4 overflow-hidden">
                 <div class="card-header bg-white pb-0 pt-3 border-0">
                     <ul class="nav nav-tabs card-header-tabs border-bottom-0" id="publicProcessTabs" role="tablist">
@@ -280,7 +267,6 @@
         </div>
     </div>
 
-    <!-- TABELLINE STATISTICHE LIVE IN FONDO ALLA PAGINA -->
     <div class="row g-3 mb-4">
         <div class="col-6 col-md-3">
             <div class="card bg-white border-0 shadow-sm text-center py-3 rounded-4">
@@ -308,7 +294,6 @@
         </div>
     </div>
 
-    <!-- IN FONDO A TUTTO: PARAMETRI DI PROCESSO -->
     <div class="card border-0 shadow-sm mb-4 bg-white rounded-4">
         <div class="card-body py-3">
             <div class="row text-center align-items-center g-2 small text-dark fw-bold">
@@ -328,7 +313,6 @@
 
 </div>
 
-<!-- MOTORE DI CALCOLO SCIENTIFICO AVANZATO COMPLETO -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const freshToDryRatio = parseFloat("{{ settings_data.fresh_to_dry_ratio if settings_data else 3.0 }}");

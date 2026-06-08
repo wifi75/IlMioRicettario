@@ -40,8 +40,6 @@ migrate = Migrate(app, db)
 # ==========================================================
 # CRITICO: NUOVO ORDINE DI REGISTRAZIONE BLUEPRINT
 # ==========================================================
-# Registriamo PRIMA l'amministrazione in modo che tutti i suoi endpoint 
-# (incluso admin.master_pans_view) siano iniettati nella mappa delle rotte di Flask.
 app.register_blueprint(admin_bp)
 app.register_blueprint(recipes_bp)
 
@@ -54,11 +52,11 @@ def load_user(user_id):
     )
 
 
-# PROCESSORE DI CONTESTO GLOBALE PULITO
+# CORRETTO: Ordiniamo per ID decrescente per prendere SICURAMENTE l'ultimo record attivo e aggiornato
 @app.context_processor
 def inject_global_settings():
     return dict(
-        settings_data=Setting.query.first()
+        settings_data=Setting.query.order_by(Setting.id.desc()).first()
     )
 
 
@@ -71,8 +69,14 @@ def index():
 
 with app.app_context():
 
-    # NOTA: create_all() rimane attivo solo come salvagente per installazioni da zero
     db.create_all()
+
+    # ALLINEAMENTO DI EMERGENZA DATABASE
+    try:
+        db.session.execute(db.text("ALTER TABLE settings ADD COLUMN theme_active VARCHAR(50) DEFAULT 'modern'"))
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
 
     admin = User.query.filter_by(
         username="admin"
@@ -95,7 +99,6 @@ with app.app_context():
         print("Username: admin")
         print("Password: admin123")
 
-    # Iniezione record di partenza nell'anagrafica della flotta teglie infinite
     if MasterBakeryPan.query.count() == 0:
         default_pans = [
             MasterBakeryPan(name="Teglia Rettangolare Ferro Blu 40x30", pan_type="rettangolare", weight_capacity=1200.0),
@@ -104,9 +107,7 @@ with app.app_context():
         ]
         db.session.bulk_save_objects(default_pans)
         db.session.commit()
-        print("Anagrafica teglie master pre-popolata con successo!")
 
-    # Iniezione record di partenza nell'anagrafica centralizzata comprensiva di parametri W
     if MasterIngredient.query.count() == 0:
 
         default_ingredients = [
@@ -127,25 +128,28 @@ with app.app_context():
 
         db.session.bulk_save_objects(default_ingredients)
         db.session.commit()
-        print("Anagrafica ingredienti master pre-popolata con successo con valori W!")
 
     setting = Setting.query.first()
 
     if not setting:
-
         setting = Setting(
             fresh_to_dry_ratio=3.0,
             tangzhong_flour_percent=5.0,
             tangzhong_liquid_multiplier=5.0,
             site_name="Il Mio Ricettario",
             default_unit="g",
-            allow_public_recipes=True
+            allow_public_recipes=True,
+            theme_active="modern"
         )
-
         db.session.add(setting)
         db.session.commit()
+    else:
+        try:
+            db.session.execute(db.text("UPDATE settings SET theme_active = 'modern' WHERE theme_active IS NULL"))
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
 
 
 if __name__ == "__main__":
-    # Mantieni la tua porta personalizzata 8080
     app.run(debug=True, port=8080)

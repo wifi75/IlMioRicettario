@@ -123,11 +123,13 @@ def recipe_new():
 
         instructions_text = request.form.get("instructions", "").strip()
         preferment_text = request.form.get("preferment_instructions", "").strip()
+        badge_text_input = request.form.get("badge_text", "Antica Formula Bilanciata").strip()
 
         recipe = Recipe(
             name=request.form["name"],
             slug=request.form["slug"],
-            description=request.form["description"],
+            badge_text=badge_text_input if badge_text_input else "Antica Formula Bilanciata",
+            description=request.form.get("description", "").strip(),
             instructions=instructions_text,
             is_published="is_published" in request.form,
             
@@ -211,7 +213,6 @@ def recipe_new():
 @admin_bp.route("/recipe/<int:id>")
 @login_required
 def recipe_detail(id):
-    """BLINDATO E PULITO: Schermata di visualizzazione e simulazione in sola lettura"""
     recipe = Recipe.query.get_or_404(id)
 
     ingredients = RecipeIngredient.query.filter_by(
@@ -280,10 +281,13 @@ def recipe_edit(id):
 
         instructions_text = request.form.get("instructions", "").strip()
         preferment_text = request.form.get("preferment_instructions", "").strip()
+        badge_text_input = request.form.get("badge_text", "Antica Formula Bilanciata").strip()
 
         recipe.name = request.form["name"]
         recipe.slug = request.form["slug"]
-        recipe.description = request.form["description"]
+        recipe.icon = request.form.get("icon", "bi-journal-text")
+        recipe.badge_text = badge_text_input if badge_text_input else "Antica Formula Bilanciata"
+        recipe.description = request.form.get("description", "").strip()
         recipe.instructions = instructions_text
         recipe.is_published = "is_published" in request.form
 
@@ -360,7 +364,7 @@ def recipe_edit(id):
     master_pans = MasterBakeryPan.query.order_by(MasterBakeryPan.name).all()
 
     return render_template(
-        "admin/recipe_edit_form.html",
+        "admin/recipe_form.html",
         recipe=recipe,
         feature=feature,
         ingredients=ingredients,
@@ -538,40 +542,66 @@ def master_ingredient_delete(id):
 @admin_bp.route("/settings/yeast", methods=["GET", "POST"])
 @login_required
 def settings_yeast():
-
+    db.create_all()
     setting = Setting.query.first()
+    if not setting:
+        setting = Setting(fresh_to_dry_ratio=3.0, theme_active="modern")
+        db.session.add(setting)
+        db.session.commit()
 
     if request.method == "POST":
-
         try:
-            ratio_value = float(request.form.get("fresh_to_dry_ratio", 3.0))
-            setting.fresh_to_dry_ratio = ratio_value
+            fresco_val = float(request.form.get("yeast_fresh_val", "3.0").replace(",", "."))
+            secco_val = float(request.form.get("yeast_dry_val", "1.0").replace(",", "."))
+
+            if secco_val <= 0:
+                flash("Errore: Il valore del lievito secco deve essere maggiore di 0.", "danger")
+                return redirect(url_for("admin.settings_yeast"))
+
+            setting.fresh_to_dry_ratio = fresco_val / secco_val
             db.session.commit()
-
-            flash(
-                "Coefficiente di conversione lieviti aggiornato correttamente!",
-                "success"
-            )
-
+            flash("Rapporto proporzionale dei lieviti aggiornato globalmente!", "success")
         except ValueError:
-            flash(
-                "Errore: Inserisci un valore numerico valido (es. 3.0)",
-                "danger"
-            )
+            flash("Errore: Inserisci valori numerici validi.", "danger")
+        return redirect(url_for("admin.settings_yeast"))
 
-        return redirect(
-            url_for("admin.settings_yeast")
+    return render_template("admin/settings_yeast.html", setting=setting)
+
+
+# ALLINEATO AL PLURALE: ADESSO AGGIORNA LA TABELLA "SETTINGS" (CON LA S)
+@admin_bp.route("/settings/theme", methods=["GET", "POST"])
+@login_required
+def settings_theme():
+    # Forza l'iniezione della colonna fisica sulla tabella corretta (settings)
+    try:
+        db.session.execute(db.text("ALTER TABLE settings ADD COLUMN theme_active VARCHAR(50) DEFAULT 'modern'"))
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+
+    setting = Setting.query.first()
+    if not setting:
+        setting = Setting(fresh_to_dry_ratio=3.0, theme_active="modern")
+        db.session.add(setting)
+        db.session.commit()
+
+    if request.method == "POST":
+        selected_theme = request.form.get("theme_active", "modern").strip()
+        
+        # AGGIORNAMENTO DIRETTO CORRETTO SULLA TABELLA CON LA S
+        db.session.execute(
+            db.text("UPDATE settings SET theme_active = :theme"),
+            {"theme": selected_theme}
         )
+        db.session.commit()
 
-    return render_template(
-        "admin/settings_yeast.html",
-        setting=setting
-    )
+        flash("Nuovo stile estetico applicato al sito pubblico!", "success")
+        return redirect(url_for("admin.settings_theme"))
 
+    # Ricarica il record aggiornato
+    setting = Setting.query.first()
+    return render_template("admin/settings_theme.html", setting=setting)
 
-# ==========================================================
-# SEZIONE: GESTIONE CAMBIO PASSWORD AMMINISTRATORE (FIXED)
-# ==========================================================
 
 @admin_bp.route("/change_password", methods=["GET", "POST"])
 @login_required

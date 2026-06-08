@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}Nuova Ricetta{% endblock %}
-{% block page_title %}Inserimento Nuova Formula Bilanciata{% endblock %}
+{% block title %}{% if recipe %}Modifica Ricetta{% else %}Nuova Ricetta{% endif %}{% endblock %}
+{% block page_title %}{% if recipe %}Modifica Formula: {{ recipe.name }}{% else %}Inserimento Nuova Formula Bilanciata{% endif %}{% endblock %}
 
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <style>
@@ -51,6 +51,7 @@
 
 <form method="post" id="main-recipe-form">
 
+    <!-- SCHEDA ANAGRAFICA ED IDENTIFICATIVI (CON DESCRIZIONE SPOSTATA IN CIMA) -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header bg-dark text-white fw-bold py-3">
             📝 Scheda Anagrafica ed Identificativi Formula
@@ -59,39 +60,46 @@
             <div class="row g-3">
                 <div class="col-md-4">
                     <label class="form-label fw-bold small text-secondary text-uppercase">Nome Formula</label>
-                    <input type="text" name="name" id="recipe-name" class="form-control" placeholder="es. Focaccia Barese ad Alta Idratazione" required>
+                    <input type="text" name="name" id="recipe-name" class="form-control" value="{{ recipe.name if recipe else '' }}" placeholder="es. Focaccia Barese" required>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-bold small text-secondary text-uppercase">Slug Web (Autogenerato)</label>
-                    <input type="text" name="slug" id="recipe-slug" class="form-control bg-light" placeholder="es. focaccia-barese-ad-alta-idratazione" required>
+                    <input type="text" name="slug" id="recipe-slug" class="form-control bg-light" value="{{ recipe.slug if recipe else '' }}" placeholder="es. focaccia-barese" required>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-bold small text-danger text-uppercase">Etichetta del Badge (Marrone)</label>
-                    <input type="text" name="badge_text" id="recipe-badge-text" class="form-control fw-bold text-dark" placeholder="es. Antica Formula Bilanciata" value="Antica Formula Bilanciata">
+                    <input type="text" name="badge_text" id="recipe-badge-text" class="form-control fw-bold text-dark" value="{{ recipe.badge_text if recipe else 'Antica Formula Bilanciata' }}" placeholder="es. Antica Formula Bilanciata">
                 </div>
                 <div class="col-md-12 mt-3">
                     <label class="form-label fw-bold small text-secondary text-uppercase">Icona Grafica ed Identificazione Categoria</label>
                     <select name="icon" class="form-select fw-semibold bg-white text-dark">
-                        <option value="bi-bread-slice">🍞 Pane / Pane in Cassetta / Impasti Base</option>
-                        <option value="bi-database">🍕 Pizza Generica</option>
-                        <option value="bi-disc">🎯 Pizza Napoletana</option>
-                        <option value="bi-grid-3x3-gap">📋 Pizza in Teglia Romana</option>
-                        <option value="bi-suit-club">🧫 Pinsa in Pala</option>
-                        <option value="bi-circle">🥯 Focaccia Pugliese / Focacce</option>
-                        <option value="bi-cup-straw">🥛 Panini al Latte / all'Olio / Panini</option>
-                        <option value="bi-egg-fried">🍔 Panini per Hamburger / Buns</option>
-                        <option value="bi-bag-heart">🥟 Panzerotti</option>
-                        <option value="bi-moon-stars">🌙 Cornetti / Brioches / Maritozzi</option>
-                        <option value="bi-cookie">🍪 Pangoccioli / Lievitati Dolci da Colazione</option>
-                        <option value="bi-cake2">🎂 Grandi Lievitati (Panettone / Pandoro / Colomba)</option>
-                        <option value="bi-sun">🍩 Zeppole / Fritti</option>
-                        <option value="bi-journal-text" selected>📖 Altro / Formula Generica</option>
+                        <option value="bi-bread-slice" {% if recipe and recipe.icon == 'bi-bread-slice' %}selected{% endif %}>🍞 Pane / Pane in Cassetta / Impasti Base</option>
+                        <option value="bi-database" {% if recipe and recipe.icon == 'bi-database' %}selected{% endif %}>🍕 Pizza Generica</option>
+                        <option value="bi-disc" {% if recipe and recipe.icon == 'bi-disc' %}selected{% endif %}>🎯 Pizza Napoletana</option>
+                        <option value="bi-grid-3x3-gap" {% if recipe and recipe.icon == 'bi-grid-3x3-gap' %}selected{% endif %}>📋 Pizza in Teglia Romana</option>
+                        <option value="bi-suit-club" {% if recipe and recipe.icon == 'bi-suit-club' %}selected{% endif %}>🧫 Pinsa in Pala</option>
+                        <option value="bi-circle" {% if recipe and recipe.icon == 'bi-circle' %}selected{% endif %}>🥯 Focaccia Pugliese / Focacce</option>
+                        <option value="bi-cup-straw" {% if recipe and recipe.icon == 'bi-cup-straw' %}selected{% endif %}>🥛 Panini al Latte / all'Olio / Panini</option>
+                        <option value="bi-egg-fried" {% if recipe and recipe.icon == 'bi-egg-fried' %}selected{% endif %}>🍔 Panini per Hamburger / Buns</option>
+                        <option value="bi-bag-heart" {% if recipe and recipe.icon == 'bi-bag-heart' %}selected{% endif %}>🥟 Panzerotti</option>
+                        <option value="bi-moon-stars" {% if recipe and recipe.icon == 'bi-moon-stars' %}selected{% endif %}>🌙 Cornetti / Brioches / Maritozzi</option>
+                        <option value="bi-cookie" {% if recipe and recipe.icon == 'bi-cookie' %}selected{% endif %}>🍪 Pangoccioli / Lievitati Dolci da Colazione</option>
+                        <option value="bi-cake2" {% if recipe and recipe.icon == 'bi-cake2' %}selected{% endif %}>🎂 Grandi Lievitati (Panettone / Pandoro / Colomba)</option>
+                        <option value="bi-sun" {% if recipe and recipe.icon == 'bi-sun' %}selected{% endif %}>🍩 Zeppole / Fritti</option>
+                        <option value="bi-journal-text" {% if not recipe or recipe.icon == 'bi-journal-text' %}selected{% endif %}>📖 Altro / Formula Generica</option>
                     </select>
+                </div>
+                
+                <!-- COPIATA E INCOLLATA IN CIMA: ECCO LA CASSA DELLA DESCRIZIONE SBLOCCATA -->
+                <div class="col-md-12 mt-3">
+                    <label class="form-label fw-bold small text-secondary text-uppercase">📖 Descrizione Breve della Formula (Sottotitolo della Ricetta)</label>
+                    <textarea name="description" class="form-control shadow-none fw-medium text-dark" rows="3" placeholder="Scrivi qui il sottotitolo personalizzato della ricetta...">{{ recipe.description if recipe and recipe.description else 'Formula di panificazione bilanciata ad alta precisione.' }}</textarea>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- BILANCIAMENTO INGREDIENTI -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header bg-primary text-white fw-bold py-3 d-flex justify-content-between align-items-center">
             <span>📋 Bilanciamento Ingredienti Base (Su 100% Farina)</span>
@@ -111,38 +119,70 @@
                         </tr>
                     </thead>
                     <tbody id="ingredients-container">
-                        <tr class="ingredient-row border-bottom">
-                            <td class="ps-4">
-                                <input type="text" name="ing_name[]" class="form-control form-control-sm fw-semibold input-autocomplete-trigger" list="global-master-ingredients" value="Farina Tipo 0" placeholder="Cerca ingrediente..." required>
-                            </td>
-                            <td>
-                                <input type="number" name="ing_qty[]" class="form-control form-control-sm text-end fw-bold text-primary" placeholder="1000" step="0.1" required>
-                            </td>
-                            <td>
-                                <select name="ing_unit[]" class="form-select form-select-sm text-center fw-medium">
-                                    <option value="g" selected>g</option>
-                                    <option value="kg">kg</option>
-                                    <option value="%">%</option>
-                                </select>
-                            </td>
-                            <td class="text-center">
-                                <input type="checkbox" class="form-check-input input-is-flour" checked>
-                                <input type="hidden" class="hidden-flour-val" name="ing_is_flour_0" value="true">
-                            </td>
-                            <td class="text-center">
-                                <input type="checkbox" class="form-check-input input-is-liquid">
-                                <input type="hidden" class="hidden-liquid-val" name="ing_is_liquid_0" value="false">
-                            </td>
-                            <td class="text-center pe-3">
-                                <button type="button" class="btn btn-sm btn-link text-danger p-0 btn-remove-row"><i class="bi bi-trash fs-5"></i></button>
-                            </td>
-                        </tr>
+                        {% if ingredients %}
+                            {% for ing in ingredients %}
+                            <tr class="ingredient-row border-bottom">
+                                <td class="ps-4">
+                                    <input type="text" name="ing_name[]" class="form-control form-control-sm fw-semibold input-autocomplete-trigger" list="global-master-ingredients" value="{{ ing.name }}" placeholder="Cerca ingrediente..." required>
+                                </td>
+                                <td>
+                                    <input type="number" name="ing_qty[]" class="form-control form-control-sm text-end fw-bold text-primary" value="{{ ing.quantity }}" step="0.1" required>
+                                </td>
+                                <td>
+                                    <select name="ing_unit[]" class="form-select form-select-sm text-center fw-medium">
+                                        <option value="g" {% if ing.unit == 'g' %}selected{% endif %}>g</option>
+                                        <option value="kg" {% if ing.unit == 'kg' %}selected{% endif %}>kg</option>
+                                        <option value="%" {% if ing.unit == '%' %}selected{% endif %}>%</option>
+                                    </select>
+                                </td>
+                                <td class="text-center">
+                                    <input type="checkbox" class="form-check-input input-is-flour" {% if ing.is_flour %}checked{% endif %}>
+                                    <input type="hidden" class="hidden-flour-val" name="ing_is_flour_{{ loop.index0 }}" value="{{ 'true' if ing.is_flour else 'false' }}">
+                                </td>
+                                <td class="text-center">
+                                    <input type="checkbox" class="form-check-input input-is-liquid" {% if ing.is_liquid %}checked{% endif %}>
+                                    <input type="hidden" class="hidden-liquid-val" name="ing_is_liquid_{{ loop.index0 }}" value="{{ 'true' if ing.is_liquid else 'false' }}">
+                                </td>
+                                <td class="text-center pe-3">
+                                    <button type="button" class="btn btn-sm btn-link text-danger p-0 btn-remove-row"><i class="bi bi-trash fs-5"></i></button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr class="ingredient-row border-bottom">
+                                <td class="ps-4">
+                                    <input type="text" name="ing_name[]" class="form-control form-control-sm fw-semibold input-autocomplete-trigger" list="global-master-ingredients" value="Farina Tipo 0" placeholder="Cerca ingrediente..." required>
+                                </td>
+                                <td>
+                                    <input type="number" name="ing_qty[]" class="form-control form-control-sm text-end fw-bold text-primary" placeholder="1000" step="0.1" required>
+                                </td>
+                                <td>
+                                    <select name="ing_unit[]" class="form-select form-select-sm text-center fw-medium">
+                                        <option value="g" selected>g</option>
+                                        <option value="kg">kg</option>
+                                        <option value="%">%</option>
+                                    </select>
+                                </td>
+                                <td class="text-center">
+                                    <input type="checkbox" class="form-check-input input-is-flour" checked>
+                                    <input type="hidden" class="hidden-flour-val" name="ing_is_flour_0" value="true">
+                                </td>
+                                <td class="text-center">
+                                    <input type="checkbox" class="form-check-input input-is-liquid">
+                                    <input type="hidden" class="hidden-liquid-val" name="ing_is_liquid_0" value="false">
+                                </td>
+                                <td class="text-center pe-3">
+                                    <button type="button" class="btn btn-sm btn-link text-danger p-0 btn-remove-row"><i class="bi bi-trash fs-5"></i></button>
+                                </td>
+                            </tr>
+                        {% endif %}
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
+    <!-- FLOTTA TEGLIE -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header bg-secondary text-white fw-bold py-3">
             📐 Flotta Teglie e Stampi Abilitati per questa Ricetta
@@ -155,7 +195,7 @@
                     <div class="col-md-4">
                         <div class="card p-3 rounded pan-checkbox-card">
                             <div class="form-check shadow-none mb-0">
-                                <input class="form-check-input fs-5 me-2" type="checkbox" name="pans[]" value="{{ pan.id }}" id="pan_{{ pan.id }}">
+                                <input class="form-check-input fs-5 me-2" type="checkbox" name="pans[]" value="{{ pan.id }}" id="pan_{{ pan.id }}" {% if recipe and pan in recipe.pans %}checked{% endif %}>
                                 <label class="form-check-label pt-1" for="pan_{{ pan.id }}">
                                     <strong class="text-dark d-block mb-0">{{ pan.name }}</strong>
                                     <small class="text-muted text-uppercase" style="font-size: 11px;">Capacità: {{ pan.weight_capacity|int }}g</small>
@@ -171,16 +211,17 @@
         </div>
     </div>
 
+    <!-- PARAMETRI DI CONFIGURAZIONE -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header bg-warning text-dark fw-bold py-3">
-            🎛️ Parametri di Configurazione Tecnica e Feature Toggles
+            🎛️ Parametri di Configuration Tecnica e Feature Toggles
         </div>
         <div class="card-body p-4">
             <div class="row g-4">
                 <div class="col-md-3 border-end">
                     <label class="form-label small text-uppercase text-muted mb-3">Visibilità e Stato</label>
                     <div class="form-check form-switch mb-2 shadow-none">
-                        <input class="form-check-input" type="checkbox" name="is_published" id="is_published" checked>
+                        <input class="form-check-input" type="checkbox" name="is_published" id="is_published" {% if recipe and recipe.is_published %}checked{% elif not recipe %}checked{% endif %}>
                         <label class="form-check-label small fw-bold" for="is_published">Pubblica immediatamente</label>
                     </div>
                 </div>
@@ -188,7 +229,7 @@
                 <div class="col-md-3 border-end">
                     <label class="form-label small text-uppercase text-muted mb-3">Geometria e Pezzature</label>
                     <div class="form-check form-switch mb-2 shadow-none">
-                        <input class="form-check-input" type="checkbox" name="enable_piece_count" id="enable_piece_count" checked>
+                        <input class="form-check-input" type="checkbox" name="enable_piece_count" id="enable_piece_count" {% if feature and feature.enable_piece_count %}checked{% elif not feature %}checked{% endif %}>
                         <label class="form-check-label small fw-bold" for="enable_piece_count">Abilita Input N. Pezzi / Peso</label>
                     </div>
                 </div>
@@ -196,11 +237,11 @@
                 <div class="col-md-3 border-end">
                     <label class="form-label small text-uppercase text-muted mb-3">Opzioni Calcolatore Scientifico</label>
                     <div class="form-check form-switch mb-2 shadow-none">
-                        <input class="form-check-input" type="checkbox" name="enable_yeast_type" id="enable_yeast_type" checked>
+                        <input class="form-check-input" type="checkbox" name="enable_yeast_type" id="enable_yeast_type" {% if feature and feature.enable_yeast_type %}checked{% elif not feature %}checked{% endif %}>
                         <label class="form-check-label small fw-bold" for="enable_yeast_type">Abilita Menu Tipo Lievito</label>
                     </div>
                     <div class="form-check form-switch shadow-none">
-                        <input class="form-check-input" type="checkbox" name="enable_tangzhong" id="enable_tangzhong">
+                        <input class="form-check-input" type="checkbox" name="enable_tangzhong" id="enable_tangzhong" {% if feature and feature.enable_tangzhong %}checked{% endif %}>
                         <label class="form-check-label small fw-bold" for="enable_tangzhong">Abilita Opzione Tangzhong</label>
                     </div>
                 </div>
@@ -208,77 +249,68 @@
                 <div class="col-md-3">
                     <label class="form-label small text-uppercase text-muted mb-2">Schema Fermentativo Sottoscritto</label>
                     <select name="preferment_type" id="preferment-type-select" class="form-select form-select-sm fw-semibold">
-                        <option value="none" selected>Impasto Diretto</option>
-                        <option value="poolish">Poolish (100% Idratazione)</option>
-                        <option value="biga">Biga Standard (44% Idratazione)</option>
+                        <option value="none" {% if not recipe or recipe.fermentation_type == 'diretto' or recipe.fermentation_type == 'none' %}selected{% endif %}>Impasto Diretto</option>
+                        <option value="poolish" {% if recipe and recipe.fermentation_type == 'poolish' %}selected{% endif %}>Poolish (100% Idratazione)</option>
+                        <option value="biga" {% if recipe and recipe.fermentation_type == 'biga' %}selected{% endif %}>Biga Standard (44% Idratazione)</option>
                     </select>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- PARAMETRI FISICI -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header bg-info text-dark fw-bold py-3">
             🌡️ Parametri Fisici e Tempi di Processo Forzati
         </div>
         <div class="card-body p-4">
             <div class="row g-4 align-items-start">
-                
                 <div class="col-md-3 p-3 bg-light rounded border-1">
                     <div class="form-check form-switch mb-2 shadow-none">
-                        <input class="form-check-input" type="checkbox" name="show_chiusura" id="show_chiusura" checked>
+                        <input class="form-check-input" type="checkbox" name="show_chiusura" id="show_chiusura" {% if recipe and recipe.show_chiusura %}checked{% elif not recipe %}checked{% endif %}>
                         <label class="form-check-label small fw-bold text-dark" for="show_chiusura">Mostra Chiusura</label>
                     </div>
                     <label class="form-label small text-secondary mb-1">Temp. Target (°C)</label>
-                    <input type="number" name="temp_chiusura" class="form-control form-control-sm text-center fw-bold text-danger" value="24.0" step="0.5">
+                    <input type="number" name="temp_chiusura" class="form-control form-control-sm text-center fw-bold text-danger" value="{{ recipe.temp_chiusura if recipe else '24.0' }}" step="0.5">
                 </div>
                 
                 <div class="col-md-3 p-3 bg-light rounded border-1">
                     <div class="form-check form-switch mb-2 shadow-none">
-                        <input class="form-check-input" type="checkbox" name="show_autolysis" id="show_autolysis" checked>
+                        <input class="form-check-input" type="checkbox" name="show_autolysis" id="show_autolysis" {% if recipe and recipe.show_autolysis %}checked{% elif not recipe %}checked{% endif %}>
                         <label class="form-check-label small fw-bold text-dark" for="show_autolysis">Mostra Autolisi</label>
                     </div>
                     <label class="form-label small text-secondary mb-1">Tempo Autolisi (min)</label>
-                    <input type="number" name="tempo_autolisi" class="form-control form-control-sm text-center fw-bold" value="0">
+                    <input type="number" name="tempo_autolisi" class="form-control form-control-sm text-center fw-bold" value="{{ recipe.tempo_autolisi if recipe else '0' }}">
                 </div>
                 
                 <div class="col-md-3 p-3 bg-light rounded border-1">
                     <div class="form-check form-switch mb-1 shadow-none">
-                        <input class="form-check-input" type="checkbox" name="show_checkpoint" id="show_puntata" checked>
+                        <input class="form-check-input" type="checkbox" name="show_checkpoint" id="show_puntata" {% if recipe and recipe.show_puntata %}checked{% elif not recipe %}checked{% endif %}>
                         <label class="form-check-label small fw-bold text-dark" for="show_puntata">Mostra Puntata</label>
                     </div>
                     <div class="form-check form-checkbox shadow-none mb-2">
-                        <input class="form-check-input shadow-none" type="checkbox" name="puntata_fino_al_raddoppio" id="puntata_fino_al_raddoppio">
+                        <input class="form-check-input shadow-none" type="checkbox" name="puntata_fino_al_raddoppio" id="puntata_fino_al_raddoppio" {% if recipe and recipe.puntata_fino_al_raddoppio %}checked{% endif %}>
                         <label class="form-check-label small text-muted" for="puntata_fino_al_raddoppio" style="font-size: 11px; font-weight: 700;">Fino al Raddoppio</label>
                     </div>
-                    <input type="number" id="input-tempo-puntata" name="tempo_puntata" class="form-control form-control-sm text-center fw-bold" value="120">
+                    <input type="number" id="input-tempo-puntata" name="tempo_puntata" class="form-control form-control-sm text-center fw-bold" value="{{ recipe.tempo_puntata if recipe else '120' }}">
                 </div>
                 
                 <div class="col-md-3 p-3 bg-light rounded border-1">
                     <div class="form-check form-switch mb-2 shadow-none">
-                        <input class="form-check-input" type="checkbox" name="show_appretto" id="show_appretto" checked>
+                        <input class="form-check-input" type="checkbox" name="show_appretto" id="show_appretto" {% if recipe and recipe.show_appretto %}checked{% elif not recipe %}checked{% endif %}>
                         <label class="form-check-label small fw-bold text-dark" for="show_appretto">Mostra Appretto</label>
                     </div>
                     <label class="form-label small text-secondary mb-1">Tempo Appretto (min)</label>
-                    <input type="number" name="tempo_appretto" class="form-control form-control-sm text-center fw-bold" value="60">
+                    <input type="number" name="tempo_appretto" class="form-control form-control-sm text-center fw-bold" value="{{ recipe.tempo_appretto if recipe else '60' }}">
                 </div>
-                
             </div>
         </div>
     </div>
 
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-header bg-dark text-white fw-bold py-3">
-            📖 Descrizione Breve della Formula
-        </div>
-        <div class="card-body p-3">
-            <textarea name="description" class="form-control" rows="3" placeholder="Breve introduzione commerciale o tecnica alla ricetta..."></textarea>
-        </div>
-    </div>
-
+    <!-- PREFERMENTO -->
     <div class="card shadow-sm border-0 mb-4 d-none" id="card-preferment-editor">
         <div class="card-header bg-info text-dark fw-bold py-3">
-            🧫 Fase 1: Istruzioni operative e Preparazione del Prefermento
+            🧫 Fase 1: Istruzioni operative e Preparation del Prefermento
         </div>
         <div class="card-body p-3">
             <div id="preferment-editor-container"></div>
@@ -286,6 +318,7 @@
         </div>
     </div>
 
+    <!-- PROCEDIMENTO COMPLETO -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header bg-dark text-white fw-bold py-3">
             📝 Istruzioni di Impasto e Procedimento Completo
@@ -293,20 +326,21 @@
         <div class="card-body p-3">
             <div id="word-toolbar-container"></div>
             <div id="word-editor-container"></div>
-            
             <input type="hidden" name="instructions" id="hidden-instructions-field">
         </div>
     </div>
 
+    <textarea id="raw-instructions-source" class="d-none">{{ recipe.instructions if recipe else '' }}</textarea>
+    <textarea id="raw-preferment-source" class="d-none">{{ recipe.preferment_instructions if recipe else '' }}</textarea>
+
     <div class="d-flex justify-content-between mb-5">
-        <a href="/admin/recipes" class="btn btn-outline-secondary px-4 fw-semibold">Annulla</a>
+        <a href="{{ url_for('admin.recipes') }}" class="btn btn-outline-secondary px-4 fw-semibold">Annulla</a>
         <button type="submit" class="btn btn-success px-5 fw-bold shadow-sm">💾 Registra e Salva Formula</button>
     </div>
 
 </form>
 
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     
@@ -319,21 +353,24 @@ document.addEventListener('DOMContentLoaded', function() {
         ['clean']
     ];
 
-    // Inizializzazione Editor 1: Procedimento Generale
     var quillGeneral = new Quill('#word-editor-container', {
         modules: { toolbar: toolbarOptions },
         theme: 'snow',
-        placeholder: 'Scrivi qui la procedura di impasto e cottura... Usa la barra degli strumenti per gli elenchi numerati.'
+        placeholder: 'Scrivi qui la procedura di impasto e cottura...'
     });
 
-    // Inizializzazione Editor 2: Prefermento
     var quillPreferment = new Quill('#preferment-editor-container', {
         modules: { toolbar: toolbarOptions },
         theme: 'snow',
         placeholder: 'Scrivi qui la procedura di preparazione della biga o del poolish...'
     });
 
-    // Gestione visualizzazione della scheda prefermento in base allo schema fermentativo
+    const textGeneralSource = document.getElementById('raw-instructions-source').value;
+    const textPrefermentSource = document.getElementById('raw-preferment-source').value;
+    
+    quillGeneral.setText(textGeneralSource);
+    quillPreferment.root.innerHTML = textPrefermentSource;
+
     const prefermentSelect = document.getElementById('preferment-type-select');
     const prefermentCard = document.getElementById('card-preferment-editor');
 
@@ -346,9 +383,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     if (prefermentSelect) {
         prefermentSelect.addEventListener('change', checkPrefermentCardVisibility);
+        checkPrefermentCardVisibility();
     }
 
-    // Gestione interblocco Puntata "Fino al Raddoppio"
     const raddoppioCheck = document.getElementById('puntata_fino_al_raddoppio');
     const tempoPuntataInput = document.getElementById('input-tempo-puntata');
 
@@ -364,16 +401,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     if (raddoppioCheck) {
         raddoppioCheck.addEventListener('change', checkRaddoppioInterlock);
+        checkRaddoppioInterlock();
     }
 
-    // Al submit convogliami i dati di testo puliti per il backend Flask
     var recipeForm = document.getElementById('main-recipe-form');
     recipeForm.addEventListener('submit', function() {
         document.getElementById('hidden-instructions-field').value = quillGeneral.getText().trim();
         document.getElementById('hidden-preferment-field').value = quillPreferment.root.innerHTML.trim();
     });
 
-    // Generatore automatico real-time dello Slug Web
     const nameInput = document.getElementById('recipe-name');
     if (nameInput) {
         nameInput.addEventListener('input', function() {
@@ -385,7 +421,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Gestione dinamica righe tabella ingredienti
     const container = document.getElementById('ingredients-container');
     const btnAdd = document.getElementById('btn-add-ingredient');
 
@@ -394,8 +429,8 @@ document.addEventListener('DOMContentLoaded', function() {
         rows.forEach((row, index) => {
             const flourHidden = row.querySelector('.hidden-flour-val');
             const liquidHidden = row.querySelector('.hidden-liquid-val');
-            if (flourHidden) flourHidden.setAttribute('name', `ing_is_flour_{index}`);
-            if (liquidHidden) liquidHidden.setAttribute('name', `ing_is_liquid_{index}`);
+            if (flourHidden) flourHidden.setAttribute('name', `ing_is_flour_${index}`);
+            if (liquidHidden) liquidHidden.setAttribute('name', `ing_is_liquid_${index}`);
         });
     }
 
@@ -497,5 +532,4 @@ document.addEventListener('DOMContentLoaded', function() {
     reindexRows();
 });
 </script>
-
 {% endblock %}

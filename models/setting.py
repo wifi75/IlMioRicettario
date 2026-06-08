@@ -40,5 +40,11 @@ class Setting(db.Model):
         default=True
     )
 
+    # LA COLONNA AGGIUNTA SULLA TABELLA PLURALE CORRETTA
+    theme_active = db.Column(
+        db.String(50),
+        default="modern"
+    )
+
     def __repr__(self):
         return "<Settings>"

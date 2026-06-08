@@ -18,6 +18,133 @@
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
+    <!-- ========================================================================= -->
+    <!-- MOTORE DEI 6 TEMI VINTAGE DINAMICI (SI ATTIVA SUL FRONTEND PUBBLICO)      -->
+    <!-- ========================================================================= -->
+    {% if settings_data %}
+    <style>
+        :root {
+            /* =============== TEMA 1: MODERNO STANDARD =============== */
+            {% if settings_data.theme_active == 'modern' or not settings_data.theme_active %}
+            --vtg-bg: #f8fafc;
+            --vtg-card-bg: #ffffff;
+            --vtg-text: #1e293b;
+            --vtg-primary: #0284c7;
+            --vtg-secondary: #22c55e;
+            --vtg-accent: #06b6d4;
+            --vtg-border: #e2e8f0;
+            --vtg-font: 'Inter', system-ui, sans-serif;
+            --vtg-radius: 12px;
+
+            /* =============== TEMA 2: ANTICA PANETTERIA =============== */
+            {% elif settings_data.theme_active == 'antica_panetteria' %}
+            --vtg-bg: #F9F6F0 !important;
+            --vtg-card-bg: #FCFAF7 !important;
+            --vtg-text: #2B2621 !important;
+            --vtg-primary: #A94438 !important;
+            --vtg-secondary: #606C5D !important;
+            --vtg-accent: #8C6D53 !important;
+            --vtg-border: #E1D4BB !important;
+            --vtg-font: 'Georgia', serif !important;
+            --vtg-radius: 4px !important;
+
+            /* =============== TEMA 3: MULINO STORICO =============== */
+            {% elif settings_data.theme_active == 'mulino_storico' %}
+            --vtg-bg: #EFEAD8 !important;
+            --vtg-card-bg: #F5F2E9 !important;
+            --vtg-text: #3C2A21 !important;
+            --vtg-primary: #1A1A1A !important;
+            --vtg-secondary: #567287 !important;
+            --vtg-accent: #654E34 !important;
+            --vtg-border: #D0C9B1 !important;
+            --vtg-font: 'Georgia', serif !important;
+            --vtg-radius: 0px !important;
+
+            /* =============== TEMA 4: FORNO DI PAESE =============== */
+            {% elif settings_data.theme_active == 'forno_paese' %}
+            --vtg-bg: #EAEFF2 !important;
+            --vtg-card-bg: #F4F7F9 !important;
+            --vtg-text: #1E252B !important;
+            --vtg-primary: #2B4C63 !important;
+            --vtg-secondary: #D4A359 !important;
+            --vtg-accent: #567287 !important;
+            --vtg-border: #C8D3DB !important;
+            --vtg-font: 'Georgia', serif !important;
+            --vtg-radius: 8px !important;
+
+            /* =============== TEMA 5: BORGO ANTICO =============== */
+            {% elif settings_data.theme_active == 'borgo_antico' %}
+            --vtg-bg: #F5EFE6 !important;
+            --vtg-card-bg: #FAF7F2 !important;
+            --vtg-text: #3F3329 !important;
+            --vtg-primary: #D36B39 !important;
+            --vtg-secondary: #7882A4 !important;
+            --vtg-accent: #A799B7 !important;
+            --vtg-border: #E6DDC4 !important;
+            --vtg-font: 'Georgia', serif !important;
+            --vtg-radius: 6px !important;
+
+            /* =============== TEMA 6: PIZZERIA INDUSTRIALE =============== */
+            {% elif settings_data.theme_active == 'pizzeria_industriale' %}
+            --vtg-bg: #22252A !important;
+            --vtg-card-bg: #2B2F36 !important;
+            --vtg-text: #E3E6EB !important;
+            --vtg-primary: #E67E22 !important;
+            --vtg-secondary: #7F8C8D !important;
+            --vtg-accent: #BDC3C7 !important;
+            --vtg-border: #3F444E !important;
+            --vtg-font: 'Trebuchet MS', sans-serif !important;
+            --vtg-radius: 2px !important;
+            {% endif %}
+        }
+
+        /* INIEZIONE UNIVERSALE STRIPPA-BOOTSTRAP (ATTIVA SOLO FUORI DALL'INTERFACCIA ADMIN DEL SITO) */
+        body:not(:has(.main-content)) { 
+            background-color: var(--vtg-bg) !important; 
+            color: var(--vtg-text) !important;
+            font-family: var(--vtg-font) !important;
+        }
+        body:not(:has(.main-content)) .card, body:not(:has(.main-content)) .card-body { 
+            background-color: var(--vtg-card-bg) !important; 
+            border-color: var(--vtg-border) !important;
+            border-radius: var(--vtg-radius) !important;
+            color: var(--vtg-text) !important;
+        }
+        body:not(:has(.main-content)) h1, body:not(:has(.main-content)) h2, body:not(:has(.main-content)) h3, body:not(:has(.main-content)) h4, body:not(:has(.main-content)) h5, body:not(:has(.main-content)) h6, body:not(:has(.main-content)) .fw-bold {
+            color: var(--vtg-text) !important;
+            font-family: var(--vtg-font) !important;
+        }
+        body:not(:has(.main-content)) .text-primary, body:not(:has(.main-content)) .output-final-weight { 
+            color: var(--vtg-primary) !important; 
+        }
+        body:not(:has(.main-content)) .text-success, body:not(:has(.main-content)) .output-baker-pct { 
+            color: var(--vtg-secondary) !important; 
+        }
+        body:not(:has(.main-content)) .text-info { 
+            color: var(--vtg-accent) !important; 
+        }
+        body:not(:has(.main-content)) .btn-primary, body:not(:has(.main-content)) .btn-success, body:not(:has(.main-content)) .input-group-text, body:not(:has(.main-content)) .form-select, body:not(:has(.main-content)) .form-control {
+            border-color: var(--vtg-border) !important;
+            border-radius: var(--vtg-radius) !important;
+        }
+        body:not(:has(.main-content)) .btn-primary, body:not(:has(.main-content)) .btn-success {
+            background-color: var(--vtg-primary) !important;
+            color: #fff !important;
+        }
+    </style>
+    {% endif %}
+
+    <style>
+        /* Sincronizzazione transizioni pannello admin barra laterale */
+        .hover-sidebar {
+            transition: all 0.2s ease-in-out;
+        }
+        .hover-sidebar:hover {
+            background: rgba(255, 255, 255, 0.08) !important;
+            transform: translateX(3px);
+        }
+    </style>
+
 </head>
 
 <body>
@@ -93,8 +220,13 @@
             </span>
 
             <a href="{{ url_for('admin.settings_yeast') }}" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 opacity-75 hover-sidebar">
-                <i class="bi bi-gear"></i>
-                <span>Impostazioni Lieviti</span>
+                <i class="bi bi-gear-fill text-primary"></i>
+                <span>Bilanciamento Lieviti</span>
+            </a>
+
+            <a href="{{ url_for('admin.settings_theme') }}" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 opacity-75 hover-sidebar">
+                <i class="bi bi-palette-fill text-info"></i>
+                <span>Design e Temi Sito</span>
             </a>
 
             <a href="{{ url_for('admin.change_password') }}" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 opacity-75 hover-sidebar">
@@ -132,7 +264,7 @@
         </div>
         <div>
             <span class="badge bg-primary px-3 py-2">
-                Il Mio Ricettario
+                Pannello Amministrazione
             </span>
         </div>
     </div>
@@ -146,9 +278,7 @@
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
         {% for category, message in messages %}
-        <div class="alert alert-{{ category }} shadow-sm">
-            {{ message }}
-        </div>
+        <div class="alert alert-{{ category }} shadow-sm">{{ message }}</div>
         {% endfor %}
     {% endif %}
     {% endwith %}
