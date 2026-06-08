@@ -3,6 +3,8 @@
 {% block title %}Dettaglio: {{ recipe.name }}{% endblock %}
 {% block page_title %}Scheda Tecnica: {{ recipe.name }}{% endblock %}
 
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
 {% block content %}
 
 <div class="d-flex justify-content-end gap-2 mb-4">
@@ -45,10 +47,10 @@
                                 <td class="ps-4 fw-bold text-dark">
                                     {{ ingredient.name }}
                                     {% if ingredient.is_flour %}
-                                    <span class="badge bg-warning text-dark style-badge" style="font-size: 9px;">Farina</span>
+                                    <span class="badge bg-warning text-dark ms-1" style="font-size: 9px; font-weight: 800;">Farina</span>
                                     {% endif %}
                                     {% if ingredient.is_liquid %}
-                                    <span class="badge bg-info text-dark style-badge" style="font-size: 9px;">Liquido</span>
+                                    <span class="badge bg-info text-dark ms-1" style="font-size: 9px; font-weight: 800;">Liquido</span>
                                     {% endif %}
                                 </td>
                                 <td class="text-end text-muted">{{ ingredient.quantity }}</td>
@@ -202,8 +204,27 @@
                 
                 <div class="tab-pane fade show active" id="tab-base" role="tabpanel">
                     <h5 class="fw-bold mb-3 text-dark">Procedimento Operativo Step-by-Step</h5>
-                    <div class="text-dark fs-6 lh-base" style="white-space: pre-line;">
-                        {{ recipe.instructions or "Nessun dettaglio operativo inserito." }}
+                    
+                    <div class="text-dark fs-6" style="line-height: 2;">
+                        {% if recipe.instructions %}
+                            {% set righe = recipe.instructions.split('\n') %}
+                            {% set count = namespace(value=1) %}
+                            {% for riga in righe %}
+                                {% set riga_pulita = riga.strip() %}
+                                {% if riga_pulita %}
+                                    <div class="d-flex align-items-start mb-2">
+                                        <span class="fw-bold text-primary me-2" style="min-width: 25px;">{{ count.value }}.</span>
+                                        <div>
+                                            {% set parole = riga_pulita.split(' ') %}
+                                            <strong class="text-dark">{{ parole[0] }}</strong> {{ parole[1:] | join(' ') }}
+                                        </div>
+                                    </div>
+                                    {% set count.value = count.value + 1 %}
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <span class="text-muted italic">Nessun dettaglio operativo inserito.</span>
+                        {% endif %}
                     </div>
                 </div>
 
@@ -272,6 +293,8 @@
 
 </div>
 
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const DB_YEAST_RATIO = parseFloat("{{ settings_data.fresh_to_dry_ratio if settings_data and settings_data.fresh_to_dry_ratio else 3.0 }}");
@@ -330,7 +353,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Attiva l'elemento corrente
                 this.classList.add('active');
                 targetedPane.classList.remove('d-none');
-                // Timeout minimo per far elaborare l'animazione di entrata dissolvenza
                 setTimeout(() => {
                     targetedPane.classList.add('show', 'active');
                 }, 10);

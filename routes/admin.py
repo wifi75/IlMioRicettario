@@ -14,7 +14,8 @@ from flask_login import (
     current_user
 )
 
-from werkzeug.security import check_password_hash
+# AGGIORNATO: Importati sia check che generate per la sicurezza delle password
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from extensions import db
 
@@ -39,7 +40,7 @@ admin_bp = Blueprint(
 def login():
 
     if current_user.is_authenticated:
-        return redirect(url_for("admin.dashboard"))
+        return redirect(url_for("admin.recipes")) # AGGIORNATO: Va dritto alle ricette
 
     if request.method == "POST":
 
@@ -62,7 +63,7 @@ def login():
             )
 
             return redirect(
-                url_for("admin.dashboard")
+                url_for("admin.recipes") # AGGIORNATO: Atterra dritto sulle ricette
             )
 
         flash(
@@ -94,15 +95,8 @@ def logout():
 @admin_bp.route("/dashboard")
 @login_required
 def dashboard():
-
-    recipes_count = Recipe.query.count()
-    wiki_count = WikiArticle.query.count()
-
-    return render_template(
-        "admin/dashboard.html",
-        recipes_count=recipes_count,
-        wiki_count=wiki_count
-    )
+    # AGGIORNATO: Disattivata e convertita in un redirect di sicurezza verso le ricette
+    return redirect(url_for("admin.recipes"))
 
 
 @admin_bp.route("/recipes")
@@ -128,11 +122,14 @@ def recipe_new():
 
     if request.method == "POST":
 
+        # AGGIORNATO DA TIZIANO CASSONE: Rilevamento istruzioni pulite per l'editor Word
+        instructions_text = request.form.get("instructions", "").strip()
+
         recipe = Recipe(
             name=request.form["name"],
             slug=request.form["slug"],
             description=request.form["description"],
-            instructions=request.form["instructions"],
+            instructions=instructions_text,
             is_published="is_published" in request.form,
             temp_chiusura=float(request.form.get("temp_chiusura", 24.0)) if request.form.get("temp_chiusura") else 24.0,
             tempo_autolisi=int(request.form.get("tempo_autolisi", 0)) if request.form.get("tempo_autolisi") else 0,
@@ -325,10 +322,13 @@ def recipe_edit(id):
 
     if request.method == "POST":
 
+        # AGGIORNATO DA TIZIANO CASSONE: Rilevamento istruzioni pulite in fase di modifica formula
+        instructions_text = request.form.get("instructions", "").strip()
+
         recipe.name = request.form["name"]
         recipe.slug = request.form["slug"]
         recipe.description = request.form["description"]
-        recipe.instructions = request.form["instructions"]
+        recipe.instructions = instructions_text
         recipe.is_published = "is_published" in request.form
 
         recipe.temp_chiusura = float(request.form.get("temp_chiusura", 24.0)) if request.form.get("temp_chiusura") else 24.0
@@ -538,3 +538,40 @@ def settings_yeast():
         "admin/settings_yeast.html",
         setting=setting
     )
+
+
+# ==========================================================
+# INTEGRAZIONE: GESTIONE CAMBIO PASSWORD SICURA AMMINISTRATORE
+# ==========================================================
+
+@admin_bp.route("/change-password", methods=["GET", "POST"])
+@login_required
+def change_password():
+    if request.method == "POST":
+        old_password = request.form.get("old_password")
+        new_password = request.form.get("new_password")
+        confirm_password = request.form.get("confirm_password")
+
+        # 1. Verifica la password attuale sul database
+        if not check_password_hash(current_user.password_hash, old_password):
+            flash("La password attuale inserita non è corretta.", "danger")
+            return redirect(url_for("admin.change_password"))
+
+        # 2. Controllo coerenza nuova chiave
+        if new_password != confirm_password:
+            flash("La nuova password e la password di conferma non coincidono.", "danger")
+            return redirect(url_for("admin.change_password"))
+
+        # 3. Controllo lunghezza minima
+        if len(new_password) < 6:
+            flash("La nuova password deve contenere almeno 6 caratteri.", "warning")
+            return redirect(url_for("admin.change_password"))
+
+        # 4. Generazione hash e salvataggio
+        current_user.password_hash = generate_password_hash(new_password)
+        db.session.commit()
+
+        flash("Password amministratore aggiornata con successo!", "success")
+        return redirect(url_for("admin.recipes")) # Redirezione pulita verso ricette
+
+    return render_template("admin/change_password.html")

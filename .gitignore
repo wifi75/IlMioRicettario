@@ -1,4 +1,13 @@
+# Cache di Python
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+
+# Database personale di Tiziano (Non caricare mai!)
 instance/
+*.db
+data/*.db
+
+# File di configurazione locale o segreti
 .env

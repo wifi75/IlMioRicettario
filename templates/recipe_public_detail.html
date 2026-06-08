@@ -5,11 +5,9 @@
 {% block content %}
 <div class="container py-4">
 
-    <!-- HEADER DELLA RICETTA IN STILE RETRÒ / VINTAGE ARTISAN -->
     <div class="card mb-4 border-0 shadow-sm rounded-4 overflow-hidden" style="background-color: #fdfaf6; border: 2px solid #e6dfd3 !important;">
         <div class="card-body p-4 d-flex flex-column flex-md-row align-items-center gap-4 text-center text-md-start">
             
-            <!-- Timbro Tradizionale dei Mulini in SVG -->
             <div class="d-inline-flex align-items-center justify-content-center rounded-circle flex-shrink-0" 
                  style="width: 80px; height: 80px; background-color: #f4ece1; border: 3px double #8c6d53; box-shadow: 0 0 0 4px #f4ece1;">
                 <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#8c6d53" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -153,7 +151,24 @@
                     
                     <div class="tab-pane fade show active" id="panel-base" role="tabpanel">
                         <h6 class="fw-bold mb-3 text-secondary text-uppercase tracking-wide" style="font-size: 11px;">Procedura Operativa di Chiusura</h6>
-                        <div style="white-space: pre-line;" class="text-dark fs-6 lh-base fw-medium">{{ recipe.instructions }}</div>
+                        
+                        <div style="line-height: 2; letter-spacing: 0.01em;" class="text-dark fs-6 fw-medium">
+                            {% set righe = recipe.instructions.split('\n') %}
+                            {% set count = namespace(value=1) %}
+                            {% for riga in righe %}
+                                {% set riga_pulita = riga.strip() %}
+                                {% if riga_pulita %}
+                                    <div class="d-flex align-items-start mb-3">
+                                        <span class="fw-bold text-primary me-2" style="min-width: 25px;">{{ count.value }}.</span>
+                                        <div>
+                                            {% set parole = riga_pulita.split(' ') %}
+                                            <strong class="text-dark">{{ parole[0] }}</strong> {{ parole[1:] | join(' ') }}
+                                        </div>
+                                    </div>
+                                    {% set count.value = count.value + 1 %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
                     </div>
                     
                     <div class="tab-pane fade d-none" id="panel-preferment" role="tabpanel">
@@ -203,7 +218,7 @@
 
                         <div class="p-3 bg-light rounded-3 border-0 small text-muted">
                             <div class="mb-2"><strong class="text-dark">Regola Scientifica:</strong> Tang Zhong = <span id="desc-rule-flour-pct">5%</span> della farina totale e liquidi = <span id="desc-rule-mult">5×</span> la farina del Tang Zhong. Queste quantità vengono sottratte automaticamente da farina e latte della ricetta principale.</div>
-                            <div><strong class="text-dark">Nota tecnica:</strong> Il Tangzhong (conosciuto anche come Water Roux o Yudane) è una tecnica di pre-gelatinizzazione degli amidi. This permette all'impasto di trattenere più umidità, rendendo i panini più soffici, elastici e duraturi nel tempo.</div>
+                            <div><strong class="text-dark">Nota tecnica:</strong> Il Tangzhong (conosciuto anche como Water Roux o Yudane) è una tecnica di pre-gelatinizzazione degli amidi. This permette all'impasto di trattenere più umidità, rendendo i panini più soffici, elastici e duraturi nel tempo.</div>
                             <div class="mt-2 text-warning fw-bold">🚨 Nota bene: quando attivi il Tangzhong, le quantità utilizzate per prepararlo non sono incluse direttamente negli ingredienti principali della ricetta a destra, perché vengono sottratte automaticamente per essere cotte a parte.</div>
                         </div>
                     </div>
