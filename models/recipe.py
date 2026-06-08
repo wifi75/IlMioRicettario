@@ -1,6 +1,12 @@
 from datetime import datetime
-
 from extensions import db
+
+# Tabella di associazione Many-to-Many tra Ricette e Teglie abilitate
+recipe_pans = db.Table(
+    "recipe_pans",
+    db.Column("recipe_id", db.Integer, db.ForeignKey("recipes.id", ondelete="CASCADE"), primary_key=True),
+    db.Column("pan_id", db.Integer, db.ForeignKey("master_bakery_pans.id", ondelete="CASCADE"), primary_key=True)
+)
 
 
 class Recipe(db.Model):
@@ -71,6 +77,44 @@ class Recipe(db.Model):
         default=60
     )
 
+    # --- SOTTO-SISTEMA DI VISIBILITÀ CON SWITCH BOOLEANI ---
+    show_chiusura = db.Column(
+        db.Boolean,
+        default=True
+    )
+
+    show_autolysis = db.Column(
+        db.Boolean,
+        default=True
+    )
+
+    show_puntata = db.Column(
+        db.Boolean,
+        default=True
+    )
+
+    puntata_fino_al_raddoppio = db.Column(
+        db.Boolean,
+        default=False
+    )
+
+    show_appretto = db.Column(
+        db.Boolean,
+        default=True
+    )
+
+    # --- GESTIONE AVANZATA PREFERMENTAZIONE (FASE 1) ---
+    fermentation_type = db.Column(
+        db.String(50),
+        nullable=False,
+        default="diretto"  # 'diretto', 'poolish', 'biga'
+    )
+
+    preferment_instructions = db.Column(
+        db.Text,
+        nullable=True
+    )
+
     created_at = db.Column(
         db.DateTime,
         default=datetime.utcnow
@@ -82,6 +126,7 @@ class Recipe(db.Model):
         onupdate=datetime.utcnow
     )
 
+    # --- RELAZIONI E COLLEGAMENTI ---
     ingredients = db.relationship(
         "RecipeIngredient",
         backref="recipe",
@@ -97,31 +142,38 @@ class Recipe(db.Model):
         lazy=True
     )
 
+    # Relazione Many-to-Many con la flotta delle teglie master infinite
+    pans = db.relationship(
+        "MasterBakeryPan",
+        secondary=recipe_pans,
+        lazy="subquery",
+        backref=db.backref("recipes", lazy=True)
+    )
+
 
     def ingredient_count(self):
         return len(self.ingredients)
 
 
     def total_flour(self):
-
         return sum(
             ingredient.quantity
             for ingredient in self.ingredients
-            if ingredient.is_flour
+            for ingredient_master in [getattr(ingredient, 'master_ingredient', None)]
+            if (ingredient_master and ingredient_master.is_flour) or getattr(ingredient, 'is_flour', False)
         )
 
 
     def total_liquids(self):
-
         return sum(
             ingredient.quantity
             for ingredient in self.ingredients
-            if ingredient.is_liquid
+            for ingredient_master in [getattr(ingredient, 'master_ingredient', None)]
+            if (ingredient_master and ingredient_master.is_liquid) or getattr(ingredient, 'is_liquid', False)
         )
 
 
     def hydration(self):
-
         flour = self.total_flour()
 
         if flour <= 0:

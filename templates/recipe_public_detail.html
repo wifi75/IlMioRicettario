@@ -5,6 +5,7 @@
 {% block content %}
 <div class="container py-4">
 
+    <!-- INTESTAZIONE SCHEDA RICETTA -->
     <div class="card mb-4 border-0 shadow-sm rounded-4 overflow-hidden" style="background-color: #fdfaf6; border: 2px solid #e6dfd3 !important;">
         <div class="card-body p-4 d-flex flex-column flex-md-row align-items-center gap-4 text-center text-md-start">
             
@@ -28,43 +29,69 @@
 
     <div class="row g-4 mb-4">
         
+        <!-- COLONNA IMPOSTAZIONI LATERALE -->
         <div class="col-lg-5">
             <div class="card bg-white p-4 border-0 shadow-sm rounded-4">
                 <h5 class="fw-bold mb-3 text-dark text-uppercase border-bottom pb-2 tracking-wide" style="font-size: 14px;">
                     <i class="bi bi-sliders text-primary me-2"></i> Impostazioni Impasto
                 </h5>
 
-                {% if feature and feature.enable_piece_count %}
-                <div class="row g-2 mb-3">
-                    <div class="col-6">
-                        <label class="form-label small text-secondary fw-bold text-uppercase" style="font-size: 11px;">N. Panetti / Pezzi</label>
-                        <input type="number" id="calc-pieces-count" class="form-control text-center fw-bold fs-5 rounded-3" value="6" min="1">
-                    </div>
-                    <div class="col-6">
-                        <label class="form-label small text-secondary fw-bold text-uppercase" style="font-size: 11px;">Peso Panetto (g)</label>
-                        <input type="number" id="calc-pieces-weight" class="form-control text-center fw-bold fs-5 rounded-3" value="140" min="1">
+                <!-- SELETTORE METODO DI CALCOLO -->
+                <div class="mb-3">
+                    <label class="form-label small text-secondary fw-bold text-uppercase" style="font-size: 11px;">Metodo di Calcolo</label>
+                    <select id="calc-scale-mode" class="form-select form-select-sm fw-bold rounded-3">
+                        <option value="weight" selected>⚖️ Peso Impasto Desiderato</option>
+                        <option value="tray">📐 Calcolo per Teglie Assegnate</option>
+                    </select>
+                </div>
+
+                <!-- BOX 1: INPUT MANUALE PESO LIBERO IN GRAMMI -->
+                <div id="wrapper-weight-input" class="mb-3">
+                    <label class="form-label small text-secondary fw-bold text-uppercase" style="font-size: 11px;">Grammi Impasto Desiderati</label>
+                    <input type="number" id="calc-target-weight" class="form-control text-center fw-bold fs-5 rounded-3" value="1000" step="50">
+                </div>
+
+                <!-- BOX 2: LISTA VISIBILE DI TUTTE LE TEGLIE ABILITATE CON CONTROLLI + / - -->
+                <div id="wrapper-tray-input" class="mb-3 d-none">
+                    <label class="form-label small text-secondary fw-bold text-uppercase d-block mb-2" style="font-size: 11px;">Quantità per Singola Teglia Abilitata</label>
+                    
+                    <div class="d-flex flex-column gap-2 mb-2" id="public-pans-list-container">
+                        {% if recipe.pans %}
+                            {% for pan in recipe.pans %}
+                            <div class="d-flex align-items-center justify-content-between p-2 border rounded-3 bg-light-subtle public-pan-row" data-capacity="{{ pan.weight_capacity }}">
+                                <div>
+                                    <span class="fw-bold text-dark d-block" style="font-size: 13px;">{{ pan.name }}</span>
+                                    <small class="text-muted fw-medium">Capacità: {{ pan.weight_capacity|int }}g</small>
+                                </div>
+                                <div class="input-group input-group-sm justify-content-end" style="max-width: 120px;">
+                                    <button class="btn btn-outline-secondary fw-bold btn-pan-qty-minus" type="button">-</button>
+                                    <input type="number" class="form-control text-center fw-bold input-pan-qty-value" value="0" min="0" style="font-size: 14px;" readonly>
+                                    <button class="btn btn-outline-secondary fw-bold btn-pan-qty-plus" type="button">+</button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center py-2 text-muted small border rounded-3 bg-light">Nessuna teglia associata a questa ricetta.</div>
+                        {% endif %}
                     </div>
                 </div>
-                <select id="calc-scale-mode" class="d-none"><option value="pieces" selected></option></select>
-                {% else %}
-                    <select id="calc-scale-mode" class="d-none"><option value="weight" selected></option></select>
-                    <div id="wrapper-weight-input" class="mb-3">
-                        <label class="form-label small text-secondary fw-bold text-uppercase" style="font-size: 11px;">Grammi Impasto Desiderati</label>
-                        <input type="number" id="calc-target-weight" class="form-control text-center fw-bold fs-5 rounded-3" value="1000" step="50">
-                    </div>
+
+                <!-- GESTIONE COMPATIBILITÀ VECCHI TOGGLES GEOMETRIA PEZZATURA -->
+                {% if feature and feature.enable_piece_count %}
+                <div class="p-3 bg-light rounded-3 border mb-3 text-center small text-muted d-none">
+                    <input type="number" id="calc-pieces-count" value="1">
+                    <input type="number" id="calc-pieces-weight" value="140">
+                </div>
                 {% endif %}
 
-                {% if feature and feature.enable_yeast_type %}
+                <!-- SELETTORE LIEVITO FORZATO SEMPRE VISIBILE -->
                 <div class="mb-3">
                     <label class="form-label small text-secondary fw-bold text-uppercase" style="font-size: 11px;">Tipo di Lievito</label>
-                    <select id="calc-yeast-select" class="form-select fw-semibold rounded-3">
+                    <select id="calc-yeast-select" class="form-select fw-semibold rounded-3 text-dark">
                         <option value="base" selected>Lievito fresco</option>
                         <option value="dry">Lievito secco disidratato</option>
                     </select>
                 </div>
-                {% else %}
-                    <select id="calc-yeast-select" class="d-none"><option value="base" selected></option></select>
-                {% endif %}
 
                 {% if feature and feature.enable_tangzhong %}
                 <div class="mb-3">
@@ -91,11 +118,12 @@
                 </div>
 
                 <div class="mt-3 p-3 bg-light rounded-3 text-dark border small fw-bold text-center" id="box-stringa-riepilogo" style="border-color: #e2e8f0 !important;">
-                    Parametri Target Selezionati Rilevati
+                    Target Peso Impasto Richiesto: 1000g
                 </div>
             </div>
         </div>
 
+        <!-- COLONNA FORMULA CALCOLATA -->
         <div class="col-lg-7">
             <div class="card border-0 shadow-sm mb-4 rounded-4 overflow-hidden">
                 <div class="card-body p-4">
@@ -106,7 +134,7 @@
                             <thead>
                                 <tr class="table-light text-secondary small">
                                     <th class="ps-3">Materia Prima</th>
-                                    <th class="text-end text-success">Percentuale Baker</th>
+                                    <th class="text-center" style="width: 25%;">Percentuale Baker</th>
                                     <th class="text-end text-primary fw-bold pe-3" style="width: 35%;">Grammi Necessari</th>
                                 </tr>
                             </thead>
@@ -123,23 +151,38 @@
                                         {% if ing.is_flour %}<span class="badge bg-warning text-dark ms-1" style="font-size:9px; font-weight: 800;">FARINA</span>{% endif %}
                                         {% if ing.is_liquid %}<span class="badge bg-info text-dark ms-1" style="font-size:9px; font-weight: 800;">LIQUIDO</span>{% endif %}
                                     </td>
-                                    <td class="text-end text-success fw-bold output-baker-pct">0%</td>
+                                    <td class="text-center text-success fw-bold output-baker-pct">0%</td>
                                     <td class="text-end text-primary fw-bold fs-5 output-final-weight pe-3">0 g</td>
                                 </tr>
                                 {% endfor %}
+                                
+                                <!-- RIGA DI SICUREZZA INSERITA AUTOMATICAMENTE SE MANCA IL LIEVITO -->
+                                <tr id="fallback-yeast-row" class="output-ingredient-row border-bottom d-none"
+                                    data-name="Lievito di Birra"
+                                    data-base-qty="2.5" 
+                                    data-is-flour="false"
+                                    data-is-liquid="false"
+                                    data-is-yeast="true">
+                                    <td class="fw-bold text-dark ps-3">
+                                        <span id="fallback-yeast-label-name">Lievito di Birra Fresco</span>
+                                    </td>
+                                    <td class="text-center text-success fw-bold output-baker-pct">0.3%</td>
+                                    <td class="text-end text-primary fw-bold fs-5 output-final-weight pe-3">0 g</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
+            <!-- TAB ISTRUZIONI DI PRODUZIONE -->
             <div class="card border-0 shadow-sm mb-4 rounded-4 overflow-hidden">
                 <div class="card-header bg-white pb-0 pt-3 border-0">
                     <ul class="nav nav-tabs card-header-tabs border-bottom-0" id="publicProcessTabs" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active fw-bold small text-uppercase px-3 py-2" id="nav-base-tab" data-bs-toggle="tab" data-bs-target="#panel-base" type="button" role="tab">Impasto Finale</button>
                         </li>
-                        <li class="nav-item {% if not feature or (not feature.enable_biga and not feature.enable_poolish) %}d-none{% endif %}" id="nav-li-preferment" role="presentation">
+                        <li class="nav-item {{ 'd-none' if not feature or (not feature.enable_biga and not feature.enable_poolish) }}" id="nav-li-preferment" role="presentation">
                             <button class="nav-link fw-bold small text-uppercase text-info px-3 py-2" id="nav-pref-tab" data-bs-toggle="tab" data-bs-target="#panel-preferment" type="button" role="tab">🧫 Prefermento (Biga/Poolish)</button>
                         </li>
                         <li class="nav-item d-none" id="nav-li-tangzhong" role="presentation">
@@ -151,7 +194,6 @@
                     
                     <div class="tab-pane fade show active" id="panel-base" role="tabpanel">
                         <h6 class="fw-bold mb-3 text-secondary text-uppercase tracking-wide" style="font-size: 11px;">Procedura Operativa di Chiusura</h6>
-                        
                         <div style="line-height: 2; letter-spacing: 0.01em;" class="text-dark fs-6 fw-medium">
                             {% set righe = recipe.instructions.split('\n') %}
                             {% set count = namespace(value=1) %}
@@ -215,18 +257,13 @@
                             <li>Accendi il fuoco e mescola finché ottieni una <strong>crema densa</strong> (roux).</li>
                             <li>Spegni, fai intiepidire e unisci il <strong>Tang Zhong</strong> all'impasto principale.</li>
                         </ol>
-
-                        <div class="p-3 bg-light rounded-3 border-0 small text-muted">
-                            <div class="mb-2"><strong class="text-dark">Regola Scientifica:</strong> Tang Zhong = <span id="desc-rule-flour-pct">5%</span> della farina totale e liquidi = <span id="desc-rule-mult">5×</span> la farina del Tang Zhong. Queste quantità vengono sottratte automaticamente da farina e latte della ricetta principale.</div>
-                            <div><strong class="text-dark">Nota tecnica:</strong> Il Tangzhong (conosciuto anche como Water Roux o Yudane) è una tecnica di pre-gelatinizzazione degli amidi. This permette all'impasto di trattenere più umidità, rendendo i panini più soffici, elastici e duraturi nel tempo.</div>
-                            <div class="mt-2 text-warning fw-bold">🚨 Nota bene: quando attivi il Tangzhong, le quantità utilizzate per prepararlo non sono incluse direttamente negli ingredienti principali della ricetta a destra, perché vengono sottratte automaticamente per essere cotte a parte.</div>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- TABELLINE STATISTICHE IN BASSO -->
     <div class="row g-3 mb-4">
         <div class="col-6 col-md-3">
             <div class="card bg-white border-0 shadow-sm text-center py-3 rounded-4">
@@ -254,6 +291,7 @@
         </div>
     </div>
 
+    <!-- BLOCCO PARAMETRI DI PROCESSO -->
     <div class="card border-0 shadow-sm mb-4 bg-white rounded-4">
         <div class="card-body py-3">
             <div class="row text-center align-items-center g-2 small text-dark fw-bold">
@@ -273,6 +311,7 @@
 
 </div>
 
+<!-- MOTORE DI CALCOLO SCIENTIFICO CON INIEZIONE LIEVITO AUTOMATICA -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const freshToDryRatio = parseFloat("{{ settings_data.fresh_to_dry_ratio if settings_data else 3.0 }}");
@@ -280,6 +319,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const tzLiquidMultGlobal = parseFloat("{{ settings_data.tangzhong_liquid_multiplier if settings_data else 5.0 }}");
 
     const scaleModeSelect = document.getElementById('calc-scale-mode');
+    const wrapperWeightInput = document.getElementById('wrapper-weight-input');
+    const wrapperTrayInput = document.getElementById('wrapper-tray-input');
+    
+    const inputTargetWeight = document.getElementById('calc-target-weight');
     const sliderHydration = document.getElementById('calc-slider-hydration');
     const overrideHydrationCheck = document.getElementById('calc-override-hydration');
     const labelCurrentHydroTarget = document.getElementById('label-current-hydro-target');
@@ -295,38 +338,42 @@ document.addEventListener('DOMContentLoaded', function() {
     const navLiTz = document.getElementById('nav-li-tangzhong');
     const stringaRiepilogo = document.getElementById('box-stringa-riepilogo');
 
-    const ingredientRows = document.querySelectorAll('.output-ingredient-row');
+    const panRows = document.querySelectorAll('.public-pan-row');
 
-    const hasBiga = {% if feature and feature.enable_biga %}true{% else %}false{% endif %};
-    const hasPoolish = {% if feature and feature.enable_poolish %}true{% else %}false{% endif %};
-    const prefMode = hasBiga ? 'biga' : (hasPoolish ? 'poolish' : 'none');
+    // CONTROLLO DI SICUREZZA INTELLIGENTE PER IL LIEVITO SUL DOM
+    let initialYeastDetected = false;
+    document.querySelectorAll('.output-ingredient-row').forEach(row => {
+        let isYeastRaw = String(row.getAttribute('data-is-yeast')).toLowerCase().trim();
+        let rowName = (row.getAttribute('data-name') || '').toLowerCase();
+        if (row.getAttribute('id') !== 'fallback-yeast-row' && (isYeastRaw === 'true' || rowName.includes('lievito'))) {
+            initialYeastDetected = true;
+        }
+    });
 
-    // --- SISTEMA DI SCAMBIO TAB FALLBACK PER IL FRONTEND ---
+    const fallbackYeastRow = document.getElementById('fallback-yeast-row');
+    if (!initialYeastDetected && fallbackYeastRow) {
+        fallbackYeastRow.classList.remove('d-none');
+    } else if (fallbackYeastRow) {
+        fallbackYeastRow.remove(); 
+    }
+
     const frontendButtons = document.querySelectorAll('#publicProcessTabs button');
     const frontendPanes = document.querySelectorAll('#recipeProcessTabsContent .tab-pane');
 
     frontendButtons.forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
-            e.stopPropagation();
-            
             const targetSelector = this.getAttribute('data-bs-target');
             const targetedPane = document.querySelector(targetSelector);
-            
             if (targetedPane) {
-                // Rimuove lo stato attivo dai bottoni e nasconde tutti i pannelli
                 frontendButtons.forEach(b => b.classList.remove('active'));
                 frontendPanes.forEach(p => {
                     p.classList.remove('show', 'active');
                     p.classList.add('d-none');
                 });
-                
-                // Attiva l'elemento cliccato
                 this.classList.add('active');
                 targetedPane.classList.remove('d-none');
-                setTimeout(() => {
-                    targetedPane.classList.add('show', 'active');
-                }, 10);
+                setTimeout(() => { targetedPane.classList.add('show', 'active'); }, 10);
             }
         });
     });
@@ -345,26 +392,52 @@ document.addEventListener('DOMContentLoaded', function() {
             basePane.classList.add('show', 'active');
         }
     }
-    // ------------------------------------------------------------------
 
-    let baseTotalRecipeWeight = 0;
-    ingredientRows.forEach(row => {
-        baseTotalRecipeWeight += parseFloat(row.getAttribute('data-base-qty')) || 0;
+    if (scaleModeSelect) {
+        scaleModeSelect.addEventListener('change', function() {
+            if (this.value === 'tray') {
+                wrapperWeightInput.classList.add('d-none');
+                wrapperTrayInput.classList.remove('d-none');
+                
+                let totalCurrentTrays = 0;
+                panRows.forEach(r => totalCurrentTrays += parseInt(r.querySelector('.input-pan-qty-value').value) || 0);
+                if (totalCurrentTrays === 0 && panRows.length > 0) {
+                    panRows[0].querySelector('.input-pan-qty-value').value = 1;
+                }
+            } else {
+                wrapperWeightInput.classList.remove('d-none');
+                wrapperTrayInput.classList.add('d-none');
+            }
+            calculateFormula();
+        });
+    }
+
+    panRows.forEach(row => {
+        const btnMinus = row.querySelector('.btn-pan-qty-minus');
+        const btnPlus = row.querySelector('.btn-pan-qty-plus');
+        const inputQty = row.querySelector('.input-pan-qty-value');
+
+        btnMinus.addEventListener('click', function() {
+            let val = parseInt(inputQty.value) || 0;
+            if (val > 0) {
+                inputQty.value = val - 1;
+                calculateFormula();
+            }
+        });
+
+        btnPlus.addEventListener('click', function() {
+            let val = parseInt(inputQty.value) || 0;
+            inputQty.value = val + 1;
+            calculateFormula();
+        });
     });
 
-    if (scaleModeSelect) scaleModeSelect.addEventListener('change', calculateFormula);
-    const inputTriggers = ['calc-pieces-count', 'calc-pieces-weight', 'calc-target-weight'];
-    inputTriggers.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.addEventListener('input', calculateFormula);
-    });
-
-    sliderHydration.addEventListener('input', function() {
+    if (inputTargetWeight) inputTargetWeight.addEventListener('input', calculateFormula);
+    if (sliderHydration) sliderHydration.addEventListener('input', function() {
         labelCurrentHydroTarget.textContent = this.value + '%';
         calculateFormula();
     });
-    
-    overrideHydrationCheck.addEventListener('change', calculateFormula);
+    if (overrideHydrationCheck) overrideHydrationCheck.addEventListener('change', calculateFormula);
     if (yeastSelect) yeastSelect.addEventListener('change', calculateFormula);
     if (tangzhongSelect) tangzhongSelect.addEventListener('change', calculateFormula);
 
@@ -373,11 +446,28 @@ document.addEventListener('DOMContentLoaded', function() {
         let recipeTotalWeightBase = 0;
         let originalIngredients = [];
 
-        ingredientRows.forEach(row => {
-            const baseQty = parseFloat(row.getAttribute('data-base-qty')) || 0;
-            const isFlour = row.getAttribute('data-is-flour') === 'true';
-            const isLiquid = row.getAttribute('data-is-liquid') === 'true';
-            const isYeast = row.getAttribute('data-is-yeast') === 'true';
+        const allIngredientRows = document.querySelectorAll('.output-ingredient-row');
+
+        allIngredientRows.forEach(row => {
+            // Salta le righe nascoste (es. il lievito fallback se non è attivo)
+            if (row.classList.contains('d-none')) return;
+
+            // SISTEMA DI LETTURA BLINDATO PER EVITARE I CRASH DA NUMERI ITALIANI (VIRGOLE) E VUOTI
+            let rawQty = row.getAttribute('data-base-qty') || '0';
+            rawQty = rawQty.toString().replace(/,/g, '.'); // converte eventuali "150,5" in "150.5" per JS
+            const baseQty = parseFloat(rawQty) || 0;
+
+            const name = (row.getAttribute('data-name') || '').toLowerCase();
+
+            // SISTEMA A DOPPIO CONTROLLO: Legge il database e, se non c'è, guarda il nome
+            let isFlour = String(row.getAttribute('data-is-flour')).toLowerCase().trim() === 'true';
+            if (!isFlour && (name.includes('farina') || name.includes('semola'))) isFlour = true;
+
+            let isLiquid = String(row.getAttribute('data-is-liquid')).toLowerCase().trim() === 'true';
+            if (!isLiquid && (name.includes('acqua') || name.includes('latte'))) isLiquid = true;
+
+            let isYeast = String(row.getAttribute('data-is-yeast')).toLowerCase().trim() === 'true';
+            if (!isYeast && name.includes('lievito')) isYeast = true;
 
             if (isFlour) recipeTotalFlourBase += baseQty;
             recipeTotalWeightBase += baseQty;
@@ -391,30 +481,47 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
 
-        if (recipeTotalFlourBase === 0) return;
+        // PREVENZIONE ESTREMA CRASH: Se non ci sono farine, evita di dividere per zero
+        if (recipeTotalFlourBase <= 0) {
+            recipeTotalFlourBase = 1; 
+        }
 
         let targetTotalWeight = 1000;
         const mode = scaleModeSelect ? scaleModeSelect.value : 'weight';
 
-        const pCountEl = document.getElementById('calc-pieces-count');
-        const pWeightEl = document.getElementById('calc-pieces-weight');
-        const tWeightEl = document.getElementById('calc-target-weight');
+        if (mode === 'tray') {
+            let computedSumMassa = 0;
+            let reportSegments = [];
 
-        if (mode === 'pieces' && pCountEl && pWeightEl) {
-            const count = parseFloat(pCountEl.value) || 1;
-            const weight = parseFloat(pWeightEl.value) || 140;
-            targetTotalWeight = count * weight;
+            panRows.forEach(row => {
+                let capStr = row.getAttribute('data-capacity') || '0';
+                const cap = parseFloat(capStr.toString().replace(/,/g, '.')) || 0;
+                const qty = parseInt(row.querySelector('.input-pan-qty-value').value) || 0;
+                
+                if (qty > 0) {
+                    computedSumMassa += cap * qty;
+                    reportSegments.push(`${qty}x (${Math.round(cap)}g)`);
+                }
+            });
+
+            targetTotalWeight = computedSumMassa > 0 ? computedSumMassa : 500;
+
             if (stringaRiepilogo) {
-                stringaRiepilogo.textContent = `Pezzi: ${count} · Peso: ${weight}g · Totale Target: ${Math.round(targetTotalWeight)}g`;
+                if (reportSegments.length > 0) {
+                    stringaRiepilogo.textContent = `Configurazione: ${reportSegments.join(' + ')} · Totale Target: ${Math.round(targetTotalWeight)}g`;
+                } else {
+                    stringaRiepilogo.textContent = "Seleziona almeno una teglia usando i tasti + e -";
+                }
             }
-        } else if (mode === 'weight' && tWeightEl) {
-            targetTotalWeight = parseFloat(tWeightEl.value) || 1000;
+        } else if (inputTargetWeight) {
+            targetTotalWeight = parseFloat(inputTargetWeight.value) || 1000;
             if (stringaRiepilogo) {
                 stringaRiepilogo.textContent = `Target Peso Impasto Richiesto: ${Math.round(targetTotalWeight)}g`;
             }
         }
 
-        let targetHydrationPct = (recipeTotalWeightBase > 0) ? (originalIngredients.filter(i => i.isLiquid).reduce((sum, i) => sum + i.baseQty, 0) / recipeTotalFlourBase) : 0.70;
+        let liquidBaseSum = originalIngredients.filter(i => i.isLiquid).reduce((sum, i) => sum + i.baseQty, 0);
+        let targetHydrationPct = (recipeTotalWeightBase > 0 && liquidBaseSum > 0) ? (liquidBaseSum / recipeTotalFlourBase) : 0.70;
         
         if (overrideHydrationCheck && overrideHydrationCheck.checked) {
             targetHydrationPct = parseFloat(sliderHydration.value) / 100;
@@ -423,21 +530,31 @@ document.addEventListener('DOMContentLoaded', function() {
             labelCurrentHydroTarget.textContent = sliderHydration.value + '%';
         }
 
+        const yeastType = yeastSelect ? yeastSelect.value : 'base';
+        const fallbackLabel = document.getElementById('fallback-yeast-label-name');
+        if (fallbackLabel) {
+            fallbackLabel.innerHTML = yeastType === 'dry' ? 'Lievito di Birra Secco <span class="badge bg-secondary ms-1" style="font-size:9px;">Disidratato</span>' : 'Lievito di Birra Fresco <span class="badge bg-success text-white ms-1" style="font-size:9px;">Compresso</span>';
+        }
+
         let totalBakerPercentageSum = 0;
         originalIngredients.forEach(ing => {
             if (ing.isFlour) {
                 ing.bakerPct = ing.baseQty / recipeTotalFlourBase;
             } else if (ing.isLiquid) {
-                ing.bakerPct = targetHydrationPct * (ing.baseQty / originalIngredients.filter(i => i.isLiquid).reduce((sum, i) => sum + i.baseQty, 0));
+                ing.bakerPct = targetHydrationPct * (ing.baseQty / liquidBaseSum);
             } else {
                 ing.bakerPct = ing.baseQty / recipeTotalFlourBase;
             }
 
-            if (ing.isYeast && yeastSelect && yeastSelect.value === 'dry') {
+            if (ing.isYeast && yeastType === 'dry') {
                 ing.bakerPct = ing.bakerPct / freshToDryRatio;
             }
+            
+            if (isNaN(ing.bakerPct)) ing.bakerPct = 0;
             totalBakerPercentageSum += ing.bakerPct;
         });
+
+        if (totalBakerPercentageSum <= 0) totalBakerPercentageSum = 1;
 
         let finalTotalFlourFlawless = targetTotalWeight / totalBakerPercentageSum;
         let liveFlourSum = 0;
@@ -459,18 +576,16 @@ document.addEventListener('DOMContentLoaded', function() {
             navLiTz.classList.remove('d-none');
             document.getElementById('pub-tz-flour').textContent = tzFlourQuota.toFixed(1) + ' g';
             document.getElementById('pub-tz-liquid').textContent = tzLiquidQuota.toFixed(1) + ' g';
-            
-            document.getElementById('desc-tz-flour').textContent = Math.round(tzFlourQuota) + 'g';
-            document.getElementById('desc-tz-liquid').textContent = Math.round(tzLiquidQuota) + 'g';
-            document.getElementById('desc-rule-flour-pct').textContent = (tzFlourPctGlobal * 100) + '%';
-            document.getElementById('desc-rule-mult').textContent = tzLiquidMultGlobal + '×';
         } else if (navLiTz) {
             navLiTz.classList.add('d-none');
-            // Se disattivato forzatamente e l'utente ci si trovava sopra, ritorna al base
             if (document.getElementById('nav-tz-tab').classList.contains('active')) {
                 forceSwitchToPublicBase();
             }
         }
+
+        const hasBiga = {% if feature and feature.enable_biga %}true{% else %}false{% endif %};
+        const hasPoolish = {% if feature and feature.enable_poolish %}true{% else %}false{% endif %};
+        const prefMode = hasBiga ? 'biga' : (hasPoolish ? 'poolish' : 'none');
 
         let prefFlourQuota = 0, prefLiquidQuota = 0, prefYeastQuota = 0;
         if (prefMode === 'poolish') {

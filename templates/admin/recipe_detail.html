@@ -3,8 +3,6 @@
 {% block title %}Dettaglio: {{ recipe.name }}{% endblock %}
 {% block page_title %}Scheda Tecnica: {{ recipe.name }}{% endblock %}
 
-<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-
 {% block content %}
 
 <div class="d-flex justify-content-end gap-2 mb-4">
@@ -33,7 +31,6 @@
                                 <th class="text-end">Qtà Originale</th>
                                 <th class="text-end text-primary fw-bold">Qtà Calcolata</th>
                                 <th class="text-end pe-4">Unità</th>
-                                <th class="text-center">Azioni</th>
                             </tr>
                         </thead>
                         <tbody id="ingredients-tbody">
@@ -56,55 +53,12 @@
                                 <td class="text-end text-muted">{{ ingredient.quantity }}</td>
                                 <td class="text-end fw-bold text-primary dynamic-quantity-cell">{{ ingredient.quantity }}</td>
                                 <td class="text-end text-muted pe-4">{{ ingredient.unit }}</td>
-                                <td class="text-center">
-                                    <a href="/admin/ingredient/delete/{{ ingredient.id }}"
-                                       class="btn btn-sm btn-link text-danger p-0 align-middle"
-                                       onclick="return confirm('Eliminare ingrediente?');">
-                                        <i class="bi bi-trash fs-5"></i>
-                                    </a>
-                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
                 {% endif %}
-            </div>
-        </div>
-
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-header bg-dark text-white small fw-bold py-2">
-                ➕ Aggiungi Componente alla Formula
-            </div>
-            <div class="card-body p-3">
-                <form method="post" action="/admin/recipe/{{ recipe.id }}/ingredient/new" class="row g-2 align-items-end">
-                    <div class="col-md-5">
-                        <label class="form-label small mb-1 fw-bold">Nome Ingrediente</label>
-                        <input type="text" name="name" class="form-control form-control-sm" placeholder="es. Malto Diastatico" required>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label small mb-1 fw-bold">Quantità</label>
-                        <input type="number" step="0.01" name="quantity" class="form-control form-control-sm text-end" placeholder="0" required>
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label small mb-1 fw-bold">Unità</label>
-                        <input type="text" name="unit" class="form-control form-control-sm text-center fw-bold" value="g">
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label small mb-1 fw-bold">Azione</label>
-                        <button type="submit" class="btn btn-sm btn-success w-100 fw-bold">Aggiungi</button>
-                    </div>
-                    <div class="col-12 d-flex gap-4 mt-2 px-2">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="is_flour" id="is_flour_check">
-                            <label class="form-check-label small" for="is_flour_check">È una Farina</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="is_liquid" id="is_liquid_check">
-                            <label class="form-check-label small" for="is_liquid_check">È un Liquido</label>
-                        </div>
-                    </div>
-                </form>
             </div>
         </div>
     </div>
@@ -116,34 +70,42 @@
             </div>
             <div class="card-body p-4 pt-0">
                 <div class="row g-4">
+                    
                     <div class="col-md-3 border-end">
-                        <label class="form-label small fw-bold text-uppercase text-muted mb-2">Scala Impasto</label>
+                        <label class="form-label small fw-bold text-uppercase text-muted mb-2">Metodo di Calcolo</label>
                         <div class="mb-3">
                             <select id="select-scale-mode" class="form-select form-select-sm fw-semibold mb-2">
-                                <option value="manual" selected>Moltiplicatore Manuale</option>
-                                <option value="tray">Calcolo per Teglia / Panielli</option>
+                                <option value="manual" selected>⚖️ Peso Impasto Desiderato</option>
+                                <option value="tray">📐 Calcolo per Teglie Assegnate</option>
                             </select>
                         </div>
+                        
                         <div id="box-manual-scale">
-                            <label class="form-label small fw-bold text-secondary">Fattore</label>
-                            <input type="number" id="input-scale-factor" class="form-control form-control-sm text-center fw-bold" value="1.0" step="0.1" min="0.1">
+                            <label class="form-label small fw-bold text-secondary">Grammi Impasto Target</label>
+                            <input type="number" id="input-target-total-weight" class="form-control form-control-sm text-center fw-bold text-primary fs-5" value="1000" step="50" min="100">
                         </div>
+                        
                         <div id="box-tray-geometry" class="d-none">
-                            <div class="row g-2">
+                            <label class="form-label small fw-bold text-secondary mb-1">Seleziona Teglia / Stampo</label>
+                            <select id="select-active-pan" class="form-select form-select-sm fw-semibold mb-2 text-dark">
+                                {% if recipe.pans %}
+                                    {% for pan in recipe.pans %}
+                                        <option value="{{ pan.weight_capacity }}">{{ pan.name }} ({{ pan.weight_capacity|int }}g)</option>
+                                    {% endfor %}
+                                {% else %}
+                                    <option value="0" disabled selected>Nessuna teglia associata</option>
+                                {% endif %}
+                            </select>
+                            <div class="row g-2 mt-1">
                                 <div class="col-12">
-                                    <select id="select-tray-type" class="form-select form-select-sm fw-semibold">
-                                        <option value="rect" selected>Rettangolare / Pale</option>
-                                        <option value="round">Tonda / Panielli</option>
-                                    </select>
+                                    <label class="form-label small text-muted mb-1 d-block text-center">Numero di Teglie</label>
+                                    <div class="input-group input-group-sm justify-content-center">
+                                        <button class="btn btn-outline-secondary fw-bold px-2" type="button" id="btn-pan-minus">-</button>
+                                        <input type="number" id="input-pan-pieces" class="form-control form-control-sm text-center fw-bold" value="1" min="1" style="max-width: 60px;">
+                                        <button class="btn btn-outline-secondary fw-bold px-2" type="button" id="btn-pan-plus">+</button>
+                                    </div>
                                 </div>
-                                <div class="col-6">
-                                    <label class="form-label small text-muted mb-0" id="label-tray-dim1">N. Pezzi</label>
-                                    <input type="number" id="input-tray-dim1" class="form-control form-control-sm text-center fw-bold" value="40" min="1">
-                                </div>
-                                <div class="col-6" id="box-tray-dim2">
-                                    <label class="form-label small text-muted mb-0">Peso Cad. (g)</label>
-                                    <input type="number" id="input-tray-dim2" class="form-control form-control-sm text-center fw-bold" value="30" min="1">
-                                </div>
+                                <input type="hidden" id="input-pan-weight" value="0">
                             </div>
                         </div>
                     </div>
@@ -165,19 +127,39 @@
                     <div class="col-md-3 border-end">
                         <label class="form-label small fw-bold text-uppercase text-muted mb-2">Prefermentazione</label>
                         <select id="select-preferment" class="form-select form-select-sm fw-semibold">
-                            <option value="none" selected>Nessuno (Diretto)</option>
-                            <option value="poolish">Poolish (100% idro)</option>
-                            <option value="biga">Biga Standard (44% idro)</option>
+                            <option value="none" {% if recipe.fermentation_type == 'diretto' %}selected{% endif %}>Nessuno (Diretto)</option>
+                            <option value="poolish" {% if recipe.fermentation_type == 'poolish' %}selected{% endif %}>Poolish (100% idro)</option>
+                            <option value="biga" {% if recipe.fermentation_type == 'biga' %}selected{% endif %}>Biga Standard (44% idro)</option>
                         </select>
                     </div>
 
                     <div class="col-md-3">
                         <label class="form-label small fw-bold text-uppercase text-muted mb-2">Parametri di Processo</label>
                         <div class="row g-2 text-start small">
-                            <div class="col-6">🌡️ Chiusura: <strong class="text-danger">{{ recipe.temp_chiusura or 24 }}°C</strong></div>
-                            <div class="col-6">🥣 Autolisi: <strong>{{ recipe.tempo_autolisi or 0 }}m</strong></div>
-                            <div class="col-6">🧫 Puntata: <strong>{{ recipe.tempo_puntata or 120 }}m</strong></div>
-                            <div class="col-6">🧺 Appretto: <strong>{{ recipe.tempo_appretto or 60 }}m</strong></div>
+                            {% if recipe.show_chiusura %}
+                            <div class="col-12 mb-1">🌡️ Chiusura: <strong class="text-danger">{{ recipe.temp_chiusura or 24 }}°C</strong></div>
+                            {% endif %}
+                            
+                            {% if recipe.show_autolysis and recipe.tempo_autolisi > 0 %}
+                            <div class="col-12 mb-1">🥣 Autolisi: <strong>{{ recipe.tempo_autolisi }}m</strong></div>
+                            {% endif %}
+                            
+                            {% if recipe.show_puntata %}
+                            <div class="col-12 mb-1">
+                                🧫 Puntata: 
+                                <strong>
+                                    {% if recipe.puntata_fino_al_raddoppio %}
+                                        Fino al Raddoppio
+                                    {% else %}
+                                        {{ recipe.tempo_puntata or 120 }}m
+                                    {% endif %}
+                                </strong>
+                            </div>
+                            {% endif %}
+                            
+                            {% if recipe.show_appretto %}
+                            <div class="col-12">🧺 Appretto: <strong>{{ recipe.tempo_appretto or 60 }}m</strong></div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -204,7 +186,6 @@
                 
                 <div class="tab-pane fade show active" id="tab-base" role="tabpanel">
                     <h5 class="fw-bold mb-3 text-dark">Procedimento Operativo Step-by-Step</h5>
-                    
                     <div class="text-dark fs-6" style="line-height: 2;">
                         {% if recipe.instructions %}
                             {% set righe = recipe.instructions.split('\n') %}
@@ -232,14 +213,22 @@
                     <div class="alert alert-info border-0 mb-3">
                         <strong>Fase Anticipata:</strong> Da preparare 12-16 ore prima della chiusura finale.
                     </div>
-                    <div class="p-3 bg-light rounded border mb-3">
+                    <div class="p-3 bg-light rounded border mb-4">
                         <div class="row text-center fw-bold g-2 text-dark">
                             <div class="col-4 border-end"><small class="d-block text-muted">FARINA</small><span id="pref-flour-output">0 g</span></div>
                             <div class="col-4 border-end"><small class="d-block text-muted">LIQUIDO</small><span id="pref-liquid-output">0 g</span></div>
                             <div class="col-4"><small class="d-block text-muted">LIEVITO</small><span id="pref-yeast-output">0 g</span></div>
                         </div>
                     </div>
-                    <p class="small text-muted mb-0">Mescolare grossolanamente senza impastare a lungo. Lasciare fermentare alla temperatura controllata prevista dal processo.</p>
+                    
+                    <h6 class="fw-bold text-dark mb-2">Istruzioni di Preparazione del Prefermento:</h6>
+                    <div class="small text-secondary mb-0">
+                        {% if recipe.preferment_instructions %}
+                            {{ recipe.preferment_instructions|safe }}
+                        {% else %}
+                            <p class="italic text-muted">Mescolare grossolanamente senza impastare a lungo. Lasciare fermentare alla temperatura controllata prevista dal processo.</p>
+                        {% endif %}
+                    </div>
                 </div>
 
                 <div class="tab-pane d-none" id="tab-tangzhong" role="tabpanel">
@@ -257,7 +246,7 @@
         </div>
 
         <div class="card border-0 shadow-sm mb-4">
-            <div class="card-header bg-dark text-white fw-bold py-3">
+            <div class="card-header bg-white fw-bold py-3 text-dark border-bottom">
                 📖 Descrizione Formula
             </div>
             <div class="card-body p-4 text-secondary small">
@@ -273,6 +262,10 @@
             </div>
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                    <span class="fw-semibold text-muted">Massa Target Elaborata</span>
+                    <strong class="fs-5 fw-bold text-primary" id="stat-total-calculated-massa">0 g</strong>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
                     <span class="fw-semibold text-muted">Farine Totali Reali</span>
                     <span class="fs-5 fw-bold text-dark" id="stat-total-flour">0 g</span>
                 </div>
@@ -285,15 +278,13 @@
                     <span class="fs-4 fw-bold text-success" id="stat-hydration">0%</span>
                 </div>
                 <div class="p-2 bg-light rounded text-center small text-muted">
-                    I pesi totali includono le compensazioni automatiche di Tangzhong e Prefermenti se attivati.
+                    I pesi totali includono le quote di idratazione e i prefermenti riproporzionati in automatico.
                 </div>
             </div>
         </div>
     </div>
 
 </div>
-
-<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -304,12 +295,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const selectScaleMode = document.getElementById('select-scale-mode');
     const boxManualScale = document.getElementById('box-manual-scale');
     const boxTrayGeometry = document.getElementById('box-tray-geometry');
-    const inputScale = document.getElementById('input-scale-factor');
-    const selectTrayType = document.getElementById('select-tray-type');
-    const labelTrayDim1 = document.getElementById('label-tray-dim1');
-    const boxTrayDim2 = document.getElementById('box-tray-dim2');
-    const inputTrayDim1 = document.getElementById('input-tray-dim1');
-    const inputTrayDim2 = document.getElementById('input-tray-dim2');
+    const inputTargetWeight = document.getElementById('input-target-total-weight');
+    
+    const selectActivePan = document.getElementById('select-active-pan');
+    const inputPanPieces = document.getElementById('input-pan-pieces');
+    const inputPanWeight = document.getElementById('input-pan-weight');
+    
+    const btnMinus = document.getElementById('btn-pan-minus');
+    const btnPlus = document.getElementById('btn-pan-plus');
+
     const selectYeast = document.getElementById('select-yeast-type');
     const toggleTz = document.getElementById('toggle-tangzhong');
     const selectPref = document.getElementById('select-preferment');
@@ -324,38 +318,32 @@ document.addEventListener('DOMContentLoaded', function() {
     const prefLiquidOutput = document.getElementById('pref-liquid-output');
     const prefYeastOutput = document.getElementById('pref-yeast-output');
     
+    const statTotalMassa = document.getElementById('stat-total-calculated-massa');
     const statFlour = document.getElementById('stat-total-flour');
     const statLiquids = document.getElementById('stat-total-liquids');
     const statHydration = document.getElementById('stat-hydration');
     
     const rows = document.querySelectorAll('.ingredient-row');
 
-    // --- MOTORE DI SCAMBIO TAB ALTERNATIVO CORE ---
     const allTabButtons = document.querySelectorAll('#recipeProcessTabs button');
     const allTabPanes = document.querySelectorAll('#recipeProcessTabsContent .tab-pane');
 
     allTabButtons.forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
-            e.stopPropagation();
-            
             const targetSelector = this.getAttribute('data-bs-target');
             const targetedPane = document.querySelector(targetSelector);
             
             if (targetedPane) {
-                // Svuota classi attive dai bottoni e nasconde tutti i pannelli
                 allTabButtons.forEach(b => b.classList.remove('active'));
                 allTabPanes.forEach(p => {
                     p.classList.remove('show', 'active');
                     p.classList.add('d-none');
                 });
                 
-                // Attiva l'elemento corrente
                 this.classList.add('active');
                 targetedPane.classList.remove('d-none');
-                setTimeout(() => {
-                    targetedPane.classList.add('show', 'active');
-                }, 10);
+                setTimeout(() => { targetedPane.classList.add('show', 'active'); }, 10);
             }
         });
     });
@@ -375,36 +363,59 @@ document.addEventListener('DOMContentLoaded', function() {
             targetPane.classList.add('show', 'active');
         }
     }
-    // ----------------------------------------------
 
     let baseTotalRecipeWeight = 0;
     rows.forEach(row => { baseTotalRecipeWeight += parseFloat(row.getAttribute('data-base-quantity')) || 0; });
 
     if (selectScaleMode) {
         selectScaleMode.addEventListener('change', function() {
-            if (this.value === 'tray') { boxManualScale.classList.add('d-none'); boxTrayGeometry.classList.remove('d-none'); }
-            else { boxManualScale.classList.remove('d-none'); boxTrayGeometry.classList.add('d-none'); }
+            if (this.value === 'tray') { 
+                boxManualScale.classList.add('d-none'); 
+                boxTrayGeometry.classList.remove('d-none'); 
+            } else { 
+                boxManualScale.classList.remove('d-none'); 
+                boxTrayGeometry.classList.add('d-none'); 
+            }
             runEngine();
         });
     }
 
-    if (selectTrayType) {
-        selectTrayType.addEventListener('change', function() {
-            if (this.value === 'round') { labelTrayDim1.textContent = 'N. Panielli'; }
-            else { labelTrayDim1.textContent = 'N. Pale / Teglie'; }
+    if (btnMinus) {
+        btnMinus.addEventListener('click', function() {
+            let val = parseInt(inputPanPieces.value) || 1;
+            if (val > 1) {
+                inputPanPieces.value = val - 1;
+                runEngine();
+            }
+        });
+    }
+    if (btnPlus) {
+        btnPlus.addEventListener('click', function() {
+            let val = parseInt(inputPanPieces.value) || 1;
+            inputPanPieces.value = val + 1;
             runEngine();
         });
     }
 
     function runEngine() {
         let scale = 1.0;
-        if (selectScaleMode && selectScaleMode.value === 'tray') {
-            const pezzi = parseFloat(inputTrayDim1.value) || 0;
-            const peso = parseFloat(inputTrayDim2.value) || 0;
-            const targetWeight = pezzi * peso;
-            if (baseTotalRecipeWeight > 0) scale = targetWeight / baseTotalRecipeWeight;
-        } else {
-            scale = parseFloat(inputScale.value) || 1.0;
+        let finalTargetMassa = 1000;
+
+        if (selectScaleMode && selectScaleMode.value === 'tray' && selectActivePan) {
+            const unitCapacity = parseFloat(selectActivePan.value) || 0;
+            const pieces = parseFloat(inputPanPieces.value) || 1;
+            finalTargetMassa = unitCapacity * pieces;
+            if (inputPanWeight) inputPanWeight.value = finalTargetMassa;
+        } else if (inputTargetWeight) {
+            finalTargetMassa = parseFloat(inputTargetWeight.value) || 1000;
+        }
+
+        if (baseTotalRecipeWeight > 0) {
+            scale = finalTargetMassa / baseTotalRecipeWeight;
+        }
+
+        if (statTotalMassa) {
+            statTotalMassa.textContent = Math.round(finalTargetMassa) + ' g';
         }
 
         const yeastType = selectYeast.value;
@@ -426,7 +437,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (row.getAttribute('data-is-yeast') === 'true') totalYeastScaled += currentVal;
         });
 
-        // Gestione Visibilità e attivazione del Tab Tangzhong
         let tzFlourQuota = isTzActive ? totalFlourScaled * DB_TZ_FLOUR_PCT : 0;
         let tzLiquidQuota = tzFlourQuota * DB_TZ_LIQUID_MULT;
         if (isTzActive) {
@@ -440,7 +450,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // Gestione Visibilità Tab Prefermento
         let prefFlourQuota = 0, prefLiquidQuota = 0, prefYeastQuota = 0;
         if (prefMode === 'poolish') {
             prefFlourQuota = totalFlourScaled * 0.3;
@@ -494,9 +503,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (statHydration && liveTotalFlour > 0) statHydration.textContent = ((liveTotalLiquids / liveTotalFlour) * 100).toFixed(0) + '%';
     }
 
-    if (inputScale) inputScale.addEventListener('input', runEngine);
-    if (inputTrayDim1) inputTrayDim1.addEventListener('input', runEngine);
-    if (inputTrayDim2) inputTrayDim2.addEventListener('input', runEngine);
+    if (inputTargetWeight) inputTargetWeight.addEventListener('input', runEngine);
+    if (selectActivePan) selectActivePan.addEventListener('change', runEngine);
+    if (inputPanPieces) inputPanPieces.addEventListener('input', runEngine);
     if (selectYeast) selectYeast.addEventListener('change', runEngine);
     if (toggleTz) toggleTz.addEventListener('change', runEngine);
     if (selectPref) selectPref.addEventListener('change', runEngine);

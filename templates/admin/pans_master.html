@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Anagrafica Master Teglie & Stampi{% endblock %}
+{% block page_title %}Configurazione Flotta Teglie Globali{% endblock %}
+
+{% block content %}
+
+<div class="row g-4">
+    
+    <div class="col-12">
+        <div class="card border-0 shadow-sm bg-white border border-light">
+            <div class="card-header bg-dark text-white fw-bold py-3 d-flex align-items-center gap-2 border-0">
+                <i class="bi bi-plus-circle-fill text-success"></i> ➕ Registra Nuova Teglia / Stampo nell'Anagrafica
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" action="{{ url_for('admin.master_pan_add') }}" class="row g-3 align-items-end">
+                    
+                    <div class="col-md-5">
+                        <label for="pan-name" class="form-label small mb-1 fw-bold text-secondary">Identificativo / Nome Teglia</label>
+                        <input type="text" id="pan-name" name="name" class="form-control form-control-sm" placeholder="es. Teglia Alluminio Professionale 60x40" required>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <label for="pan-type" class="form-label small mb-1 fw-bold text-secondary">Geometria / Tipologia</label>
+                        <select id="pan-type" name="pan_type" class="form-select form-select-sm fw-semibold">
+                            <option value="rettangolare" selected>📐 Rettangolare / Pale</option>
+                            <option value="rotonda">⭕ Rotonda / Panielli</option>
+                            <option value="stampo">🍞 Stampo Verticale (Panettone/Bauletto)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-2">
+                        <label for="pan-capacity" class="form-label small mb-1 fw-bold text-secondary">Capacità Impasto (g)</label>
+                        <input type="number" id="pan-capacity" name="weight_capacity" class="form-control form-control-sm text-end fw-bold" placeholder="0" min="1" step="0.1" required>
+                    </div>
+                    
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-sm btn-success w-100 fw-bold py-2 shadow-sm">
+                            <i class="bi bi-check-lg"></i> Inserisci
+                        </button>
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-primary text-white fw-bold py-3">
+                📋 Registro Flotta Teglie Infinite Attive
+            </div>
+            <div class="card-body p-0">
+                {% if master_pans_list %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr class="small text-secondary">
+                                <th class="ps-4">ID</th>
+                                <th>Nome / Modello Contenitore</th>
+                                <th class="text-center">Configurazione Geometrica</th>
+                                <th class="text-end text-primary fw-bold">Capacità Target Standard</th>
+                                <th class="text-center pe-4">Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pan in master_pans_list %}
+                            <tr>
+                                <td class="ps-4 text-muted small fw-bold">#{{ pan.id }}</td>
+                                <td class="fw-bold text-dark">{{ pan.name }}</td>
+                                <td class="text-center">
+                                    {% if pan.pan_type == 'rettangolare' %}
+                                        <span class="badge bg-secondary px-2 py-1 small">Rettangolare</span>
+                                    {% elif pan.pan_type == 'rotonda' %}
+                                        <span class="badge bg-info text-dark px-2 py-1 small">Rotonda</span>
+                                    {% else %}
+                                        <span class="badge bg-dark text-white px-2 py-1 small">Stampo Verticale</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end fw-bold text-primary">{{ pan.weight_capacity|int }} g</td>
+                                <td class="text-center pe-4">
+                                    <a href="{{ url_for('admin.master_pan_delete', id=pan.id) }}" 
+                                       class="btn btn-sm btn-link text-danger p-0 align-middle link-underline-opacity-0"
+                                       onclick="return confirm('Rimuovere definitivamente questa teglia dall\'anagrafica globale?');">
+                                        <i class="bi bi-trash3-fill fs-5"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="p-4 text-center text-secondary bg-light rounded m-3 border border-dashed">
+                    <i class="bi bi-info-circle fs-3 d-block mb-2 text-muted"></i>
+                    Nessuna teglia inserita in archivio. Usa il form sopra per iniziare il pre-popolamento.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

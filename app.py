@@ -19,6 +19,8 @@ from models.setting import Setting
 from models.wiki import WikiArticle
 from models.parameter import RecipeParameter
 from models.ingredient_master import MasterIngredient
+# IMPORTAZIONE NUOVO MODELLO DELLE TEGLIE MASTER
+from models.bakery_pan import MasterBakeryPan
 
 from routes.recipes import recipes_bp
 # BLINDATO: Forza il caricamento del Blueprint corretto per evitare conflitti di sotto-cartelle
@@ -35,9 +37,13 @@ login_manager.init_app(app)
 # INIZIALIZZAZIONE DEL MOTORE DI MIGRAZIONE DEL DATABASE
 migrate = Migrate(app, db)
 
-# Registrazione dei motori di rotte
-app.register_blueprint(recipes_bp)
+# ==========================================================
+# CRITICO: NUOVO ORDINE DI REGISTRAZIONE BLUEPRINT
+# ==========================================================
+# Registriamo PRIMA l'amministrazione in modo che tutti i suoi endpoint 
+# (incluso admin.master_pans_view) siano iniettati nella mappa delle rotte di Flask.
 app.register_blueprint(admin_bp)
+app.register_blueprint(recipes_bp)
 
 
 @login_manager.user_loader
@@ -89,6 +95,17 @@ with app.app_context():
         print("Username: admin")
         print("Password: admin123")
 
+    # Iniezione record di partenza nell'anagrafica della flotta teglie infinite
+    if MasterBakeryPan.query.count() == 0:
+        default_pans = [
+            MasterBakeryPan(name="Teglia Rettangolare Ferro Blu 40x30", pan_type="rettangolare", weight_capacity=1200.0),
+            MasterBakeryPan(name="Tonda Classica Diametro 32", pan_type="rotonda", weight_capacity=650.0),
+            MasterBakeryPan(name="Stampo Panettone Alto 1kg", pan_type="stampo", weight_capacity=1000.0)
+        ]
+        db.session.bulk_save_objects(default_pans)
+        db.session.commit()
+        print("Anagrafica teglie master pre-popolata con successo!")
+
     # Iniezione record di partenza nell'anagrafica centralizzata comprensiva di parametri W
     if MasterIngredient.query.count() == 0:
 
@@ -130,4 +147,5 @@ with app.app_context():
 
 
 if __name__ == "__main__":
+    # Mantieni la tua porta personalizzata 8080
     app.run(debug=True, port=8080)

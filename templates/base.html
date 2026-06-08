@@ -74,6 +74,11 @@
                 <span>Anagrafica Ingredienti</span>
             </a>
 
+            <a href="{{ url_for('admin.master_pans_view') }}" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 hover-sidebar">
+                <i class="bi bi-grid-fill text-purple" style="color: #c084fc !important;"></i>
+                <span>Anagrafica Teglie</span>
+            </a>
+
             <a href="{{ url_for('admin.wiki_list') }}" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 hover-sidebar">
                 <i class="bi bi-book text-info"></i>
                 <span>Wiki</span>
@@ -92,7 +97,7 @@
                 <span>Impostazioni Lieviti</span>
             </a>
 
-            <a href="/admin/change-password" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 opacity-75 hover-sidebar">
+            <a href="{{ url_for('admin.change_password') }}" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 opacity-75 hover-sidebar">
                 <i class="bi bi-shield-lock"></i>
                 <span>Sicurezza Account</span>
             </a>

@@ -14,7 +14,6 @@ from flask_login import (
     current_user
 )
 
-# AGGIORNATO: Importati sia check che generate per la sicurezza delle password
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from extensions import db
@@ -27,6 +26,7 @@ from models.parameter import RecipeParameter
 from models.setting import Setting
 from models.wiki import WikiArticle
 from models.ingredient_master import MasterIngredient
+from models.bakery_pan import MasterBakeryPan
 
 
 admin_bp = Blueprint(
@@ -40,7 +40,7 @@ admin_bp = Blueprint(
 def login():
 
     if current_user.is_authenticated:
-        return redirect(url_for("admin.recipes")) # AGGIORNATO: Va dritto alle ricette
+        return redirect(url_for("admin.recipes"))
 
     if request.method == "POST":
 
@@ -63,7 +63,7 @@ def login():
             )
 
             return redirect(
-                url_for("admin.recipes") # AGGIORNATO: Atterra dritto sulle ricette
+                url_for("admin.recipes")
             )
 
         flash(
@@ -95,7 +95,6 @@ def logout():
 @admin_bp.route("/dashboard")
 @login_required
 def dashboard():
-    # AGGIORNATO: Disattivata e convertita in un redirect di sicurezza verso le ricette
     return redirect(url_for("admin.recipes"))
 
 
@@ -122,8 +121,8 @@ def recipe_new():
 
     if request.method == "POST":
 
-        # AGGIORNATO DA TIZIANO CASSONE: Rilevamento istruzioni pulite per l'editor Word
         instructions_text = request.form.get("instructions", "").strip()
+        preferment_text = request.form.get("preferment_instructions", "").strip()
 
         recipe = Recipe(
             name=request.form["name"],
@@ -131,29 +130,48 @@ def recipe_new():
             description=request.form["description"],
             instructions=instructions_text,
             is_published="is_published" in request.form,
+            
+            # Parametri fisici numerici
             temp_chiusura=float(request.form.get("temp_chiusura", 24.0)) if request.form.get("temp_chiusura") else 24.0,
             tempo_autolisi=int(request.form.get("tempo_autolisi", 0)) if request.form.get("tempo_autolisi") else 0,
             tempo_puntata=int(request.form.get("tempo_puntata", 0)) if request.form.get("tempo_puntata") else 0,
-            tempo_appretto=int(request.form.get("tempo_appretto", 0)) if request.form.get("tempo_appretto") else 0
+            tempo_appretto=int(request.form.get("tempo_appretto", 0)) if request.form.get("tempo_appretto") else 0,
+            
+            # Toggle Booleani di visibilità dei parametri fisici
+            show_chiusura="show_chiusura" in request.form,
+            show_autolysis="show_autolysis" in request.form,
+            show_puntata="show_puntata" in request.form,
+            puntata_fino_al_raddoppio="puntata_fino_al_raddoppio" in request.form,
+            show_appretto="show_appretto" in request.form,
+            
+            # Schema fermentativo avanzato e istruzioni Fase 1
+            fermentation_type=request.form.get("fermentation_type", "diretto"),
+            preferment_instructions=preferment_text
         )
+
+        # Associazione Many-to-Many con le Teglie selezionate
+        selected_pan_ids = request.form.getlist("pans[]")
+        for pan_id in selected_pan_ids:
+            pan = MasterBakeryPan.query.get(int(pan_id))
+            if pan:
+                recipe.pans.append(pan)
 
         db.session.add(recipe)
         db.session.commit()
 
-        pref_type = request.form.get("preferment_type", "none")
-
+        # Configurazione Feature Toggles locali della ricetta
         feature = RecipeFeature(
             recipe_id=recipe.id,
             enable_piece_count="enable_piece_count" in request.form,
             enable_piece_weight="enable_piece_weight" in request.form,
             enable_yeast_type="enable_yeast_type" in request.form,
             enable_tangzhong="enable_tangzhong" in request.form,
-            enable_poolish=pref_type == "poolish",
-            enable_biga=pref_type == "biga"
+            enable_poolish=recipe.fermentation_type == "poolish",
+            enable_biga=recipe.fermentation_type == "biga"
         )
-
         db.session.add(feature)
 
+        # Salvataggio dinamico della lista ingredienti della ricetta
         ing_names = request.form.getlist("ing_name[]")
         ing_qtys = request.form.getlist("ing_qty[]")
         ing_units = request.form.getlist("ing_unit[]")
@@ -178,26 +196,22 @@ def recipe_new():
 
         db.session.commit()
 
-        flash(
-            "Formula bilanciata e salvata con successo!",
-            "success"
-        )
-
-        return redirect(
-            url_for("admin.recipes")
-        )
+        flash("Formula bilanciata e salvata con successo!", "success")
+        return redirect(url_for("admin.recipes"))
 
     master_ingredients = MasterIngredient.query.order_by(MasterIngredient.name).all()
+    master_pans = MasterBakeryPan.query.order_by(MasterBakeryPan.name).all()
     return render_template(
         "admin/recipe_form.html",
-        master_ingredients_list=master_ingredients
+        master_ingredients_list=master_ingredients,
+        master_pans_list=master_pans
     )
 
 
 @admin_bp.route("/recipe/<int:id>")
 @login_required
 def recipe_detail(id):
-
+    """BLINDATO E PULITO: Schermata di visualizzazione e simulazione in sola lettura"""
     recipe = Recipe.query.get_or_404(id)
 
     ingredients = RecipeIngredient.query.filter_by(
@@ -222,64 +236,6 @@ def recipe_detail(id):
         ingredients=ingredients,
         feature=feature,
         parameters=parameters
-    )
-
-
-@admin_bp.route(
-    "/recipe/<int:id>/ingredient/new",
-    methods=["POST"]
-)
-@login_required
-def ingredient_new(id):
-
-    recipe = Recipe.query.get_or_404(id)
-
-    ingredient = RecipeIngredient(
-        recipe_id=recipe.id,
-        name=request.form["name"],
-        quantity=float(request.form["quantity"]),
-        unit=request.form["unit"],
-        is_flour="is_flour" in request.form,
-        is_liquid="is_liquid" in request.form
-    )
-
-    db.session.add(ingredient)
-    db.session.commit()
-
-    flash(
-        "Ingrediente aggiunto",
-        "success"
-    )
-
-    return redirect(
-        url_for(
-            "admin.recipe_detail",
-            id=recipe.id
-        )
-    )
-
-
-@admin_bp.route("/ingredient/delete/<int:id>")
-@login_required
-def ingredient_delete(id):
-
-    ingredient = RecipeIngredient.query.get_or_404(id)
-
-    recipe_id = ingredient.recipe_id
-
-    db.session.delete(ingredient)
-    db.session.commit()
-
-    flash(
-        "Ingrediente eliminato",
-        "warning"
-    )
-
-    return redirect(
-        url_for(
-            "admin.recipe_detail",
-            id=recipe_id
-        )
     )
 
 
@@ -308,7 +264,7 @@ def recipe_delete(id):
 )
 @login_required
 def recipe_edit(id):
-
+    """CABINA DI REGIA: Gestione strutturale completa della formula"""
     recipe = Recipe.query.get_or_404(id)
 
     feature = RecipeFeature.query.filter_by(
@@ -322,8 +278,8 @@ def recipe_edit(id):
 
     if request.method == "POST":
 
-        # AGGIORNATO DA TIZIANO CASSONE: Rilevamento istruzioni pulite in fase di modifica formula
         instructions_text = request.form.get("instructions", "").strip()
+        preferment_text = request.form.get("preferment_instructions", "").strip()
 
         recipe.name = request.form["name"]
         recipe.slug = request.form["slug"]
@@ -331,20 +287,40 @@ def recipe_edit(id):
         recipe.instructions = instructions_text
         recipe.is_published = "is_published" in request.form
 
+        # Aggiornamento parametri fisici numerici
         recipe.temp_chiusura = float(request.form.get("temp_chiusura", 24.0)) if request.form.get("temp_chiusura") else 24.0
         recipe.tempo_autolisi = int(request.form.get("tempo_autolisi", 0)) if request.form.get("tempo_autolisi") else 0
         recipe.tempo_puntata = int(request.form.get("tempo_puntata", 0)) if request.form.get("tempo_puntata") else 0
         recipe.tempo_appretto = int(request.form.get("tempo_appretto", 0)) if request.form.get("tempo_appretto") else 0
 
-        pref_type = request.form.get("preferment_type", "none")
+        # Aggiornamento Toggle Booleani di visibilità
+        recipe.show_chiusura = "show_chiusura" in request.form
+        recipe.show_autolysis = "show_autolysis" in request.form
+        recipe.show_puntata = "show_puntata" in request.form
+        recipe.puntata_fino_al_raddoppio = "puntata_fino_al_raddoppio" in request.form
+        recipe.show_appretto = "show_appretto" in request.form
 
+        # Aggiornamento schema fermentativo avanzato e istruzioni Fase 1
+        recipe.fermentation_type = request.form.get("fermentation_type", "diretto")
+        recipe.preferment_instructions = preferment_text
+
+        # Aggiornamento delle Feature Toggles della ricetta
         feature.enable_piece_count = "enable_piece_count" in request.form
         feature.enable_piece_weight = "enable_piece_weight" in request.form
         feature.enable_yeast_type = "enable_yeast_type" in request.form
         feature.enable_tangzhong = "enable_tangzhong" in request.form
-        feature.enable_poolish = pref_type == "poolish"
-        feature.enable_biga = pref_type == "biga"
+        feature.enable_poolish = recipe.fermentation_type == "poolish"
+        feature.enable_biga = recipe.fermentation_type == "biga"
 
+        # Aggiornamento dell'associazione Many-to-Many con le Teglie
+        recipe.pans.clear()
+        selected_pan_ids = request.form.getlist("pans[]")
+        for pan_id in selected_pan_ids:
+            pan = MasterBakeryPan.query.get(int(pan_id))
+            if pan:
+                recipe.pans.append(pan)
+
+        # Ricostruzione della lista ingredienti per evitare frammentazioni
         RecipeIngredient.query.filter_by(recipe_id=recipe.id).delete()
 
         ing_names = request.form.getlist("ing_name[]")
@@ -371,14 +347,8 @@ def recipe_edit(id):
 
         db.session.commit()
 
-        flash(
-            "Ricetta aggiornata e ribilanciata correttamente",
-            "success"
-        )
-
-        return redirect(
-            url_for("admin.recipes")
-        )
+        flash("Ricetta aggiornata e ribilanciata correttamente", "success")
+        return redirect(url_for("admin.recipes"))
 
     ingredients = RecipeIngredient.query.filter_by(
         recipe_id=recipe.id
@@ -387,15 +357,72 @@ def recipe_edit(id):
     ).all()
 
     master_ingredients = MasterIngredient.query.order_by(MasterIngredient.name).all()
+    master_pans = MasterBakeryPan.query.order_by(MasterBakeryPan.name).all()
 
     return render_template(
         "admin/recipe_edit_form.html",
         recipe=recipe,
         feature=feature,
         ingredients=ingredients,
-        master_ingredients_list=master_ingredients
+        master_ingredients_list=master_ingredients,
+        master_pans_list=master_pans
     )
 
+
+# ==========================================================
+# SEZIONE: ANAGRAFICA INFINITA DELLE TEGLIE / STAMPI MASTER
+# ==========================================================
+
+@admin_bp.route("/pans/master", methods=["GET"])
+@login_required
+def master_pans_view():
+    master_pans = MasterBakeryPan.query.order_by(MasterBakeryPan.name).all()
+    return render_template(
+        "admin/pans_master.html",
+        master_pans_list=master_pans
+    )
+
+
+@admin_bp.route("/pans/master/add", methods=["POST"])
+@login_required
+def master_pan_add():
+    name = request.form.get("name", "").strip()
+    pan_type = request.form.get("pan_type", "rettangolare")
+    weight_capacity = request.form.get("weight_capacity", 0.0)
+
+    if name:
+        existing = MasterBakeryPan.query.filter_by(name=name).first()
+        if not existing:
+            try:
+                new_pan = MasterBakeryPan(
+                    name=name,
+                    pan_type=pan_type,
+                    weight_capacity=float(weight_capacity) if weight_capacity else 0.0
+                )
+                db.session.add(new_pan)
+                db.session.commit()
+                flash(f"Teglia '{name}' aggiunta alla tua flotta globale!", "success")
+            except ValueError:
+                flash("Errore: Inserisci un peso di capacità valido", "danger")
+        else:
+            flash("Questa tipologia di teglia esiste già nel database", "warning")
+    return redirect(url_for("admin.master_pans_view"))
+
+
+@admin_bp.route("/pans/master/delete/<int:id>", methods=["GET"])
+@login_required
+def master_pan_delete(id):
+    pan = MasterBakeryPan.query.get_or_404(id)
+    name = pan.name
+    db.session.delete(pan)
+    db.session.commit()
+    flash(f"Teglia '{name}' rimossa dalla configurazione", "warning")
+    return redirect(url_for("admin.master_pans_view"))
+
+
+# ==========================================================
+# SEZIONE WIKI & ARTICOLI
+# ==========================================================
 
 @admin_bp.route("/wiki")
 @login_required
@@ -463,6 +490,10 @@ def wiki_delete(id):
     )
 
 
+# ==========================================================
+# SEZIONE INGREDIENTI MASTER & IMPOSTAZIONI GLOBALI
+# ==========================================================
+
 @admin_bp.route("/ingredients/master", methods=["GET"])
 @login_required
 def master_ingredients_view():
@@ -513,7 +544,6 @@ def settings_yeast():
     if request.method == "POST":
 
         try:
-
             ratio_value = float(request.form.get("fresh_to_dry_ratio", 3.0))
             setting.fresh_to_dry_ratio = ratio_value
             db.session.commit()
@@ -524,7 +554,6 @@ def settings_yeast():
             )
 
         except ValueError:
-
             flash(
                 "Errore: Inserisci un valore numerico valido (es. 3.0)",
                 "danger"
@@ -541,10 +570,10 @@ def settings_yeast():
 
 
 # ==========================================================
-# INTEGRAZIONE: GESTIONE CAMBIO PASSWORD SICURA AMMINISTRATORE
+# SEZIONE: GESTIONE CAMBIO PASSWORD AMMINISTRATORE (FIXED)
 # ==========================================================
 
-@admin_bp.route("/change-password", methods=["GET", "POST"])
+@admin_bp.route("/change_password", methods=["GET", "POST"])
 @login_required
 def change_password():
     if request.method == "POST":
@@ -552,26 +581,22 @@ def change_password():
         new_password = request.form.get("new_password")
         confirm_password = request.form.get("confirm_password")
 
-        # 1. Verifica la password attuale sul database
         if not check_password_hash(current_user.password_hash, old_password):
             flash("La password attuale inserita non è corretta.", "danger")
             return redirect(url_for("admin.change_password"))
 
-        # 2. Controllo coerenza nuova chiave
         if new_password != confirm_password:
             flash("La nuova password e la password di conferma non coincidono.", "danger")
             return redirect(url_for("admin.change_password"))
 
-        # 3. Controllo lunghezza minima
         if len(new_password) < 6:
             flash("La nuova password deve contenere almeno 6 caratteri.", "warning")
             return redirect(url_for("admin.change_password"))
 
-        # 4. Generazione hash e salvataggio
         current_user.password_hash = generate_password_hash(new_password)
         db.session.commit()
 
         flash("Password amministratore aggiornata con successo!", "success")
-        return redirect(url_for("admin.recipes")) # Redirezione pulita verso ricette
+        return redirect(url_for("admin.recipes"))
 
     return render_template("admin/change_password.html")
