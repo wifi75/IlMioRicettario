@@ -71,13 +71,33 @@ with app.app_context():
 
     db.create_all()
 
-    # ALLINEAMENTO DI EMERGENZA DATABASE
+    # =========================================================================
+    # BLINDATURA STRUTTURALE ANTICRASH ANTICIPATA (SQL CRUDO A FREDDO)
+    # Eseguiamo le alterazioni prima di qualsiasi interazione ORM
+    # =========================================================================
     try:
         db.session.execute(db.text("ALTER TABLE settings ADD COLUMN theme_active VARCHAR(50) DEFAULT 'modern'"))
         db.session.commit()
     except Exception:
         db.session.rollback()
 
+    try:
+        db.session.execute(db.text("ALTER TABLE settings ADD COLUMN site_description TEXT"))
+        db.session.commit()
+        print("Allineamento Database: colonna 'site_description' verificata e inserita!")
+    except Exception:
+        db.session.rollback()
+
+    try:
+        db.session.execute(db.text("ALTER TABLE recipe_ingredients ADD COLUMN w_value INTEGER DEFAULT 0"))
+        db.session.commit()
+        print("Allineamento Ingredienti: colonna 'w_value' verificata e inserita con successo!")
+    except Exception:
+        db.session.rollback()
+
+    # =========================================================================
+    # DA QUI IN POI LE QUERY POSSONO GIRARE IN TOTALE SICUREZZA
+    # =========================================================================
     admin = User.query.filter_by(
         username="admin"
     ).first()
@@ -137,6 +157,7 @@ with app.app_context():
             tangzhong_flour_percent=5.0,
             tangzhong_liquid_multiplier=5.0,
             site_name="Il Mio Ricettario",
+            site_description="Esplora le nostre antiche formule bilanciate professionali. Utilizza i motori di calcolo integrati ad alta precisione per ridimensionare istantaneamente ogni impasto.",
             default_unit="g",
             allow_public_recipes=True,
             theme_active="modern"
@@ -146,6 +167,7 @@ with app.app_context():
     else:
         try:
             db.session.execute(db.text("UPDATE settings SET theme_active = 'modern' WHERE theme_active IS NULL"))
+            db.session.execute(db.text("UPDATE settings SET site_description = 'Esplora le nostre antiche formule bilanciate professionali. Utilizza i motori di calcolo integrati ad alta precisione per ridimensionare istantaneamente ogni impasto.' WHERE site_description IS NULL"))
             db.session.commit()
         except Exception:
             db.session.rollback()

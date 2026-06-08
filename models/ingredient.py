@@ -47,6 +47,13 @@ class RecipeIngredient(db.Model):
         default=False
     )
 
+    # NUOVA COLONNA TECNICA LOCALIZZATA PER LA FORZA DELLE FARINE
+    w_value = db.Column(
+        db.Integer,
+        nullable=True,
+        default=0
+    )
+
     is_optional = db.Column(
         db.Boolean,
         default=False
@@ -62,15 +69,9 @@ class RecipeIngredient(db.Model):
     )
 
     def display_value(self):
-
         if self.percentage and self.percentage > 0:
             return f"{self.percentage}%"
-
         return f"{self.quantity} {self.unit}"
 
     def __repr__(self):
-
-        return (
-            f"<Ingredient "
-            f"{self.name}>"
-        )
+        return f"<Ingredient {self.name}>"

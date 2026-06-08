@@ -173,10 +173,11 @@ def recipe_new():
         )
         db.session.add(feature)
 
-        # Salvataggio dinamico della lista ingredienti della ricetta
+        # Salvataggio dinamico della lista ingredienti della ricetta con recupero forza W
         ing_names = request.form.getlist("ing_name[]")
         ing_qtys = request.form.getlist("ing_qty[]")
         ing_units = request.form.getlist("ing_unit[]")
+        ing_ws = request.form.getlist("ing_w[]")
 
         for i in range(len(ing_names)):
             if not ing_names[i].strip():
@@ -184,6 +185,7 @@ def recipe_new():
 
             is_flour_checked = request.form.get(f"ing_is_flour_{i}") == "true"
             is_liquid_checked = request.form.get(f"ing_is_liquid_{i}") == "true"
+            current_w = int(ing_ws[i]) if (i < len(ing_ws) and ing_ws[i]) else 0
 
             ingredient = RecipeIngredient(
                 recipe_id=recipe.id,
@@ -192,6 +194,7 @@ def recipe_new():
                 unit=ing_units[i],
                 is_flour=is_flour_checked,
                 is_liquid=is_liquid_checked,
+                w_value=current_w,
                 sort_order=i
             )
             db.session.add(ingredient)
@@ -324,12 +327,13 @@ def recipe_edit(id):
             if pan:
                 recipe.pans.append(pan)
 
-        # Ricostruzione della lista ingredienti per evitare frammentazioni
+        # Ricostruzione della lista ingredienti per evitare frammentazioni con recupero forza W
         RecipeIngredient.query.filter_by(recipe_id=recipe.id).delete()
 
         ing_names = request.form.getlist("ing_name[]")
         ing_qtys = request.form.getlist("ing_qty[]")
         ing_units = request.form.getlist("ing_unit[]")
+        ing_ws = request.form.getlist("ing_w[]")
 
         for i in range(len(ing_names)):
             if not ing_names[i].strip():
@@ -337,6 +341,7 @@ def recipe_edit(id):
 
             is_flour_checked = request.form.get(f"ing_is_flour_{i}") == "true"
             is_liquid_checked = request.form.get(f"ing_is_liquid_{i}") == "true"
+            current_w = int(ing_ws[i]) if (i < len(ing_ws) and ing_ws[i]) else 0
 
             ingredient = RecipeIngredient(
                 recipe_id=recipe.id,
@@ -345,6 +350,7 @@ def recipe_edit(id):
                 unit=ing_units[i],
                 is_flour=is_flour_checked,
                 is_liquid=is_liquid_checked,
+                w_value=current_w,
                 sort_order=i
             )
             db.session.add(ingredient)
@@ -568,13 +574,19 @@ def settings_yeast():
     return render_template("admin/settings_yeast.html", setting=setting)
 
 
-# ALLINEATO AL PLURALE: ADESSO AGGIORNA LA TABELLA "SETTINGS" (CON LA S)
+# ALLINEATO E TOTALMENTE BLINDATO DA ORM E QUERY SQL CRUDE SU SQLITE
 @admin_bp.route("/settings/theme", methods=["GET", "POST"])
 @login_required
 def settings_theme():
-    # Forza l'iniezione della colonna fisica sulla tabella corretta (settings)
+    # INIEZIONE DIFENSIVA STRUTTURALE: Crea a freddo le colonne se mancano nel file .db vecchio
     try:
         db.session.execute(db.text("ALTER TABLE settings ADD COLUMN theme_active VARCHAR(50) DEFAULT 'modern'"))
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+
+    try:
+        db.session.execute(db.text("ALTER TABLE settings ADD COLUMN site_description TEXT"))
         db.session.commit()
     except Exception:
         db.session.rollback()
@@ -587,18 +599,20 @@ def settings_theme():
 
     if request.method == "POST":
         selected_theme = request.form.get("theme_active", "modern").strip()
+        new_site_name = request.form.get("site_name", "").strip()
+        new_site_description = request.form.get("site_description", "").strip()
         
-        # AGGIORNAMENTO DIRETTO CORRETTO SULLA TABELLA CON LA S
+        # AGGIORNAMENTO UNIVERSALE DI TUTTI I PARAMETRI EDITABILI SULLA TABELLA DEFINITIVA
         db.session.execute(
-            db.text("UPDATE settings SET theme_active = :theme"),
-            {"theme": selected_theme}
+            db.text("UPDATE settings SET theme_active = :theme, site_name = :name, site_description = :desc"),
+            {"theme": selected_theme, "name": new_site_name, "desc": new_site_description}
         )
         db.session.commit()
 
-        flash("Nuovo stile estetico applicato al sito pubblico!", "success")
+        flash("Configurazione, look estetico e testi della Home salvati con successo!", "success")
         return redirect(url_for("admin.settings_theme"))
 
-    # Ricarica il record aggiornato
+    # Ricarica l'istanza fresca e aggiornata per il rendering HTML dell'admin
     setting = Setting.query.first()
     return render_template("admin/settings_theme.html", setting=setting)
 

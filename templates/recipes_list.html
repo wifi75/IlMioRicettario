@@ -1,45 +1,61 @@
 {% extends "base.html" %}
 
-{% block title %}Ricettario Pubblico Intellegibile{% endblock %}
+{% block title %}
+    {{ settings_data.site_name if settings_data and settings_data.site_name else "Ricettario Pubblico" }}
+{% endblock %}
 
 {% block content %}
-<div class="container py-4">
+<div class="container px-3 px-sm-4 pt-0 pb-4 d-flex flex-column min-vh-100">
     
-    <div class="text-center my-5 p-5 rounded-4 shadow-sm" 
+    <!-- HEADER IN ALTO ALTO E INCOLLATO -->
+    <div class="mt-0 mb-5 p-3 rounded-3 shadow-sm text-center text-md-start" 
          style="background-color: #fdfaf6; border: 2px solid #e6dfd3 !important;">
-        <h1 class="display-5 fw-bold mb-2 tracking-tight" style="color: #4a3321; font-family: 'Georgia', serif;">
-            🌾 L'Arte Bianca - Ricettario Dinamico
-        </h1>
-        <p class="mx-auto fs-5 fw-medium opacity-75" style="max-width: 650px; color: #6e5440;">
-            Esplora le nostre antiche formule bilanciate professionali. Utilizza i motori di calcolo integrati ad alta precisione per ridimensionare istantaneamente ogni impasto.
-        </p>
+        <div class="row align-items-center g-3">
+            <div class="col-12 col-md-auto d-flex justify-content-center">
+                <span class="fs-2">🌾</span>
+            </div>
+            <div class="col-12 col-md">
+                <h1 class="h4 fw-bold mb-1 tracking-tight" style="color: #4a3321; font-family: 'Georgia', serif;">
+                    {{ settings_data.site_name if settings_data and settings_data.site_name else "L'Arte Bianca - Ricettario Dinamico" }}
+                </h1>
+                <p class="mb-0 small fw-medium opacity-75" style="color: #6e5440; line-height: 1.4;">
+                    {{ settings_data.site_description if settings_data and settings_data.site_description else "Esplora le nostre antiche formule bilanciate professionali." }}
+                </p>
+            </div>
+        </div>
     </div>
 
-    <div class="row g-4 justify-content-center">
+    <!-- GRIGLIA RICETTE IN MEZZO -->
+    <div class="row g-4 justify-content-center mb-5 flex-grow-1 align-content-start">
         {% if recipes %}
             {% for recipe in recipes %}
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="card h-100 shadow-sm rounded-4 overflow-hidden card-recipe-hover transition-all" 
-                     style="background-color: #fdfaf6; border: 2px solid #e6dfd3 !important;">
+            <div class="col-12 col-sm-6 col-lg-4 d-flex justify-content-center">
+                <div class="card shadow-sm rounded-3 overflow-hidden card-recipe-hover transition-all w-100" 
+                     style="background-color: #fdfaf6; border: 2px solid #e6dfd3 !important; max-width: 380px;">
                     
                     <div class="card-body p-4 d-flex flex-column justify-content-between text-center">
                         <div class="d-flex flex-column align-items-center">
+                            
                             <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" 
-                                 style="width: 64px; height: 64px; background-color: #f4ece1; border: 2px double #8c6d53; box-shadow: 0 0 0 3px #f4ece1;">
-                                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#8c6d53" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                 style="width: 54px; height: 54px; background-color: #f4ece1; border: 2px double #8c6d53; box-shadow: 0 0 0 2px #f4ece1;">
+                                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#8c6d53" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M12 2v20M17 5l-5 4M7 5l5 4M17 10l-5 4M7 10l-5 4M17 15l-5 4M7 15l5 4"/>
                                     <circle cx="12" cy="12" r="10" stroke="#8c6d53" stroke-width="0.75" stroke-dasharray="2,2" fill="none"/>
                                 </svg>
                             </div>
                             
-                            <h4 class="fw-bold mb-2 tracking-tight" style="color: #4a3321; font-family: 'Georgia', serif;">{{ recipe.name }}</h4>
-                            <p class="small lh-base mb-4 opacity-75 px-2" style="color: #6e5440; font-weight: 500;">
-                                {{ recipe.description if recipe.description else "Formula tecnica bilanciata per professionisti e amatori della panificazione." }}
+                            <h2 class="h6 fw-bold mb-2 tracking-wide text-uppercase" style="color: #4a3321; font-family: 'Georgia', serif;">
+                                {{ recipe.name }}
+                            </h2>
+                            
+                            <p class="small lh-base text-muted mb-4 opacity-75 px-1 text-truncate-2" style="color: #6e5440; font-weight: 500; font-size: 13px;">
+                                {{ recipe.description if recipe.description else "Formula tecnica bilanciata." }}
                             </p>
                         </div>
 
                         <a href="{{ url_for('recipes.public_detail', slug=recipe.slug) }}" 
-                           class="btn w-100 fw-bold py-2.5 rounded-3 shadow-none transition-all d-flex align-items-center justify-content-center gap-2 btn-vintage-action">
+                           class="btn w-100 fw-bold py-2 rounded-2 shadow-none transition-all d-flex align-items-center justify-content-center gap-2 btn-vintage-action"
+                           style="font-size: 13px;">
                             <span>🔬 Visualizza e Calcola</span>
                             <i class="bi bi-arrow-right-short fs-5"></i>
                         </a>
@@ -49,32 +65,45 @@
             {% endfor %}
         {% else %}
             <div class="col-12 text-center py-5">
-                <div class="fs-5 fw-bold" style="color: #6e5440;">Nessuna formula pubblicata al momento nel database.</div>
+                <div class="fs-6 fw-bold" style="color: #6e5440;">Nessuna formula pubblicata al momento nel database.</div>
             </div>
         {% endif %}
     </div>
 
-    <footer class="mt-5 pt-5 pb-4 border-top text-center" style="border-color: #e6dfd3 !important;">
+    <!-- IL FOOTER ISTITUZIONALE IN BASSO IN BASSO -->
+    <footer class="mt-auto pt-4 pb-2 border-top text-center" style="border-color: #e6dfd3 !important;">
         <div class="d-flex flex-column align-items-center justify-content-center gap-2">
-            <p class="fw-semibold mb-1" style="font-size: 14px; color: #6e5440;">
+            <p class="fw-semibold mb-0" style="font-size: 13px; color: #6e5440;">
                 © 2026 <a href="https://github.com/wifi75/IlMioRicettario" target="_blank" class="text-decoration-none fw-bold link-hover-underline" style="color: #8c6d53;">Il Mio Ricettario</a>
             </p>
-            <p class="text-muted mb-3" style="font-size: 13px;">
+            <p class="text-muted mb-1" style="font-size: 12px;">
                 Architettato e sviluppato da <span class="text-dark fw-bold">Tiziano Cassone</span>
             </p>
+            
+            <!-- SE SEI LOGGATO: Il tasto nero va qui sotto, DOPO il copyright! -->
+            {% if current_user.is_authenticated %}
+            <div class="mt-2">
+                <a href="{{ url_for('admin.recipes') }}" class="btn btn-sm btn-dark fw-bold rounded-2 shadow-sm border px-3" style="font-size: 11px;">
+                    <i class="bi bi-arrow-left-right me-1 text-warning"></i> Pannello Controllo Admin
+                </a>
+            </div>
+            {% endif %}
+
+            <!-- SE NON SEI LOGGATO: Mostra il lucchetto standard -->
+            {% if not current_user.is_authenticated %}
             <div>
-                <a href="/admin/login" class="btn btn-sm btn-light border fw-bold px-3 py-1.5 rounded-3 shadow-none d-inline-flex align-items-center gap-2" style="font-size: 12px; background-color: #f4ece1; color: #4a3321; border-color: #e6dfd3 !important;">
+                <a href="/admin/login" class="btn btn-sm btn-light border fw-bold px-3 py-1 rounded-2 shadow-none d-inline-flex align-items-center gap-2" style="font-size: 11px; background-color: #f4ece1; color: #4a3321; border-color: #e6dfd3 !important;">
                     <i class="bi bi-key-fill text-warning"></i>
                     <span>Area Riservata Admin</span>
                 </a>
             </div>
+            {% endif %}
         </div>
     </footer>
 
 </div>
 
 <style>
-    /* Pulsante in Stile Vintage Artisan */
     .btn-vintage-action {
         background-color: transparent;
         color: #8c6d53;
@@ -84,17 +113,21 @@
         background-color: #8c6d53;
         color: #fdfaf6;
     }
-
-    /* Animazioni ed Effetti ad alte prestazioni */
     .card-recipe-hover {
-        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
     .card-recipe-hover:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 1rem 2.5rem rgba(140, 109, 83, 0.15) !important;
+        transform: translateY(-3px);
+        box-shadow: 0 0.5rem 1.5rem rgba(140, 109, 83, 0.12) !important;
     }
     .link-hover-underline:hover {
         text-decoration: underline !important;
+    }
+    .text-truncate-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;  
+        overflow: hidden;
     }
 </style>
 {% endblock %}

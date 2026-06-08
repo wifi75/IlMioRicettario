@@ -30,6 +30,12 @@ class Setting(db.Model):
         default="Il Mio Ricettario"
     )
 
+    # LA NUOVA COLONNA Python DA AGGIUNGERE:
+    site_description = db.Column(
+        db.Text,
+        default="Esplora le nostre antiche formule bilanciate professionali."
+    )
+
     default_unit = db.Column(
         db.String(20),
         default="g"
@@ -40,7 +46,6 @@ class Setting(db.Model):
         default=True
     )
 
-    # LA COLONNA AGGIUNTA SULLA TABELLA PLURALE CORRETTA
     theme_active = db.Column(
         db.String(50),
         default="modern"

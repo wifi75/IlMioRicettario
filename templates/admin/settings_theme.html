@@ -8,16 +8,31 @@
     <div class="col-lg-6">
         <div class="card shadow-sm border-0 bg-white rounded-3 mb-3">
             <div class="card-header bg-dark text-white fw-bold py-3">
-                🎨 Scegli il Vestito del tuo Ricettario
+                🎨 Configurazione Estetica e Contenuti Home
             </div>
             <div class="card-body p-4">
                 <form method="post" action="{{ url_for('admin.settings_theme') }}">
                     
+                    <!-- DIAGNOSTICA DB -->
                     <div class="mb-3 bg-light p-2 rounded border">
                         <span class="small text-muted fw-bold d-block" style="font-size: 11px;">VALORE REGISTRATO ORA NEL CODICE DB:</span>
                         <input type="text" class="form-control form-control-sm fw-bold text-danger border-0 bg-transparent p-0 shadow-none" value="{{ setting.theme_active if setting else 'Nessun record trovato' }}" readonly>
                     </div>
 
+                    <!-- NUOVO: EDIT DEL TITOLO HOME -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-dark text-uppercase small">Titolo del Ricettario (Home):</label>
+                        <input type="text" name="site_name" class="form-control fw-bold bg-white border shadow-none" 
+                               value="{{ setting.site_name if setting and setting.site_name else '' }}" placeholder="Es. L'Arte Bianca - Ricettario Dinamico">
+                    </div>
+
+                    <!-- NUOVO: EDIT DELLA DESCRIZIONE HOME -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-dark text-uppercase small">Descrizione o Sottotitolo:</label>
+                        <textarea name="site_description" class="form-control bg-white border shadow-none small" rows="3" placeholder="Es. Esplora le nostre antiche formule bilanciate... Built with love.">{{ setting.site_description if setting and setting.site_description else '' }}</textarea>
+                    </div>
+
+                    <!-- SELEZIONE TEMA -->
                     <div class="mb-4">
                         <label class="form-label fw-bold text-dark text-uppercase small">Modifica l'atmosfera del Frontend pubblico:</label>
                         <select name="theme_active" class="form-select form-select-md fw-bold text-dark bg-white border shadow-none">
@@ -29,8 +44,9 @@
                             <option value="pizzeria_industriale" {% if setting and setting.theme_active == 'pizzeria_industriale' %}selected="selected"{% endif %}>6. Pizzeria Industriale (Antracite e Ferro Battuto)</option>
                         </select>
                     </div>
+
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-primary fw-bold py-2 shadow-sm">💾 Cambia Aspetto Visivo</button>
+                        <button type="submit" class="btn btn-primary fw-bold py-2 shadow-sm">💾 Cambia Aspetto e Salva Testi</button>
                     </div>
                 </form>
             </div>
@@ -38,8 +54,9 @@
     </div>
     <div class="col-lg-6">
         <div class="card shadow-sm border-0 bg-light p-4 rounded-3 h-100">
-            <h5 class="fw-bold mb-3 text-dark text-uppercase small">💡 Come funziona il cambio d'abito?</h5>
-            <p class="small text-secondary lh-lg">Scegliendo uno stile, l'intero catalogo pubblico adeguerà istantaneamente i suoi colori, i font grafici (come il font <em>Georgia</em> tipografico antico per i temi vintage) e gli angoli dei blocchi, senza mai intaccare questo pannello admin che resterà sempre pulito e leggibile.</p>
+            <h5 class="fw-bold mb-3 text-dark text-uppercase small">💡 Come funziona la cabina di regia?</h5>
+            <p class="small text-secondary lh-lg mb-3">Scegliendo uno stile, l'intero catalogo pubblico adeguerà istantaneamente i suoi colori, i font grafici (come il font <em>Georgia</em> tipografico antico per i temi vintage) e gli angoli dei blocchi.</p>
+            <p class="small text-secondary lh-lg">Inoltre, compilando i campi di sinistra, puoi variare in qualunque momento il nome del portale e il testo introduttivo visibile dagli utenti senza mettere mano al codice HTML.</p>
         </div>
     </div>
 </div>

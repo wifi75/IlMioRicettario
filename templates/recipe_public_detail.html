@@ -66,10 +66,11 @@
                                     <span class="fw-bold text-dark d-block" style="font-size: 13px;">{{ pan.name }}</span>
                                     <small class="text-muted fw-medium">Capacità: {{ pan.weight_capacity|int }}g</small>
                                 </div>
-                                <div class="input-group input-group-sm justify-content-end" style="max-width: 120px;">
-                                    <button class="btn btn-outline-secondary fw-bold btn-pan-qty-minus" type="button">-</button>
-                                    <input type="number" class="form-control text-center fw-bold input-pan-qty-value" value="1" min="0" style="font-size: 14px;" readonly autocomplete="off">
-                                    <button class="btn btn-outline-secondary fw-bold btn-pan-qty-plus" type="button">+</button>
+                                <!-- RIPRISTINATI I PULSANTI CON MENO E PIU CHIARI, LARGHEZZA STRUTTURATA ED ELIMINATE FRECCETTE BRUTTE -->
+                                <div class="input-group input-group-sm justify-content-end" style="max-width: 130px;">
+                                    <button class="btn btn-outline-secondary fw-bold btn-pan-qty-minus px-3" type="button" style="font-size: 14px;">-</button>
+                                    <input type="text" class="form-control text-center fw-bold input-pan-qty-value" value="1" style="font-size: 14px; max-width: 45px; background: #fff;" readonly autocomplete="off">
+                                    <button class="btn btn-outline-secondary fw-bold btn-pan-qty-plus px-3" type="button" style="font-size: 14px;">+</button>
                                 </div>
                             </div>
                             {% endfor %}
@@ -134,8 +135,9 @@
                             <thead>
                                 <tr class="table-light text-secondary small">
                                     <th class="ps-3">Materia Prima</th>
-                                    <th class="text-center" style="width: 25%;">Percentuale Baker</th>
-                                    <th class="text-end text-primary fw-bold pe-3" style="width: 35%;">Grammi Necessari</th>
+                                    <th class="text-center" style="width: 18%;">Forza (W)</th>
+                                    <th class="text-center" style="width: 22%;">Percentuale Baker</th>
+                                    <th class="text-end text-primary fw-bold pe-3" style="width: 28%;">Grammi Necessari</th>
                                 </tr>
                             </thead>
                             <tbody id="calculated-ingredients-tbody">
@@ -148,8 +150,12 @@
                                     data-is-yeast="{% if 'lievito' in ing.name.lower() %}true{% else %}false{% endif %}">
                                     <td class="fw-bold text-dark ps-3">
                                         <span class="dynamic-ing-name">{{ ing.name }}</span>
-                                        {% if ing.is_flour %}<span class="badge bg-warning text-dark ms-1" style="font-size:9px; font-weight: 800;">FARINA</span>{% endif %}
-                                        {% if ing.is_liquid %}<span class="badge bg-info text-dark ms-1" style="font-size:9px; font-weight: 800;">LIQUIDO</span>{% endif %}
+                                    </td>
+                                    <!-- TOTALMENTE PULITO: Rimossi i trattini brutti sugli elementi non farina -->
+                                    <td class="text-center">
+                                        {% if ing.is_flour and ing.w_value and ing.w_value > 0 %}
+                                            <span class="badge bg-dark text-warning fw-bold px-2 py-1" style="font-size: 11px; border: 1px solid rgba(211, 107, 57, 0.2);">{{ ing.w_value }} W</span>
+                                        {% endif %}
                                     </td>
                                     <td class="text-center text-success fw-bold output-baker-pct">0%</td>
                                     <td class="text-end text-primary fw-bold fs-5 output-final-weight pe-3">0 g</td>
@@ -165,13 +171,13 @@
                                     <td class="fw-bold text-dark ps-3">
                                         <span class="dynamic-ing-name" id="fallback-yeast-label-name">Lievito di Birra Fresco</span>
                                     </td>
+                                    <td class="text-center"></td>
                                     <td class="text-center text-success fw-bold output-baker-pct">0.3%</td>
                                     <td class="text-end text-primary fw-bold fs-5 output-final-weight pe-3">0 g</td>
                                 </tr>
 
                                 <tr class="table-light border-top border-dark-subtle fw-bold text-dark">
-                                    <td class="ps-3 py-3 fs-5">⚖️ TOTALE IMPASTO</td>
-                                    <td class="text-center text-secondary">—</td>
+                                    <td class="ps-3 py-3 fs-5" colspan="3">TOTAL IMPASTO</td>
                                     <td class="text-end text-danger fw-bold fs-4 pe-3" id="dash-public-total-weight-row">0 g</td>
                                 </tr>
                             </tbody>
@@ -221,7 +227,7 @@
                         <div class="alert alert-info border-0 small mb-3 rounded-3 fw-semibold">
                             <strong>Fase Anticipata:</strong> Preparare da 12 a 16 ore prima dell'impasto finale.
                         </div>
-                        <div class="p-3 bg-light rounded-3 border mb-2 text-center" style="border-color: #e2e8f0 !important;">
+                        <div class="p-3 bg-light rounded-3 border text-center mb-2" style="border-color: #e2e8f0 !important;">
                             <div class="row g-2 fw-bold text-dark">
                                 <div class="col-4 border-end"><small class="text-muted d-block fw-bold tracking-wider mb-1" style="font-size: 10px;">FARINA PREFERMENTO</small><span id="pub-pref-flour" class="fs-5 text-primary">0 g</span></div>
                                 <div class="col-4 border-end"><small class="text-muted d-block fw-bold tracking-wider mb-1" style="font-size: 10px;">ACQUA PREFERMENTO</small><span id="pub-pref-liquid" class="fs-5 text-info">0 g</span></div>
@@ -559,10 +565,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 const nameSpan = ing.rowElement.querySelector('.dynamic-ing-name');
                 if (nameSpan) {
+                    // BLINDATO: Il JavaScript inietta solo la stringa pulita senza alcun badge extra
                     if (targetYeastType === 'dry') {
-                        nameSpan.innerHTML = 'Lievito di Birra Secco <span class="badge bg-secondary ms-1" style="font-size:9px;">Disidratato</span>';
+                        nameSpan.innerText = 'Lievito di Birra Secco';
                     } else {
-                        nameSpan.innerHTML = 'Lievito di Birra Fresco <span class="badge bg-success text-white ms-1" style="font-size:9px;">Compresso</span>';
+                        nameSpan.innerText = 'Lievito di Birra Fresco';
                     }
                 }
             }
@@ -653,18 +660,13 @@ document.addEventListener('DOMContentLoaded', function() {
         if (liveTotalLiquids) liveTotalLiquids.textContent = Math.round(liveLiquidSum) + ' g';
         if (liveHydration && liveFlourSum > 0) liveHydration.textContent = Math.round((liveLiquidSum / liveFlourSum) * 100) + '%';
         
-        // SINCRONIZZAZIONE RIGA COMPLESSIVA TABELLA
         const rowTotalDisplay = document.getElementById('dash-public-total-weight-row');
         if (rowTotalDisplay) {
             rowTotalDisplay.textContent = Math.round(targetTotalWeight) + ' g';
         }
     }
 
-    // =========================================================================
-    // MOTORE DI ACCENSIONE INTELLIGENTE - FORZA IL BROWSER AD USARE I TUOI DATI
-    // =========================================================================
     function accensioneIntelligente() {
-        // 1. FORZATURA TEGLIE
         if (panRows.length > 0 && scaleModeSelect) {
             scaleModeSelect.value = 'tray';
             wrapperWeightInput.classList.add('d-none');
@@ -677,7 +679,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // 2. FORZATURA LIEVITO
         let isDry = false;
         document.querySelectorAll('.output-ingredient-row:not(.d-none)').forEach(row => {
             let n = (row.getAttribute('data-name') || '').toLowerCase();
@@ -693,7 +694,6 @@ document.addEventListener('DOMContentLoaded', function() {
             yeastSelect.value = isDry ? 'dry' : 'base';
         }
 
-        // 3. LANCIA IL CALCOLO FINALE
         calculateFormula();
     }
 

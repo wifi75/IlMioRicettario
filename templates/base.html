@@ -2,276 +2,137 @@
 <html lang="it">
 
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>{% block title %}Il Mio Ricettario{% endblock %}</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/admin.css') }}">
-
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-    <!-- ========================================================================= -->
-    <!-- MOTORE DEI 6 TEMI VINTAGE DINAMICI (SI ATTIVA SUL FRONTEND PUBBLICO)      -->
-    <!-- ========================================================================= -->
     {% if settings_data %}
     <style>
-        :root {
-            /* =============== TEMA 1: MODERNO STANDARD =============== */
-            {% if settings_data.theme_active == 'modern' or not settings_data.theme_active %}
-            --vtg-bg: #f8fafc;
-            --vtg-card-bg: #ffffff;
-            --vtg-text: #1e293b;
-            --vtg-primary: #0284c7;
-            --vtg-secondary: #22c55e;
-            --vtg-accent: #06b6d4;
-            --vtg-border: #e2e8f0;
-            --vtg-font: 'Inter', system-ui, sans-serif;
-            --vtg-radius: 12px;
+        /* 2. ANTICA PANETTERIA */
+        body.antica_panetteria { background-color: #F9F6F0 !important; color: #2B2621 !important; font-family: 'Georgia', serif !important; }
+        body.antica_panetteria .card, body.antica_panetteria .card-body { background-color: #FCFAF7 !important; border-color: #E1D4BB !important; border-radius: 4px !important; color: #2B2621 !important; }
+        body.antica_panetteria h1, body.antica_panetteria h2, body.antica_panetteria h3, body.antica_panetteria h4, body.antica_panetteria h5, body.antica_panetteria h6, body.antica_panetteria .fw-bold { color: #A94438 !important; font-family: 'Georgia', serif !important; }
+        body.antica_panetteria .text-primary { color: #A94438 !important; }
+        body.antica_panetteria .text-success { color: #606C5D !important; }
+        body.antica_panetteria .btn-primary, body.antica_panetteria .btn-success { background-color: #A94438 !important; border-color: #E1D4BB !important; color: #fff !important; border-radius: 4px !important; }
 
-            /* =============== TEMA 2: ANTICA PANETTERIA =============== */
-            {% elif settings_data.theme_active == 'antica_panetteria' %}
-            --vtg-bg: #F9F6F0 !important;
-            --vtg-card-bg: #FCFAF7 !important;
-            --vtg-text: #2B2621 !important;
-            --vtg-primary: #A94438 !important;
-            --vtg-secondary: #606C5D !important;
-            --vtg-accent: #8C6D53 !important;
-            --vtg-border: #E1D4BB !important;
-            --vtg-font: 'Georgia', serif !important;
-            --vtg-radius: 4px !important;
+        /* 3. MULINO STORICO */
+        body.mulino_storico { background-color: #EFEAD8 !important; color: #3C2A21 !important; font-family: 'Georgia', serif !important; }
+        body.mulino_storico .card, body.mulino_storico .card-body { background-color: #F5F2E9 !important; border-color: #D0C9B1 !important; border-radius: 0px !important; color: #3C2A21 !important; }
+        body.mulino_storico h1, body.mulino_storico h2, body.mulino_storico h3, body.mulino_storico h4, body.mulino_storico h5, body.mulino_storico h6, body.mulino_storico .fw-bold { color: #1A1A1A !important; font-family: 'Georgia', serif !important; }
+        body.mulino_storico .text-primary { color: #1A1A1A !important; }
+        body.mulino_storico .text-success { color: #567287 !important; }
+        body.mulino_storico .btn-primary, body.mulino_storico .btn-success { background-color: #1A1A1A !important; border-color: #D0C9B1 !important; color: #fff !important; border-radius: 0px !important; }
 
-            /* =============== TEMA 3: MULINO STORICO =============== */
-            {% elif settings_data.theme_active == 'mulino_storico' %}
-            --vtg-bg: #EFEAD8 !important;
-            --vtg-card-bg: #F5F2E9 !important;
-            --vtg-text: #3C2A21 !important;
-            --vtg-primary: #1A1A1A !important;
-            --vtg-secondary: #567287 !important;
-            --vtg-accent: #654E34 !important;
-            --vtg-border: #D0C9B1 !important;
-            --vtg-font: 'Georgia', serif !important;
-            --vtg-radius: 0px !important;
+        /* 4. FORNO DI PAESE */
+        body.forno_paese { background-color: #EAEFF2 !important; color: #1E252B !important; font-family: 'Georgia', serif !important; }
+        body.forno_paese .card, body.forno_paese .card-body { background-color: #F4F7F9 !important; border-color: #C8D3DB !important; border-radius: 8px !important; color: #1E252B !important; }
+        body.forno_paese h1, body.forno_paese h2, body.forno_paese h3, body.forno_paese h4, body.forno_paese h5, body.forno_paese h6, body.forno_paese .fw-bold { color: #2B4C63 !important; font-family: 'Georgia', serif !important; }
+        body.forno_paese .text-primary { color: #2B4C63 !important; }
+        body.forno_paese .text-success { color: #D4A359 !important; }
+        body.forno_paese .btn-primary, body.forno_paese .btn-success { background-color: #2B4C63 !important; border-color: #C8D3DB !important; color: #fff !important; border-radius: 8px !important; }
 
-            /* =============== TEMA 4: FORNO DI PAESE =============== */
-            {% elif settings_data.theme_active == 'forno_paese' %}
-            --vtg-bg: #EAEFF2 !important;
-            --vtg-card-bg: #F4F7F9 !important;
-            --vtg-text: #1E252B !important;
-            --vtg-primary: #2B4C63 !important;
-            --vtg-secondary: #D4A359 !important;
-            --vtg-accent: #567287 !important;
-            --vtg-border: #C8D3DB !important;
-            --vtg-font: 'Georgia', serif !important;
-            --vtg-radius: 8px !important;
+        /* 5. BORGO ANTICO */
+        body.borgo_antico { background-color: #F5EFE6 !important; color: #3F3329 !important; font-family: 'Georgia', serif !important; }
+        body.borgo_antico .card, body.borgo_antico .card-body { background-color: #FAF7F2 !important; border-color: #E6DDC4 !important; border-radius: 6px !important; color: #3F3329 !important; }
+        body.borgo_antico h1, body.borgo_antico h2, body.borgo_antico h3, body.borgo_antico h4, body.borgo_antico h5, body.borgo_antico h6, body.borgo_antico .fw-bold { color: #D36B39 !important; font-family: 'Georgia', serif !important; }
+        body.borgo_antico .text-primary { color: #D36B39 !important; }
+        body.borgo_antico .text-success { color: #7882A4 !important; }
+        body.borgo_antico .btn-primary, body.borgo_antico .btn-success { background-color: #D36B39 !important; border-color: #E6DDC4 !important; color: #fff !important; border-radius: 6px !important; }
 
-            /* =============== TEMA 5: BORGO ANTICO =============== */
-            {% elif settings_data.theme_active == 'borgo_antico' %}
-            --vtg-bg: #F5EFE6 !important;
-            --vtg-card-bg: #FAF7F2 !important;
-            --vtg-text: #3F3329 !important;
-            --vtg-primary: #D36B39 !important;
-            --vtg-secondary: #7882A4 !important;
-            --vtg-accent: #A799B7 !important;
-            --vtg-border: #E6DDC4 !important;
-            --vtg-font: 'Georgia', serif !important;
-            --vtg-radius: 6px !important;
+        /* 6. PIZZERIA INDUSTRIALE */
+        body.pizzeria_industriale { background-color: #22252A !important; color: #E3E6EB !important; font-family: 'Trebuchet MS', sans-serif !important; }
+        body.pizzeria_industriale .card, body.pizzeria_industriale .card-body { background-color: #2B2F36 !important; border-color: #3F444E !important; border-radius: 2px !important; color: #E3E6EB !important; }
+        body.pizzeria_industriale h1, body.pizzeria_industriale h2, body.pizzeria_industriale h3, body.pizzeria_industriale h4, body.pizzeria_industriale h5, body.pizzeria_industriale h6, body.pizzeria_industriale .fw-bold { color: #E67E22 !important; font-family: 'Trebuchet MS', sans-serif !important; }
+        body.pizzeria_industriale .text-primary { color: #E67E22 !important; }
+        body.pizzeria_industriale .text-success { color: #7F8C8D !important; }
+        body.pizzeria_industriale .btn-primary, body.pizzeria_industriale .btn-success { background-color: #E67E22 !important; border-color: #3F444E !important; color: #fff !important; border-radius: 2px !important; }
 
-            /* =============== TEMA 6: PIZZERIA INDUSTRIALE =============== */
-            {% elif settings_data.theme_active == 'pizzeria_industriale' %}
-            --vtg-bg: #22252A !important;
-            --vtg-card-bg: #2B2F36 !important;
-            --vtg-text: #E3E6EB !important;
-            --vtg-primary: #E67E22 !important;
-            --vtg-secondary: #7F8C8D !important;
-            --vtg-accent: #BDC3C7 !important;
-            --vtg-border: #3F444E !important;
-            --vtg-font: 'Trebuchet MS', sans-serif !important;
-            --vtg-radius: 2px !important;
-            {% endif %}
-        }
-
-        /* INIEZIONE UNIVERSALE STRIPPA-BOOTSTRAP (ATTIVA SOLO FUORI DALL'INTERFACCIA ADMIN DEL SITO) */
-        body:not(:has(.main-content)) { 
-            background-color: var(--vtg-bg) !important; 
-            color: var(--vtg-text) !important;
-            font-family: var(--vtg-font) !important;
-        }
-        body:not(:has(.main-content)) .card, body:not(:has(.main-content)) .card-body { 
-            background-color: var(--vtg-card-bg) !important; 
-            border-color: var(--vtg-border) !important;
-            border-radius: var(--vtg-radius) !important;
-            color: var(--vtg-text) !important;
-        }
-        body:not(:has(.main-content)) h1, body:not(:has(.main-content)) h2, body:not(:has(.main-content)) h3, body:not(:has(.main-content)) h4, body:not(:has(.main-content)) h5, body:not(:has(.main-content)) h6, body:not(:has(.main-content)) .fw-bold {
-            color: var(--vtg-text) !important;
-            font-family: var(--vtg-font) !important;
-        }
-        body:not(:has(.main-content)) .text-primary, body:not(:has(.main-content)) .output-final-weight { 
-            color: var(--vtg-primary) !important; 
-        }
-        body:not(:has(.main-content)) .text-success, body:not(:has(.main-content)) .output-baker-pct { 
-            color: var(--vtg-secondary) !important; 
-        }
-        body:not(:has(.main-content)) .text-info { 
-            color: var(--vtg-accent) !important; 
-        }
-        body:not(:has(.main-content)) .btn-primary, body:not(:has(.main-content)) .btn-success, body:not(:has(.main-content)) .input-group-text, body:not(:has(.main-content)) .form-select, body:not(:has(.main-content)) .form-control {
-            border-color: var(--vtg-border) !important;
-            border-radius: var(--vtg-radius) !important;
-        }
-        body:not(:has(.main-content)) .btn-primary, body:not(:has(.main-content)) .btn-success {
-            background-color: var(--vtg-primary) !important;
-            color: #fff !important;
-        }
+        .hover-sidebar { transition: all 0.2s ease-in-out; }
+        .hover-sidebar:hover { background: rgba(255, 255, 255, 0.08) !important; transform: translateX(3px); }
     </style>
     {% endif %}
-
-    <style>
-        /* Sincronizzazione transizioni pannello admin barra laterale */
-        .hover-sidebar {
-            transition: all 0.2s ease-in-out;
-        }
-        .hover-sidebar:hover {
-            background: rgba(255, 255, 255, 0.08) !important;
-            transform: translateX(3px);
-        }
-    </style>
-
 </head>
 
-<body>
+<body class="{% if not request.path.startswith('/admin') and settings_data %}{{ settings_data.theme_active }}{% endif %}">
 
-{% if current_user.is_authenticated %}
-
-<div class="sidebar d-flex flex-column justify-content-between p-4" 
-     style="width: 280px; position: fixed; height: 100vh; background: #1e293b; color: #fff; z-index: 1000;">
-
-    <div>
-
-        <div class="mb-4 pb-2 border-bottom border-secondary border-opacity-25">
-            <h3 class="mb-1 text-white fw-bold">
-                🍞 Ricettario
-            </h3>
-            <small class="text-uppercase tracking-wider fw-semibold opacity-50" style="font-size: 10px; color: #94a3b8;">
-                Pannello Amministrazione
-            </small>
-        </div>
-
-        <div class="mb-4 p-3 d-flex align-items-center gap-3"
-             style="background: rgba(255, 255, 255, 0.04);
-                    border: 1px solid rgba(255, 255, 255, 0.08);
-                    border-radius: 10px;">
-            
-            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" 
-                 style="width: 38px; height: 38px; font-size: 14px;">
-                {{ current_user.username[:2].upper() }}
+{% if current_user.is_authenticated and request.path.startswith('/admin') %}
+    <div class="sidebar d-flex flex-column justify-content-between p-4" 
+         style="width: 280px; position: fixed; height: 100vh; background: #1e293b; color: #fff; z-index: 1000;">
+        <div>
+            <div class="mb-4 pb-2 border-bottom border-secondary border-opacity-25">
+                <h3 class="mb-1 text-white fw-bold">🍞 Ricettario</h3>
+                <small class="text-uppercase tracking-wider fw-semibold opacity-50" style="font-size: 10px; color: #94a3b8;">Pannello Amministrazione</small>
             </div>
 
-            <div>
-                <div style="font-size: 11px; color: #94a3b8;" class="text-uppercase fw-bold opacity-50">
-                    Utente
+            <div class="mb-4 p-3 d-flex align-items-center gap-3" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px;">
+                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" style="width: 38px; height: 38px; font-size: 14px;">
+                    {{ current_user.username[:2].upper() }}
                 </div>
-                <div class="fw-bold text-white small">
-                    {{ current_user.username }}
+                <div>
+                    <div style="font-size: 11px; color: #94a3b8;" class="text-uppercase fw-bold opacity-50">Utente</div>
+                    <div class="fw-bold text-white small">{{ current_user.username }}</div>
                 </div>
+            </div>
+
+            <div class="nav flex-column gap-1 mb-4">
+                <span class="text-uppercase tracking-wider fw-bold px-2 mb-2 opacity-25" style="font-size: 10px; color: #94a3b8;">Gestione Contenuti</span>
+                <a href="{{ url_for('admin.recipes') }}" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 hover-sidebar">
+                    <i class="bi bi-journal-richtext text-warning"></i><span>Ricette</span>
+                </a>
+                <a href="{{ url_for('admin.master_ingredients_view') }}" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 hover-sidebar">
+                    <i class="bi bi-egg-fried text-success"></i><span>Anagrafica Ingredienti</span>
+                </a>
+                <a href="{{ url_for('admin.master_pans_view') }}" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 hover-sidebar">
+                    <i class="bi bi-grid-fill text-purple" style="color: #c084fc !important;"></i><span>Anagrafica Teglie</span>
+                </a>
+                <a href="{{ url_for('admin.wiki_list') }}" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 hover-sidebar">
+                    <i class="bi bi-book text-info"></i><span>Wiki</span>
+                </a>
+            </div>
+
+            <div class="nav flex-column gap-1">
+                <span class="text-uppercase tracking-wider fw-bold px-2 mb-2 opacity-25" style="font-size: 10px; color: #94a3b8;">Configurazione</span>
+                <a href="{{ url_for('admin.settings_yeast') }}" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 opacity-75 hover-sidebar">
+                    <i class="bi bi-gear-fill text-primary"></i><span>Bilanciamento Lieviti</span>
+                </a>
+                <a href="{{ url_for('admin.settings_theme') }}" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 opacity-75 hover-sidebar">
+                    <i class="bi bi-palette-fill text-info"></i><span>Design e Temi Sito</span>
+                </a>
+                <a href="{{ url_for('admin.change_password') }}" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 opacity-75 hover-sidebar">
+                    <i class="bi bi-shield-lock"></i><span>Sicurezza Account</span>
+                </a>
             </div>
         </div>
 
-        <div class="nav flex-column gap-1 mb-4">
-            
-            <span class="text-uppercase tracking-wider fw-bold px-2 mb-2 opacity-25" style="font-size: 10px; color: #94a3b8;">
-                Gestione Contenuti
-            </span>
-
-            <a href="{{ url_for('admin.recipes') }}" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 hover-sidebar">
-                <i class="bi bi-journal-richtext text-warning"></i>
-                <span>Ricette</span>
+        <div class="pt-3 border-top border-secondary border-opacity-25 nav flex-column gap-1">
+            <a href="{{ url_for('recipes.list_recipes') }}" target="_blank" class="nav-link text-info rounded px-3 py-2 d-flex align-items-center gap-3 hover-sidebar fw-semibold small">
+                <i class="bi bi-globe"></i><span>Vedi Sito Pubblico</span>
             </a>
-
-            <a href="{{ url_for('admin.master_ingredients_view') }}" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 hover-sidebar">
-                <i class="bi bi-egg-fried text-success"></i>
-                <span>Anagrafica Ingredienti</span>
+            <a href="{{ url_for('admin.logout') }}" class="nav-link text-danger rounded px-3 py-2 d-flex align-items-center gap-3 hover-sidebar fw-semibold small">
+                <i class="bi bi-box-arrow-right"></i><span>Logout</span>
             </a>
-
-            <a href="{{ url_for('admin.master_pans_view') }}" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 hover-sidebar">
-                <i class="bi bi-grid-fill text-purple" style="color: #c084fc !important;"></i>
-                <span>Anagrafica Teglie</span>
-            </a>
-
-            <a href="{{ url_for('admin.wiki_list') }}" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 hover-sidebar">
-                <i class="bi bi-book text-info"></i>
-                <span>Wiki</span>
-            </a>
-
-        </div>
-
-        <div class="nav flex-column gap-1">
-            
-            <span class="text-uppercase tracking-wider fw-bold px-2 mb-2 opacity-25" style="font-size: 10px; color: #94a3b8;">
-                Configurazione
-            </span>
-
-            <a href="{{ url_for('admin.settings_yeast') }}" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 opacity-75 hover-sidebar">
-                <i class="bi bi-gear-fill text-primary"></i>
-                <span>Bilanciamento Lieviti</span>
-            </a>
-
-            <a href="{{ url_for('admin.settings_theme') }}" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 opacity-75 hover-sidebar">
-                <i class="bi bi-palette-fill text-info"></i>
-                <span>Design e Temi Sito</span>
-            </a>
-
-            <a href="{{ url_for('admin.change_password') }}" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 opacity-75 hover-sidebar">
-                <i class="bi bi-shield-lock"></i>
-                <span>Sicurezza Account</span>
-            </a>
-
-        </div>
-
-    </div>
-
-    <div class="pt-3 border-top border-secondary border-opacity-25 nav flex-column gap-1">
-
-        <a href="{{ url_for('recipes.list_recipes') }}" target="_blank" class="nav-link text-info rounded px-3 py-2 d-flex align-items-center gap-3 hover-sidebar fw-semibold small">
-            <i class="bi bi-globe"></i>
-            <span>Vedi Sito Pubblico</span>
-        </a>
-
-        <a href="{{ url_for('admin.logout') }}" class="nav-link text-danger rounded px-3 py-2 d-flex align-items-center gap-3 hover-sidebar fw-semibold small">
-            <i class="bi bi-box-arrow-right"></i>
-            <span>Logout</span>
-        </a>
-
-    </div>
-
-</div>
-
-<div class="main-content" style="margin-left: 280px; padding: 40px; min-height: 100vh; background: #f8fafc;">
-
-    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom" style="border-color: #e2e8f0 !important;">
-        <div>
-            <h2 class="fw-bold text-dark mb-0">
-                {% block page_title %}{% endblock %}
-            </h2>
-        </div>
-        <div>
-            <span class="badge bg-primary px-3 py-2">
-                Pannello Amministrazione
-            </span>
         </div>
     </div>
+
+    <div class="main-content" style="margin-left: 280px; padding: 40px; min-height: 100vh; background: #f8fafc;">
+        <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom" style="border-color: #e2e8f0 !important;">
+            <div><h2 class="fw-bold text-dark mb-0">{% block page_title %}{% endblock %}</h2></div>
+            <div><span class="badge bg-primary px-3 py-2">Pannello Amministrazione</span></div>
+        </div>
+
+{% elif current_user.is_authenticated and not request.path.startswith('/admin') %}
+    <!-- CASISTICA 2: SEI LOGGATO MA SUL SITO PUBBLICO (Tasto rimosso da qui!) -->
+    <div class="container py-3">
 
 {% else %}
-
-<div class="container py-5">
+    <div class="container py-4">
 
 {% endif %}
 
@@ -286,14 +147,10 @@
     {% block content %}
     {% endblock %}
 
-{% if current_user.is_authenticated %}
+{% if current_user.is_authenticated and request.path.startswith('/admin') %}
     <div class="mt-5 text-center text-muted pt-4 border-top" style="border-color: #e2e8f0 !important;">
-        <div class="mb-1" style="font-size: 13px;">
-            Architettato e sviluppato da <strong class="text-dark">Tiziano Cassone</strong>
-        </div>
-        <small style="font-size: 11px; opacity: 0.7;">
-            Il Mio Ricettario © 2026
-        </small>
+        <div class="mb-1" style="font-size: 13px;">Architettato e sviluppato da <strong class="text-dark">Tiziano Cassone</strong></div>
+        <small style="font-size: 11px; opacity: 0.7;">Il Mio Ricettario © 2026</small>
     </div>
 </div> 
 {% else %}
