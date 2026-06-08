@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## v0.5.0 - 2026-06-08
+
+### Aggiunto
+* **Forza della Farina Sincronizzata (`w_value`):** Inserita la colonna `w_value` nel modello locale `RecipeIngredient` e configurata l'iniezione automatica a freddo nel database SQLite all'avvio.
+* **Cattura Automatica Forza W:** Aggiornate le rotte `recipe_new` e `recipe_edit` in `routes/admin.py` per intercettare l'array `ing_w[]` dal form e blindare il valore W centralizzato all'interno della formula salvata.
+* **Badge Visivo W sul Frontend Pubblico:** Introdotto un indicatore visivo scuro con testo giallo nella tabella del calcolatore pubblico per esporre la forza delle farine ai visitatori in modalità responsive.
+
+### Modificato e Corretto
+* **Isolamento Selettivo del W:** Corretta la logica visiva sia nel form amministrativo che nel frontend pubblico; il badge della forza (W) si attiva solo ed esclusivamente sulle farine, lasciando lo spazio vuoto e pulito per sale, zucchero, acqua e olio (eliminati i trattini "—" superflui).
+* **Restyling Interfaccia Calcolatore Teglie:** Eliminati i pulsanti doppioni nativi del browser e i testi fissi (+/-) nella sezione teglie pubblica. Ricreati pulsanti grafici Bootstrap con icone vettoriali grandi, puliti e con larghezza fissa anti-schiacciamento.
+* **Unificazione Riga Totale Impasto:** Semplificata la riga di chiusura della tabella sul frontend in un'unica dicitura pulita "TOTAL IMPASTO" senza simboli grafici extra o frammentazioni.
+* **Spostamento Tasto Pannello Admin:** Rimosso il pulsante nero "Pannello Controllo Admin" dalla cima della Home pubblica (che spezzava il layout) e integrato stabilmente nel footer del sito, posizionato sotto i crediti e il copyright.
+
+---
+
 ## v0.4.0 - 2026-06-07
 
 ### Aggiunto
@@ -32,7 +47,7 @@
 * Layout generale del pannello di amministrazione
 * Visualizzazione delle statistiche e dei riepiloghi tecnici della ricetta
 * Interfaccia grafica della dashboard principale
-* Adattabilità e compatibilità del layout su smartphone e tablet
+* Adattabilità e compatibility del layout su smartphone e tablet
 
 ---
 

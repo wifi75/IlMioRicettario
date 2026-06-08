@@ -11,7 +11,7 @@ Questa guida ti spiegherà passo-passo come installare lo script su un server Li
 
 ---
 
-## 🚀 Funzionalià Principali della v1.1.0
+## 🚀 Funzionalià Principali della v1.3.0
 
 * 📝 Editor Avanzato Stile Microsoft Word: Form di creazione e modifica ricette aggiornati con l'integrazione di Quill.js (WYSIWYG) per gestire font, allineamenti e modifiche estetiche direttamente dal browser.
 * 🧠 Algoritmo di Impaginazione Intelligente: Il sistema elabora le istruzioni salvate in modo semplice, genera automaticamente elenchi numerati progressivi e applica il grassetto (<strong>) in modo automatico alla primissima parola di ogni riga.
