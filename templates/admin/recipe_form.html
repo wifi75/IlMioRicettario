@@ -57,13 +57,17 @@
         </div>
         <div class="card-body p-4">
             <div class="row g-3">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <label class="form-label fw-bold small text-secondary text-uppercase">Nome Formula</label>
                     <input type="text" name="name" id="recipe-name" class="form-control" placeholder="es. Focaccia Barese ad Alta Idratazione" required>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <label class="form-label fw-bold small text-secondary text-uppercase">Slug Web (Autogenerato)</label>
                     <input type="text" name="slug" id="recipe-slug" class="form-control bg-light" placeholder="es. focaccia-barese-ad-alta-idratazione" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold small text-danger text-uppercase">Etichetta del Badge (Marrone)</label>
+                    <input type="text" name="badge_text" id="recipe-badge-text" class="form-control fw-bold text-dark" placeholder="es. Antica Formula Bilanciata" value="Antica Formula Bilanciata">
                 </div>
                 <div class="col-md-12 mt-3">
                     <label class="form-label fw-bold small text-secondary text-uppercase">Icona Grafica ed Identificazione Categoria</label>
@@ -390,8 +394,8 @@ document.addEventListener('DOMContentLoaded', function() {
         rows.forEach((row, index) => {
             const flourHidden = row.querySelector('.hidden-flour-val');
             const liquidHidden = row.querySelector('.hidden-liquid-val');
-            if (flourHidden) flourHidden.setAttribute('name', `ing_is_flour_${index}`);
-            if (liquidHidden) liquidHidden.setAttribute('name', `ing_is_liquid_${index}`);
+            if (flourHidden) flourHidden.setAttribute('name', `ing_is_flour_{index}`);
+            if (liquidHidden) liquidHidden.setAttribute('name', `ing_is_liquid_{index}`);
         });
     }
 

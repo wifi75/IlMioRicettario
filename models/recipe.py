@@ -29,6 +29,13 @@ class Recipe(db.Model):
         nullable=False
     )
 
+    # --- NUOVO CAMPO TESTO BADGE PERSONALIZZATO ---
+    badge_text = db.Column(
+        db.String(100),
+        nullable=True,
+        default="Antica Formula Bilanciata"
+    )
+
     description = db.Column(
         db.Text
     )
