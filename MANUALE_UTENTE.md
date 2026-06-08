@@ -32,36 +32,40 @@ Il Pannello Admin è l'area riservata in cui puoi creare nuove ricette, gestire 
 
 1. Per raggiungere la schermata di login, digita nel browser: `http://IP_DEL_SERVER:8080/admin/login`
 2. Inserisci le tue credenziali (Nome Utente e Password).
-3. Una volta effettuato l'accesso, verrai reindirizzato alla **Dashboard**, che mostra le statistiche generali del tuo ricettario.
+3. Una volta effettuato l'accesso, verrai reindirizzato direttamente alla **Gestione Formule ("Ricette")**, che costituisce il fulcro operativo del tuo ricettario (la vecchia rotta Dashboard è disattivata e reindirizza qui automaticamente per velocizzare il lavoro).
 4. Per uscire in sicurezza in qualsiasi momento, clicca sul pulsante **Logout** nel menu.
 
 ---
 
 ## 🧫 4. Gestione dei Vari Pannelli Amministrativi
 
-Una volta dentro l'area Admin, avrai a disposizione tre sezioni principali nel menu di navigazione:
+Una volta dentro l'area Admin, avrai a disposizione le sezioni principali nel menu di navigazione:
 
-### A. Il Pannello "Impostazioni Lieviti" (Globali)
-In questa sezione gestisci la potenza del motore di calcolo del sito.
-* Troverai un modulo con due campi intuitivi: **Grammi Fresco** e **Grammi Secco Equivalenti**.
-* Se usi una marca di lievito secco molto forte (es. Caputo) e sai che 3g di fresco corrispondono a 1.5g di secco, ti basta inserire questi due numeri.
-* Il sistema calcolerà in automatico il rapporto (`2.0`) e lo salverà nel database. Da questo momento, tutte le ricette pubbliche useranno questo nuovo bilanciamento.
+### A. Gestione Formule ("Ricette")
+In questo pannello puoi creare i tuoi capolavori.
+* **Nuova Ricetta & Modifica:** Troverai integrato un editor avanzato stile Microsoft Word (Quill.js). Questo strumento WYSIWYG ti permette di formattare il testo, gestire i font e gli elenchi direttamente dal browser. Al salvataggio, il testo lineare viene memorizzato mantenendo i caratteri nativi di a capo (`\n`).
+* **Algoritmo di Impaginazione Autonomo:** Quando la ricetta viene renderizzata nel frontend pubblico o nel dettaglio admin, il sistema elabora il testo riga per riga. Genera automaticamente un elenco numerato progressivo ordinato (1., 2., 3...) e inserisce in grassetto (`<strong>`) in automatico la primissima parola di ogni riga (es. "Impasta a velocità..." diventa "<strong>Impasta</strong> a velocità...").
+* **Composizione Ingredienti:** Entrando nel dettaglio di una ricetta, puoi inserire le materie prime cercandole tramite una comoda tendina dall'anagrafica centralizzata e impostando il loro peso base.
+* **Feature Toggles (Interruttori Tecnici):** In fondo alla pagina di modifica della ricetta, puoi attivare o disattivare le funzioni speciali per quella specifica formula:
+  * *Abilita Input N. Pezzi / Peso Panetto* (per attivare il calcolo geometrico nel frontend).
+  * *Abilita Menu Tipo Lievito* (per permettere la conversione fresco/secco).
+  * *Abilita Opzione Tangzhong* (per attivare il calcolo e il tab del Water Roux).
 
 ### B. L'Anagrafica Centralizzata ("Master Ingredienti")
 Prima di aggiungere un ingrediente a una ricetta, esso deve esistere in questa lista globale. Serve a dare un'identità scientifica alle materie prime.
 * Clicca su **Aggiungi Ingrediente**.
 * Inserisci il nome (es. *Farina Tipo 00*, *Acqua*, *Sale Marino*).
+* **Controllo Interbloccato:** Il modulo di inserimento possiede un controllo JavaScript che impedisce a un ingrediente di essere contemporaneamente una farina e un liquido.
 * **I Toggle Tipologia:** Spunta se l'ingrediente è un *Liquido* (fondamentale per il calcolo dell'idratazione) o se è una *Farina*.
-* **Il Valore W (Forza della Farina):** Se spunti il toggle "Farina", apparirà magicamente un campo numerico. Inserisci la forza della farina (es. `320`). Se l'ingrediente non è una farina, il sistema nasconderà il campo e lo imposterà a 0 automaticamente.
+* **Il Valore W (Forza della Farina):** Se spunti il toggle "Farina", apparirà un campo numerico dedicato. Inserisci la forza della farina (es. `320`). Se l'ingrediente non è una farina, il sistema nasconderà il campo e lo imposterà a 0 automaticamente.
 
-### C. Gestione Formule ("Ricette")
-In questo pannello puoi creare i tuoi capolavori.
-* **Nuova Ricetta:** Inserisci il Nome, la descrizione e le istruzioni operative per l'impastamento e la cottura. Il sistema genererà da solo lo "Slug Web" (l'indirizzo internet semplificato).
-* **Composizione Ingredienti:** Entrando nel dettaglio di una ricetta, puoi inserire le materie prime cercandole dall'anagrafica centralizzata e impostando il loro peso base (riferito alla ricetta standard).
-* **Feature Toggles (Interruttori Tecnici):** In fondo alla pagina di modifica della ricetta, puoi attivare o disattivare le funzioni speciali per quella specifica formula:
-  * *Abilita Input N. Pezzi / Peso Panetto* (per attivare il calcolo geometrico nel frontend).
-  * *Abilita Menu Tipo Lievito* (per permettere la conversione fresco/secco).
-  * *Abilita Opzione Tangzhong* (per attivare il calcolo e il tab del Water Roux).
+### C. Il Pannello "Impostazioni Lieviti & Parametri Globali"
+In questa sezione gestisci la potenza del motore di calcolo del sito.
+* Troverai un modulo con due campi intuitivi: **Grammi Fresco** e **Grammi Secco Equivalenti** per la conversione automatica delle ricette.
+* **Parametri Tangzhong:** Gestione centralizzata dei coefficienti per il Water Roux (Standard: 5% di farina da isolare e moltiplicatore idrico 5×).
+
+### D. Sicurezza Account
+Una sezione dedicata alla protezione del profilo amministratore. Ti permette di modificare la password di accesso inserendo la chiave attuale e definendo una nuova password (minimo 6 caratteri). Il sistema si occuperà di crittografarla tramite algoritmo sicuro (`password_hash`) in tempo reale, senza mai salvarla come testo in chiaro nel database.
 
 ---
 
