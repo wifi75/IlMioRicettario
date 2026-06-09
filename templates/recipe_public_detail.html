@@ -45,48 +45,67 @@
                 <div class="mb-3">
                     <label class="form-label small text-secondary fw-bold text-uppercase" style="font-size: 11px;">Metodo di Calcolo</label>
                     <select id="calc-scale-mode" class="form-select form-select-sm fw-bold rounded-3" autocomplete="off">
-                        <option value="weight" {% if not recipe.pans %}selected{% endif %}>⚖️ Peso Impasto Desiderato</option>
-                        <option value="tray" {% if recipe.pans %}selected{% endif %}>📐 Calcolo per Teglie Assegnate</option>
+                        <option value="weight" {% if recipe.pans|length == 0 and not feature.enable_piece_count %}selected{% endif %}>⚖️ Peso Impasto Desiderato</option>
+                        
+                        {% if feature and feature.enable_piece_count %}
+                        <option value="pieces" {% if recipe.pans|length == 0 %}selected{% endif %}>🍔 Calcolo per N. Pezzi e Peso</option>
+                        {% endif %}
+
+                        {% if recipe.pans|length > 0 %}
+                        <option value="tray" selected>📐 Calcolo per Teglie Assegnate</option>
+                        {% endif %}
                     </select>
                 </div>
 
-                <div id="wrapper-weight-input" class="mb-3 {% if recipe.pans %}d-none{% endif %}">
+                <div id="wrapper-weight-input" class="mb-3 d-none">
                     <label class="form-label small text-secondary fw-bold text-uppercase" style="font-size: 11px;">Grammi Impasto Desiderati</label>
                     <input type="number" id="calc-target-weight" class="form-control text-center fw-bold fs-5 rounded-3" value="1000" step="50" autocomplete="off">
                 </div>
 
-                <div id="wrapper-tray-input" class="mb-3 {% if not recipe.pans %}d-none{% endif %}">
-                    <label class="form-label small text-secondary fw-bold text-uppercase d-block mb-2" style="font-size: 11px;">Quantità per Singola Teglia Abilitata</label>
-                    
-                    <div class="d-flex flex-column gap-2 mb-2" id="public-pans-list-container">
-                        {% if recipe.pans %}
-                            {% for pan in recipe.pans %}
-                            <div class="d-flex align-items-center justify-content-between p-2 border rounded-3 bg-light-subtle public-pan-row" data-capacity="{{ pan.weight_capacity }}">
-                                <div>
-                                    <span class="fw-bold text-dark d-block" style="font-size: 13px;">{{ pan.name }}</span>
-                                    <small class="text-muted fw-medium">Capacità: {{ pan.weight_capacity|int }}g</small>
-                                </div>
-                                <!-- RIPRISTINATI I PULSANTI CON MENO E PIU CHIARI, LARGHEZZA STRUTTURATA ED ELIMINATE FRECCETTE BRUTTE -->
-                                <div class="input-group input-group-sm justify-content-end" style="max-width: 130px;">
-                                    <button class="btn btn-outline-secondary fw-bold btn-pan-qty-minus px-3" type="button" style="font-size: 14px;">-</button>
-                                    <input type="text" class="form-control text-center fw-bold input-pan-qty-value" value="1" style="font-size: 14px; max-width: 45px; background: #fff;" readonly autocomplete="off">
-                                    <button class="btn btn-outline-secondary fw-bold btn-pan-qty-plus px-3" type="button" style="font-size: 14px;">+</button>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        {% else %}
-                            <div class="text-center py-2 text-muted small border rounded-3 bg-light">Nessuna teglia associata a questa ricetta.</div>
-                        {% endif %}
-                    </div>
-                </div>
-
                 {% if feature and feature.enable_piece_count %}
-                <div class="p-3 bg-light rounded-3 border mb-3 text-center small text-muted d-none">
-                    <input type="number" id="calc-pieces-count" value="1">
-                    <input type="number" id="calc-pieces-weight" value="140">
+                <div id="wrapper-pieces-input" class="mb-3 d-none">
+                    <label class="form-label small text-secondary fw-bold text-uppercase d-block mb-2" style="font-size: 11px;">Pezzatura Impasto</label>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-light text-secondary fw-bold" style="font-size: 11px;">Pezzi</span>
+                                <input type="number" id="calc-pieces-count" class="form-control text-center fw-bold text-primary fs-6" value="10" min="1" autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-light text-secondary fw-bold" style="font-size: 11px;">Peso</span>
+                                <input type="number" id="calc-pieces-weight" class="form-control text-center fw-bold text-dark fs-6" value="100" min="1" autocomplete="off">
+                                <span class="input-group-text bg-light text-secondary fw-bold" style="font-size: 11px;">g</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 {% endif %}
 
+                {% if recipe.pans|length > 0 %}
+                <div id="wrapper-tray-input" class="mb-3 d-none">
+                    <label class="form-label small text-secondary fw-bold text-uppercase d-block mb-2" style="font-size: 11px;">Quantità per Singola Teglia Abilitata</label>
+                    
+                    <div class="d-flex flex-column gap-2 mb-2" id="public-pans-list-container">
+                        {% for pan in recipe.pans %}
+                        <div class="d-flex align-items-center justify-content-between p-2 border rounded-3 bg-light-subtle public-pan-row" data-capacity="{{ pan.weight_capacity }}" data-pan-id="{{ pan.id }}">
+                            <div>
+                                <span class="fw-bold text-dark d-block" style="font-size: 13px;">{{ pan.name }}</span>
+                                <small class="text-muted fw-medium">Capacità: {{ pan.weight_capacity|int }}g</small>
+                            </div>
+                            <div class="input-group input-group-sm justify-content-end" style="max-width: 130px;">
+                                <button class="btn btn-outline-secondary fw-bold btn-pan-qty-minus px-3" type="button" style="font-size: 14px;">-</button>
+                                <input type="text" class="form-control text-center fw-bold input-pan-qty-value" value="1" style="font-size: 14px; max-width: 45px; background: #fff;" readonly autocomplete="off">
+                                <button class="btn btn-outline-secondary fw-bold btn-pan-qty-plus px-3" type="button" style="font-size: 14px;">+</button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if feature and feature.enable_yeast_type %}
                 <div class="mb-3">
                     <label class="form-label small text-secondary fw-bold text-uppercase" style="font-size: 11px;">Tipo di Lievito</label>
                     <select id="calc-yeast-select" class="form-select fw-semibold rounded-3 text-dark" autocomplete="off">
@@ -94,6 +113,11 @@
                         <option value="dry" {% if has_dry_yeast.value %}selected{% endif %}>Lievito secco disidratato</option>
                     </select>
                 </div>
+                {% else %}
+                <select id="calc-yeast-select" class="d-none" autocomplete="off">
+                    <option value="base" selected>Lievito fresco</option>
+                </select>
+                {% endif %}
 
                 {% if feature and feature.enable_tangzhong %}
                 <div class="mb-3">
@@ -151,7 +175,6 @@
                                     <td class="fw-bold text-dark ps-3">
                                         <span class="dynamic-ing-name">{{ ing.name }}</span>
                                     </td>
-                                    <!-- TOTALMENTE PULITO: Rimossi i trattini brutti sugli elementi non farina -->
                                     <td class="text-center">
                                         {% if ing.is_flour and ing.w_value and ing.w_value > 0 %}
                                             <span class="badge bg-dark text-warning fw-bold px-2 py-1" style="font-size: 11px; border: 1px solid rgba(211, 107, 57, 0.2);">{{ ing.w_value }} W</span>
@@ -300,16 +323,50 @@
         </div>
     </div>
 
+    {% if recipe.show_chiusura or recipe.show_autolysis or recipe.show_puntata or recipe.show_appretto %}
     <div class="card border-0 shadow-sm mb-4 bg-white rounded-4">
         <div class="card-body py-3">
-            <div class="row text-center align-items-center g-2 small text-dark fw-bold">
-                <div class="col-3 border-end">🌡️ Chiusura: <span class="text-danger fw-bold ms-1">{{ recipe.temp_chiusura or 24 }}°C</span></div>
-                <div class="col-3 border-end">⏱️ Autolisi: <span class="text-secondary fw-bold ms-1">{{ recipe.tempo_autolisi or 0 }} min</span></div>
-                <div class="col-3 border-end">🧺 Puntata: <span class="text-secondary fw-bold ms-1">{{ recipe.tempo_puntata or 120 }} min</span></div>
-                <div class="col-3">🧺 Appretto: <span class="text-secondary fw-bold ms-1">{{ recipe.tempo_appretto or 60 }} min</span></div>
+            <div class="row text-center align-items-center g-2 small text-dark fw-bold justify-content-center">
+                
+                {% if recipe.show_chiusura %}
+                <div class="col-md px-3 mb-2 mb-md-0 separator-md">
+                    🌡️ Chiusura: <span class="text-danger fw-bold ms-1">{{ recipe.temp_chiusura or 24 }}°C</span>
+                </div>
+                {% endif %}
+                
+                {% if recipe.show_autolysis %}
+                <div class="col-md px-3 mb-2 mb-md-0 separator-md">
+                    ⏱️ Autolisi: <span class="text-secondary fw-bold ms-1">{{ recipe.tempo_autolisi or 0 }} min</span>
+                </div>
+                {% endif %}
+                
+                {% if recipe.show_puntata %}
+                <div class="col-md px-3 mb-2 mb-md-0 separator-md">
+                    🧺 Puntata: 
+                    <span class="text-secondary fw-bold ms-1">
+                        {% if recipe.puntata_fino_al_raddoppio %}Fino al Raddoppio{% else %}{{ recipe.tempo_puntata or 120 }} min{% endif %}
+                    </span>
+                </div>
+                {% endif %}
+                
+                {% if recipe.show_appretto %}
+                <div class="col-md px-3">
+                    🧺 Appretto: <span class="text-secondary fw-bold ms-1">{{ recipe.tempo_appretto or 60 }} min</span>
+                </div>
+                {% endif %}
+                
             </div>
         </div>
     </div>
+    <style>
+        /* Gestione intelligente dei separatori grafici solo sugli elementi attivi a schermo */
+        @media (min-width: 768px) {
+            .separator-md { border-right: 1px solid #e2e8f0 !important; }
+            .row > .col-md:last-child, 
+            .row > .col-md.separator-md:last-of-type { border-right: none !important; }
+        }
+    </style>
+    {% endif %}
 
     <div class="text-center mb-5">
         <a href="/" class="btn btn-outline-secondary px-4 fw-semibold rounded-3 shadow-none">
@@ -321,15 +378,27 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const freshToDryRatio = parseFloat("{{ settings_data.fresh_to_dry_ratio if settings_data else 3.0 }}");
+    const recipeSlug = "{{ recipe.slug }}";
+    const storageKey = `recipe_settings_${recipeSlug}`;
+
+    const freshToDryRatio = parseFloat("{{ recipe.yeast_ratio if recipe and recipe.yeast_ratio else 3.0 }}");
     const tzFlourPctGlobal = parseFloat("{{ settings_data.tangzhong_flour_percent if settings_data else 5.0 }}") / 100;
     const tzLiquidMultGlobal = parseFloat("{{ settings_data.tangzhong_liquid_multiplier if settings_data else 5.0 }}");
+    
+    const enableYeastType = {{ 'true' if feature and feature.enable_yeast_type else 'false' }};
 
     const scaleModeSelect = document.getElementById('calc-scale-mode');
+    
+    // Wrappers
     const wrapperWeightInput = document.getElementById('wrapper-weight-input');
+    const wrapperPiecesInput = document.getElementById('wrapper-pieces-input');
     const wrapperTrayInput = document.getElementById('wrapper-tray-input');
     
+    // Inputs
     const inputTargetWeight = document.getElementById('calc-target-weight');
+    const inputPiecesCount = document.getElementById('calc-pieces-count');
+    const inputPiecesWeight = document.getElementById('calc-pieces-weight');
+    
     const sliderHydration = document.getElementById('calc-slider-hydration');
     const overrideHydrationCheck = document.getElementById('calc-override-hydration');
     const labelCurrentHydroTarget = document.getElementById('label-current-hydro-target');
@@ -347,7 +416,67 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const panRows = document.querySelectorAll('.public-pan-row');
 
-    // CONTROLLO DI SICUREZZA FALLBACK LIEVITO
+    function loadSavedSettings() {
+        const savedDataRaw = localStorage.getItem(storageKey);
+        if (!savedDataRaw) return;
+
+        try {
+            const saved = JSON.parse(savedDataRaw);
+            
+            if (saved.scaleMode && scaleModeSelect) scaleModeSelect.value = saved.scaleMode;
+            if (saved.targetWeight && inputTargetWeight) inputTargetWeight.value = saved.targetWeight;
+            if (saved.piecesCount && inputPiecesCount) inputPiecesCount.value = saved.piecesCount;
+            if (saved.piecesWeight && inputPiecesWeight) inputPiecesWeight.value = saved.piecesWeight;
+            if (saved.yeastType && yeastSelect) yeastSelect.value = saved.yeastType;
+            if (saved.tangzhong && tangzhongSelect) tangzhongSelect.value = saved.tangzhong;
+            
+            if (saved.overrideHydration !== undefined && overrideHydrationCheck) {
+                overrideHydrationCheck.checked = saved.overrideHydration;
+            }
+            if (saved.hydrationSlider && sliderHydration) {
+                sliderHydration.value = saved.hydrationSlider;
+                labelCurrentHydroTarget.textContent = saved.hydrationSlider + '%';
+            }
+
+            if (saved.trayQuantities && Object.keys(saved.trayQuantities).length > 0) {
+                panRows.forEach(row => {
+                    const panId = row.getAttribute('data-pan-id');
+                    if (panId && saved.trayQuantities[panId] !== undefined) {
+                        const qtyInput = row.querySelector('.input-pan-qty-value');
+                        if (qtyInput) qtyInput.value = saved.trayQuantities[panId];
+                    }
+                });
+            }
+        } catch (e) {
+            console.error("Errore nel caricamento delle impostazioni locales:", e);
+        }
+    }
+
+    function saveCurrentSettings() {
+        const trayQtyMap = {};
+        panRows.forEach(row => {
+            const panId = row.getAttribute('data-pan-id');
+            const qtyInput = row.querySelector('.input-pan-qty-value');
+            if (panId && qtyInput) {
+                trayQtyMap[panId] = parseInt(qtyInput.value) || 0;
+            }
+        });
+
+        const settingsToSave = {
+            scaleMode: scaleModeSelect ? scaleModeSelect.value : null,
+            targetWeight: inputTargetWeight ? inputTargetWeight.value : null,
+            piecesCount: inputPiecesCount ? inputPiecesCount.value : null,
+            piecesWeight: inputPiecesWeight ? inputPiecesWeight.value : null,
+            yeastType: yeastSelect ? yeastSelect.value : null,
+            tangzhong: tangzhongSelect ? tangzhongSelect.value : null,
+            overrideHydration: overrideHydrationCheck ? overrideHydrationCheck.checked : false,
+            hydrationSlider: sliderHydration ? sliderHydration.value : null,
+            trayQuantities: trayQtyMap
+        };
+
+        localStorage.setItem(storageKey, JSON.stringify(settingsToSave));
+    }
+
     let initialYeastDetected = false;
     document.querySelectorAll('.output-ingredient-row').forEach(row => {
         let isYeastRaw = String(row.getAttribute('data-is-yeast')).toLowerCase().trim();
@@ -364,7 +493,6 @@ document.addEventListener('DOMContentLoaded', function() {
         fallbackYeastRow.remove(); 
     }
 
-    // Gestione Tab UI
     const frontendButtons = document.querySelectorAll('#publicProcessTabs button');
     const frontendPanes = document.querySelectorAll('#recipeProcessTabsContent .tab-pane');
 
@@ -403,19 +531,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (scaleModeSelect) {
         scaleModeSelect.addEventListener('change', function() {
+            if (wrapperWeightInput) wrapperWeightInput.classList.add('d-none');
+            if (wrapperPiecesInput) wrapperPiecesInput.classList.add('d-none');
+            if (wrapperTrayInput) wrapperTrayInput.classList.add('d-none');
+
             if (this.value === 'tray') {
-                wrapperWeightInput.classList.add('d-none');
-                wrapperTrayInput.classList.remove('d-none');
+                if (wrapperTrayInput) wrapperTrayInput.classList.remove('d-none');
                 
                 let totalCurrentTrays = 0;
                 panRows.forEach(r => totalCurrentTrays += parseInt(r.querySelector('.input-pan-qty-value').value) || 0);
                 if (totalCurrentTrays === 0 && panRows.length > 0) {
                     panRows.forEach(r => r.querySelector('.input-pan-qty-value').value = 1);
                 }
+            } else if (this.value === 'pieces') {
+                if (wrapperPiecesInput) wrapperPiecesInput.classList.remove('d-none');
             } else {
-                wrapperWeightInput.classList.remove('d-none');
-                wrapperTrayInput.classList.add('d-none');
+                if (wrapperWeightInput) wrapperWeightInput.classList.remove('d-none');
             }
+            
+            saveCurrentSettings();
             calculateFormula();
         });
     }
@@ -429,6 +563,7 @@ document.addEventListener('DOMContentLoaded', function() {
             let val = parseInt(inputQty.value) || 0;
             if (val > 0) {
                 inputQty.value = val - 1;
+                saveCurrentSettings();
                 calculateFormula();
             }
         });
@@ -436,18 +571,24 @@ document.addEventListener('DOMContentLoaded', function() {
         btnPlus.addEventListener('click', function() {
             let val = parseInt(inputQty.value) || 0;
             inputQty.value = val + 1;
+            saveCurrentSettings();
             calculateFormula();
         });
     });
 
-    if (inputTargetWeight) inputTargetWeight.addEventListener('input', calculateFormula);
+    if (inputTargetWeight) inputTargetWeight.addEventListener('input', () => { saveCurrentSettings(); calculateFormula(); });
+    if (inputPiecesCount) inputPiecesCount.addEventListener('input', () => { saveCurrentSettings(); calculateFormula(); });
+    if (inputPiecesWeight) inputPiecesWeight.addEventListener('input', () => { saveCurrentSettings(); calculateFormula(); });
+    
     if (sliderHydration) sliderHydration.addEventListener('input', function() {
         labelCurrentHydroTarget.textContent = this.value + '%';
+        saveCurrentSettings();
         calculateFormula();
     });
-    if (overrideHydrationCheck) overrideHydrationCheck.addEventListener('change', calculateFormula);
-    if (yeastSelect) yeastSelect.addEventListener('change', calculateFormula);
-    if (tangzhongSelect) tangzhongSelect.addEventListener('change', calculateFormula);
+    
+    if (overrideHydrationCheck) overrideHydrationCheck.addEventListener('change', () => { saveCurrentSettings(); calculateFormula(); });
+    if (yeastSelect) yeastSelect.addEventListener('change', () => { saveCurrentSettings(); calculateFormula(); });
+    if (tangzhongSelect) tangzhongSelect.addEventListener('change', () => { saveCurrentSettings(); calculateFormula(); });
 
     function calculateFormula() {
         let recipeTotalFlourBase = 0;
@@ -518,13 +659,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (stringaRiepilogo) {
                 if (reportSegments.length > 0) {
-                    stringaRiepilogo.textContent = `Configurazione: ${reportSegments.join(' + ')} · Totale Target: ${Math.round(targetTotalWeight)}g`;
+                    stringaRiepilogo.textContent = `Configurazione Teglie: ${reportSegments.join(' + ')} · Totale Impasto: ${Math.round(targetTotalWeight)}g`;
                 } else {
                     stringaRiepilogo.textContent = "Seleziona almeno una teglia usando i tasti + e -";
                 }
             }
-        } else if (inputTargetWeight) {
-            targetTotalWeight = parseFloat(inputTargetWeight.value) || 1000;
+        } else if (mode === 'pieces') {
+            let count = inputPiecesCount ? parseInt(inputPiecesCount.value) || 0 : 0;
+            let weight = inputPiecesWeight ? parseFloat(inputPiecesWeight.value) || 0 : 0;
+            
+            targetTotalWeight = count * weight;
+            if (targetTotalWeight <= 0) targetTotalWeight = 1000;
+
+            if (stringaRiepilogo) {
+                stringaRiepilogo.textContent = `Configurazione: ${count} pezzi da ${weight}g · Totale Impasto: ${Math.round(targetTotalWeight)}g`;
+            }
+        } else {
+            targetTotalWeight = inputTargetWeight ? parseFloat(inputTargetWeight.value) || 1000 : 1000;
             if (stringaRiepilogo) {
                 stringaRiepilogo.textContent = `Target Peso Impasto Richiesto: ${Math.round(targetTotalWeight)}g`;
             }
@@ -553,23 +704,29 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             if (ing.isYeast) {
-                let conversionFactor = 1;
-                
-                if (ing.isBaseDry && targetYeastType === 'base') {
-                    conversionFactor = freshToDryRatio;
-                } else if (!ing.isBaseDry && targetYeastType === 'dry') {
-                    conversionFactor = 1 / freshToDryRatio;
-                }
+                if (enableYeastType) {
+                    let conversionFactor = 1;
+                    
+                    if (ing.isBaseDry && targetYeastType === 'base') {
+                        conversionFactor = freshToDryRatio;
+                    } else if (!ing.isBaseDry && targetYeastType === 'dry') {
+                        conversionFactor = 1 / freshToDryRatio;
+                    }
 
-                ing.bakerPct = ing.bakerPct * conversionFactor;
-                
-                const nameSpan = ing.rowElement.querySelector('.dynamic-ing-name');
-                if (nameSpan) {
-                    // BLINDATO: Il JavaScript inietta solo la stringa pulita senza alcun badge extra
-                    if (targetYeastType === 'dry') {
-                        nameSpan.innerText = 'Lievito di Birra Secco';
-                    } else {
-                        nameSpan.innerText = 'Lievito di Birra Fresco';
+                    ing.bakerPct = ing.bakerPct * conversionFactor;
+                    
+                    const nameSpan = ing.rowElement.querySelector('.dynamic-ing-name');
+                    if (nameSpan) {
+                        if (targetYeastType === 'dry') {
+                            nameSpan.innerText = 'Lievito di Birra Secco';
+                        } else {
+                            nameSpan.innerText = 'Lievito di Birra Fresco';
+                        }
+                    }
+                } else {
+                    const nameSpan = ing.rowElement.querySelector('.dynamic-ing-name');
+                    if (nameSpan) {
+                        nameSpan.innerText = ing.rowElement.getAttribute('data-name');
                     }
                 }
             }
@@ -667,31 +824,28 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function accensioneIntelligente() {
-        if (panRows.length > 0 && scaleModeSelect) {
-            scaleModeSelect.value = 'tray';
-            wrapperWeightInput.classList.add('d-none');
-            wrapperTrayInput.classList.remove('d-none');
-            
-            let totalTrays = 0;
-            panRows.forEach(r => totalTrays += parseInt(r.querySelector('.input-pan-qty-value').value) || 0);
-            if (totalTrays === 0) {
-                panRows.forEach(r => r.querySelector('.input-pan-qty-value').value = 1);
-            }
+        loadSavedSettings();
+
+        if (scaleModeSelect) {
+            const event = new Event('change');
+            scaleModeSelect.dispatchEvent(event);
         }
 
-        let isDry = false;
-        document.querySelectorAll('.output-ingredient-row:not(.d-none)').forEach(row => {
-            let n = (row.getAttribute('data-name') || '').toLowerCase();
-            let isY = String(row.getAttribute('data-is-yeast')).toLowerCase() === 'true';
-            if (isY || n.includes('lievito')) {
-                if (n.includes('secc') || n.includes('disidratat')) {
-                    isDry = true;
-                }
+        if (enableYeastType && yeastSelect) {
+            const hasMemory = localStorage.getItem(storageKey);
+            if (!hasMemory) {
+                let isDry = false;
+                document.querySelectorAll('.output-ingredient-row:not(.d-none)').forEach(row => {
+                    let n = (row.getAttribute('data-name') || '').toLowerCase();
+                    let isY = String(row.getAttribute('data-is-yeast')).toLowerCase() === 'true';
+                    if (isY || n.includes('lievito')) {
+                        if (n.includes('secc') || n.includes('disidratat')) {
+                            isDry = true;
+                        }
+                    }
+                });
+                yeastSelect.value = isDry ? 'dry' : 'base';
             }
-        });
-        
-        if (yeastSelect) {
-            yeastSelect.value = isDry ? 'dry' : 'base';
         }
 
         calculateFormula();

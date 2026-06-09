@@ -125,6 +125,19 @@ def recipe_new():
         preferment_text = request.form.get("preferment_instructions", "").strip()
         badge_text_input = request.form.get("badge_text", "Antica Formula Bilanciata").strip()
 
+        # LETTURA CORAZZATA E SALVATAGGIO DEI VALORI LETTERALI UTENTE (NUOVA RICETTA)
+        try:
+            fresco_raw = request.form.get("yeast_fresh_val", "3.0").replace(",", ".")
+            secco_raw = request.form.get("yeast_dry_val", "1.0").replace(",", ".")
+            
+            fresco_val = float(fresco_raw) if fresco_raw else 3.0
+            secco_val = float(secco_raw) if secco_raw else 1.0
+            yeast_ratio_val = round(fresco_val / secco_val, 1) if secco_val > 0 else 3.0
+        except (ValueError, TypeError):
+            fresco_val = 3.0
+            secco_val = 1.0
+            yeast_ratio_val = 3.0
+
         recipe = Recipe(
             name=request.form["name"],
             slug=request.form["slug"],
@@ -148,7 +161,12 @@ def recipe_new():
             
             # Schema fermentativo avanzato e istruzioni Fase 1
             fermentation_type=request.form.get("fermentation_type", "diretto"),
-            preferment_instructions=preferment_text
+            preferment_instructions=preferment_text,
+            
+            # Salvataggio simmetrico: sia il coefficiente che i numeri inseriti
+            yeast_ratio=yeast_ratio_val,
+            yeast_fresh_saved=fresco_val,
+            yeast_dry_saved=secco_val
         )
 
         # Associazione Many-to-Many con le Teglie selezionate
@@ -206,10 +224,13 @@ def recipe_new():
 
     master_ingredients = MasterIngredient.query.order_by(MasterIngredient.name).all()
     master_pans = MasterBakeryPan.query.order_by(MasterBakeryPan.name).all()
+    
     return render_template(
         "admin/recipe_form.html",
         master_ingredients_list=master_ingredients,
-        master_pans_list=master_pans
+        master_pans_list=master_pans,
+        computed_fresh_val=3.0,
+        computed_dry_val=1.0
     )
 
 
@@ -286,6 +307,20 @@ def recipe_edit(id):
         preferment_text = request.form.get("preferment_instructions", "").strip()
         badge_text_input = request.form.get("badge_text", "Antica Formula Bilanciata").strip()
 
+        # LETTURA CORAZZATA E SALVATAGGIO DEI VALORI LETTERALI UTENTE (MODIFICA)
+        try:
+            fresco_raw = request.form.get("yeast_fresh_val", "3.0").replace(",", ".")
+            secco_raw = request.form.get("yeast_dry_val", "1.0").replace(",", ".")
+            
+            fresco_val = float(fresco_raw) if fresco_raw else 3.0
+            secco_val = float(secco_raw) if secco_raw else 1.0
+            
+            yeast_ratio_val = round(fresco_val / secco_val, 1) if secco_val > 0 else 3.0
+        except (ValueError, TypeError):
+            fresco_val = 3.0
+            secco_val = 1.0
+            yeast_ratio_val = 3.0
+
         recipe.name = request.form["name"]
         recipe.slug = request.form["slug"]
         recipe.icon = request.form.get("icon", "bi-journal-text")
@@ -293,6 +328,11 @@ def recipe_edit(id):
         recipe.description = request.form.get("description", "").strip()
         recipe.instructions = instructions_text
         recipe.is_published = "is_published" in request.form
+        
+        # Aggiornamento integrato di tutti i campi sul database
+        recipe.yeast_ratio = yeast_ratio_val
+        recipe.yeast_fresh_saved = fresco_val
+        recipe.yeast_dry_saved = secco_val
 
         # Aggiornamento parametri fisici numerici
         recipe.temp_chiusura = float(request.form.get("temp_chiusura", 24.0)) if request.form.get("temp_chiusura") else 24.0
@@ -369,13 +409,19 @@ def recipe_edit(id):
     master_ingredients = MasterIngredient.query.order_by(MasterIngredient.name).all()
     master_pans = MasterBakeryPan.query.order_by(MasterBakeryPan.name).all()
 
+    # RESTITUIAMO AL TEMPLATE I DATI ORIGINARI SALVATI SENZA RIGENERAZIONI ARBITRARIE
+    f_val = recipe.yeast_fresh_saved if recipe.yeast_fresh_saved is not None else (recipe.yeast_ratio if recipe.yeast_ratio else 3.0)
+    d_val = recipe.yeast_dry_saved if recipe.yeast_dry_saved is not None else 1.0
+
     return render_template(
         "admin/recipe_form.html",
         recipe=recipe,
         feature=feature,
         ingredients=ingredients,
         master_ingredients_list=master_ingredients,
-        master_pans_list=master_pans
+        master_pans_list=master_pans,
+        computed_fresh_val=f_val,  # Spedisce al form i tuoi dati salvati intatti (es. 8)
+        computed_dry_val=d_val     # Spedisce al form i tuoi dati salvati intatti (es. 3)
     )
 
 
@@ -545,40 +591,9 @@ def master_ingredient_delete(id):
     return redirect(url_for("admin.master_ingredients_view"))
 
 
-@admin_bp.route("/settings/yeast", methods=["GET", "POST"])
-@login_required
-def settings_yeast():
-    db.create_all()
-    setting = Setting.query.first()
-    if not setting:
-        setting = Setting(fresh_to_dry_ratio=3.0, theme_active="modern")
-        db.session.add(setting)
-        db.session.commit()
-
-    if request.method == "POST":
-        try:
-            fresco_val = float(request.form.get("yeast_fresh_val", "3.0").replace(",", "."))
-            secco_val = float(request.form.get("yeast_dry_val", "1.0").replace(",", "."))
-
-            if secco_val <= 0:
-                flash("Errore: Il valore del lievito secco deve essere maggiore di 0.", "danger")
-                return redirect(url_for("admin.settings_yeast"))
-
-            setting.fresh_to_dry_ratio = fresco_val / secco_val
-            db.session.commit()
-            flash("Rapporto proporzionale dei lieviti aggiornato globalmente!", "success")
-        except ValueError:
-            flash("Errore: Inserisci valori numerici validi.", "danger")
-        return redirect(url_for("admin.settings_yeast"))
-
-    return render_template("admin/settings_yeast.html", setting=setting)
-
-
-# ALLINEATO E TOTALMENTE BLINDATO DA ORM E QUERY SQL CRUDE SU SQLITE
 @admin_bp.route("/settings/theme", methods=["GET", "POST"])
 @login_required
 def settings_theme():
-    # INIEZIONE DIFENSIVA STRUTTURALE: Crea a freddo le colonne se mancano nel file .db vecchio
     try:
         db.session.execute(db.text("ALTER TABLE settings ADD COLUMN theme_active VARCHAR(50) DEFAULT 'modern'"))
         db.session.commit()
@@ -602,7 +617,6 @@ def settings_theme():
         new_site_name = request.form.get("site_name", "").strip()
         new_site_description = request.form.get("site_description", "").strip()
         
-        # AGGIORNAMENTO UNIVERSALE DI TUTTI I PARAMETRI EDITABILI SULLA TABELLA DEFINITIVA
         db.session.execute(
             db.text("UPDATE settings SET theme_active = :theme, site_name = :name, site_description = :desc"),
             {"theme": selected_theme, "name": new_site_name, "desc": new_site_description}
@@ -612,7 +626,6 @@ def settings_theme():
         flash("Configurazione, look estetico e testi della Home salvati con successo!", "success")
         return redirect(url_for("admin.settings_theme"))
 
-    # Ricarica l'istanza fresca e aggiornata per il rendering HTML dell'admin
     setting = Setting.query.first()
     return render_template("admin/settings_theme.html", setting=setting)
 

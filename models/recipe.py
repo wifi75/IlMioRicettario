@@ -122,6 +122,26 @@ class Recipe(db.Model):
         nullable=True
     )
 
+    # --- RATIO CONVERSIONE LIEVITO PERSONALIZZATO RICETTA ---
+    yeast_ratio = db.Column(
+        db.Float,
+        nullable=False,
+        default=3.0
+    )
+
+    # --- NUOVI CAMPI DI MEMORIZZAZIONE VALORI LIEVITO LETTERALI UTENTE ---
+    yeast_fresh_saved = db.Column(
+        db.Float,
+        nullable=True,
+        default=3.0
+    )
+
+    yeast_dry_saved = db.Column(
+        db.Float,
+        nullable=True,
+        default=1.0
+    )
+
     created_at = db.Column(
         db.DateTime,
         default=datetime.utcnow

@@ -99,9 +99,6 @@
 
             <div class="nav flex-column gap-1">
                 <span class="text-uppercase tracking-wider fw-bold px-2 mb-2 opacity-25" style="font-size: 10px; color: #94a3b8;">Configurazione</span>
-                <a href="{{ url_for('admin.settings_yeast') }}" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 opacity-75 hover-sidebar">
-                    <i class="bi bi-gear-fill text-primary"></i><span>Bilanciamento Lieviti</span>
-                </a>
                 <a href="{{ url_for('admin.settings_theme') }}" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 opacity-75 hover-sidebar">
                     <i class="bi bi-palette-fill text-info"></i><span>Design e Temi Sito</span>
                 </a>
@@ -128,7 +125,6 @@
         </div>
 
 {% elif current_user.is_authenticated and not request.path.startswith('/admin') %}
-    <!-- CASISTICA 2: SEI LOGGATO MA SUL SITO PUBBLICO (Tasto rimosso da qui!) -->
     <div class="container py-3">
 
 {% else %}

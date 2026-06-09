@@ -55,8 +55,9 @@ def load_user(user_id):
 # CORRETTO: Ordiniamo per ID decrescente per prendere SICURAMENTE l'ultimo record attivo e aggiornato
 @app.context_processor
 def inject_global_settings():
+    setting_record = Setting.query.order_by(Setting.id.desc()).first()
     return dict(
-        settings_data=Setting.query.order_by(Setting.id.desc()).first()
+        settings_data=setting_record
     )
 
 
@@ -68,6 +69,13 @@ def index():
 
 
 with app.app_context():
+    try:
+        db.session.execute(db.text("ALTER TABLE recipes ADD COLUMN yeast_fresh_saved REAL DEFAULT 3.0"))
+        db.session.execute(db.text("ALTER TABLE recipes ADD COLUMN yeast_dry_saved REAL DEFAULT 1.0"))
+        db.session.commit()
+        print("Allineamento colonne lievito personalizzato completato!")
+    except Exception:
+        db.session.rollback()    
 
     db.create_all()
 

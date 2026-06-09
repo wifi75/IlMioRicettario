@@ -33,7 +33,6 @@
 
 <form method="post" id="main-recipe-form">
 
-    <!-- ANAGRAFICA FORMULA -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header bg-dark text-white fw-bold py-3">
             📝 Scheda Anagrafica ed Identificativi Formula
@@ -79,7 +78,6 @@
         </div>
     </div>
 
-    <!-- BILANCIAMENTO INGREDIENTI -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header bg-primary text-white fw-bold py-3 d-flex justify-content-between align-items-center">
             <span>📋 Bilanciamento Ingredienti Base (Su 100% Farina)</span>
@@ -108,7 +106,6 @@
                                     <input type="hidden" class="hidden-w-val" name="ing_w[]" value="{{ ing.w_value if ing.w_value else 0 }}">
                                 </td>
                                 <td class="text-center">
-                                    <!-- CORRETTO: Stampa il W salvato solo ed esclusivamente se l'ingrediente è una farina ed ha un valore -->
                                     <span class="badge bg-warning text-dark fw-bold label-w-display" style="font-size: 12px;">
                                         {% if ing.is_flour and ing.w_value and ing.w_value > 0 %}{{ ing.w_value }} W{% else %}-{% endif %}
                                     </span>
@@ -174,7 +171,6 @@
         </div>
     </div>
 
-    <!-- FLOTTA TEGLIE -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header bg-secondary text-white fw-bold py-3">
             📐 Flotta Teglie e Stampi Abilitati per questa Ricetta
@@ -203,7 +199,6 @@
         </div>
     </div>
 
-    <!-- CONFIGURAZIONE TECNICA -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header bg-warning text-dark fw-bold py-3">
             🎛️ Parametri di Configuration Tecnica e Feature Toggles
@@ -226,10 +221,11 @@
                 </div>
                 <div class="col-md-3 border-end">
                     <label class="form-label small text-uppercase text-muted mb-3">Opzioni Calcolatore Scientifico</label>
-                    <div class="form-check form-switch mb-2 shadow-none">
+                    <div class="form-check form-switch mb-3 shadow-none">
                         <input class="form-check-input" type="checkbox" name="enable_yeast_type" id="enable_yeast_type" {% if feature and feature.enable_yeast_type %}checked{% elif not feature %}checked{% endif %}>
                         <label class="form-check-label small fw-bold" for="enable_yeast_type">Abilita Menu Tipo Lievito</label>
                     </div>
+                    
                     <div class="form-check form-switch shadow-none">
                         <input class="form-check-input" type="checkbox" name="enable_tangzhong" id="enable_tangzhong" {% if feature and feature.enable_tangzhong %}checked{% endif %}>
                         <label class="form-check-label small fw-bold" for="enable_tangzhong">Abilita Opzione Tangzhong</label>
@@ -247,17 +243,45 @@
         </div>
     </div>
 
-    <!-- PARAMETRI FISICI -->
+    <div class="card shadow-sm border-0 mb-4 d-none" id="wrapper_yeast_ratio" style="background-color: #fcfcfd; border: 1px dashed #cbd5e1 !important;">
+        <div class="card-body p-4">
+            <h6 class="fw-bold text-dark text-uppercase tracking-wide mb-3" style="font-size: 13px;">
+                ⚖️ Impostazione Proporzioni Bilanciamento Lievito Personalizzato
+            </h6>
+            <div class="row g-3 align-items-center">
+                <div class="col-md-4">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light fw-semibold text-secondary">Lievito Fresco</span>
+                        <input type="number" name="yeast_fresh_val" id="yeast_fresh_val" class="form-control text-center fw-bold text-dark" value="{{ computed_fresh_val if computed_fresh_val else '3.0' }}" step="0.1" min="0.1" required>
+                        <span class="input-group-text bg-light text-muted">g</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light fw-semibold text-secondary">Equivale a Secco</span>
+                        <input type="number" name="yeast_dry_val" id="yeast_dry_val" class="form-control text-center fw-bold text-primary" value="{{ computed_dry_val if computed_dry_val else '1.0' }}" step="0.1" min="0.1" required>
+                        <span class="input-group-text bg-light text-muted">g</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-text text-muted mb-0 lh-sm" style="font-size: 12px;">
+                        Specifica le quantità di riferimento. Il sistema calcolerà automaticamente il fattore proporzionale specifico per questo impasto.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header bg-info text-dark fw-bold py-3">
-            🌡️ Parametri Fisici e Tempi di Processo Forzati
+            🎛️ Parametri Fisici e Tempi di Processo Forzati
         </div>
         <div class="card-body p-4">
             <div class="row g-4 align-items-start">
                 <div class="col-md-3 p-3 bg-light rounded border-1">
                     <div class="form-check form-switch mb-2 shadow-none">
                         <input class="form-check-input" type="checkbox" name="show_chiusura" id="show_chiusura" {% if recipe and recipe.show_chiusura %}checked{% elif not recipe %}checked{% endif %}>
-                        <label class="form-check-label small fw-bold text-dark" for="show_chiusura">Mostra Chiusura</label>
+                        <label class="form-check-label small fw-bold" for="show_chiusura">Mostra Chiusura</label>
                     </div>
                     <label class="form-label small text-secondary mb-1">Temp. Target (°C)</label>
                     <input type="number" name="temp_chiusura" class="form-control form-control-sm text-center fw-bold text-danger" value="{{ recipe.temp_chiusura if recipe else '24.0' }}" step="0.5">
@@ -265,15 +289,15 @@
                 <div class="col-md-3 p-3 bg-light rounded border-1">
                     <div class="form-check form-switch mb-2 shadow-none">
                         <input class="form-check-input" type="checkbox" name="show_autolysis" id="show_autolysis" {% if recipe and recipe.show_autolysis %}checked{% elif not recipe %}checked{% endif %}>
-                        <label class="form-check-label small fw-bold text-dark" for="show_autolysis">Mostra Autolisi</label>
+                        <label class="form-check-label small fw-bold" for="show_autolysis">Mostra Autolisi</label>
                     </div>
                     <label class="form-label small text-secondary mb-1">Tempo Autolisi (min)</label>
                     <input type="number" name="tempo_autolisi" class="form-control form-control-sm text-center fw-bold" value="{{ recipe.tempo_autolisi if recipe else '0' }}">
                 </div>
                 <div class="col-md-3 p-3 bg-light rounded border-1">
                     <div class="form-check form-switch mb-1 shadow-none">
-                        <input class="form-check-input" type="checkbox" name="show_checkpoint" id="show_puntata" {% if recipe and recipe.show_puntata %}checked{% elif not recipe %}checked{% endif %}>
-                        <label class="form-check-label small fw-bold text-dark" for="show_puntata">Mostra Puntata</label>
+                        <input class="form-check-input" type="checkbox" name="show_puntata" id="show_puntata" {% if recipe and recipe.show_puntata %}checked{% elif not recipe %}checked{% endif %}>
+                        <label class="form-check-label small fw-bold" for="show_puntata">Mostra Puntata</label>
                     </div>
                     <div class="form-check form-checkbox shadow-none mb-2">
                         <input class="form-check-input shadow-none" type="checkbox" name="puntata_fino_al_raddoppio" id="puntata_fino_al_raddoppio" {% if recipe and recipe.puntata_fino_al_raddoppio %}checked{% endif %}>
@@ -284,7 +308,7 @@
                 <div class="col-md-3 p-3 bg-light rounded border-1">
                     <div class="form-check form-switch mb-2 shadow-none">
                         <input class="form-check-input" type="checkbox" name="show_appretto" id="show_appretto" {% if recipe and recipe.show_appretto %}checked{% elif not recipe %}checked{% endif %}>
-                        <label class="form-check-label small fw-bold text-dark" for="show_appretto">Mostra Appretto</label>
+                        <label class="form-check-label small fw-bold" for="show_appretto">Mostra Appretto</label>
                     </div>
                     <label class="form-label small text-secondary mb-1">Tempo Appretto (min)</label>
                     <input type="number" name="tempo_appretto" class="form-control form-control-sm text-center fw-bold" value="{{ recipe.tempo_appretto if recipe else '60' }}">
@@ -293,7 +317,6 @@
         </div>
     </div>
 
-    <!-- PREFERMENTO -->
     <div class="card shadow-sm border-0 mb-4 d-none" id="card-preferment-editor">
         <div class="card-header bg-info text-dark fw-bold py-3">
             🧫 Fase 1: Istruzioni operative e Preparation del Prefermento
@@ -304,7 +327,6 @@
         </div>
     </div>
 
-    <!-- PROCEDIMENTO COMPLETO -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header bg-dark text-white fw-bold py-3">
             📝 Istruzioni di Impasto e Procedimento Completo
@@ -319,6 +341,8 @@
     <textarea id="raw-instructions-source" class="d-none">{{ recipe.instructions if recipe else '' }}</textarea>
     <textarea id="raw-preferment-source" class="d-none">{{ recipe.preferment_instructions if recipe else '' }}</textarea>
 
+    <input type="hidden" id="hidden_database_ratio" value="{{ recipe.yeast_ratio if recipe and recipe.yeast_ratio else '3.0' }}">
+
     <div class="d-flex justify-content-between mb-5">
         <a href="{{ url_for('admin.recipes') }}" class="btn btn-outline-secondary px-4 fw-semibold">Annulla</a>
         <button type="submit" class="btn btn-success px-5 fw-bold shadow-sm">💾 Registra e Salva Formula</button>
@@ -331,7 +355,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     
     var toolbarOptions = [
-        [{ 'font': [] }, { 'size': ['small', false, 'large', 'huge'] }],
         ['bold', 'italic', 'underline', 'strike'],
         [{ 'color': [] }, { 'background': [] }],
         [{ 'list': 'ordered'}, { 'list': 'bullet' }],
@@ -385,6 +408,22 @@ document.addEventListener('DOMContentLoaded', function() {
     if (raddoppioCheck) {
         raddoppioCheck.addEventListener('change', checkRaddoppioInterlock);
         checkRaddoppioInterlock();
+    }
+
+    // GESTIONE VISIBILITÀ SEZIONE COMPLEMENTARE
+    const checkYeastType = document.getElementById('enable_yeast_type');
+    const wrapperYeastRatio = document.getElementById('wrapper_yeast_ratio');
+    
+    function toggleYeastRatioVisibility() {
+        if (checkYeastType && checkYeastType.checked) {
+            wrapperYeastRatio.classList.remove('d-none');
+        } else if (wrapperYeastRatio) {
+            wrapperYeastRatio.classList.add('d-none');
+        }
+    }
+    if (checkYeastType) {
+        checkYeastType.addEventListener('change', toggleYeastRatioVisibility);
+        toggleYeastRatioVisibility();
     }
 
     var recipeForm = document.getElementById('main-recipe-form');
