@@ -1,85 +1,198 @@
-body{
-    background:#f1f5f9;
-    font-family:Segoe UI, Arial, sans-serif;
+body {
+    background: #f4f1ea; /* Colore pietra di mulino chiarissima, rilassante */
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #3e2723; /* Testo generale marrone scuro profondo per massimo contrasto */
 }
 
-.sidebar{
-    position:fixed;
-    top:0;
-    left:0;
-    width:260px;
-    height:100vh;
-    background:#17233a;
-    color:white;
-    padding:20px;
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 260px;
+    height: 100vh;
+    background: #2e1c0c; /* Marrone corteccia scuro storico */
+    color: white;
+    padding: 20px;
 }
 
-.sidebar h3{
-    margin-bottom:10px;
-    font-weight:700;
+.sidebar h3 {
+    margin-bottom: 10px;
+    font-weight: 700;
+    color: #f59e0b; /* Oro ambrato per risaltare */
 }
 
-.sidebar a{
-    display:block;
-    color:#cbd5e1;
-    text-decoration:none;
-    padding:12px;
-    border-radius:10px;
-    margin-bottom:8px;
-    transition:.2s;
+.sidebar a {
+    display: block;
+    color: #e5e7eb;
+    text-decoration: none;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    transition: .2s;
 }
 
-.sidebar a:hover{
-    background:#24344f;
-    color:white;
+.sidebar a:hover {
+    background: #4a321a; /* Legno caldo in hover */
+    color: white;
 }
 
-.main-content{
-    margin-left:280px;
-    padding:40px;
+.main-content {
+    margin-left: 280px;
+    padding: 40px;
 }
 
-.card{
-    border:none;
-    border-radius:18px;
-    box-shadow:0 4px 18px rgba(0,0,0,.08);
+/* --- CARTE E CONTENITORI TEMA MULINO STORICO --- */
+.card {
+    border: 1px solid #e4dcd3 !important;
+    border-radius: 18px;
+    box-shadow: 0 6px 20px rgba(74, 50, 26, 0.05); /* Ombra calda e leggerissima */
+    background-color: #fdfbf9; /* Fondo carta avorio leggerissimo per non stancare gli occhi */
+    overflow: hidden;
 }
 
-.stat-card{
-    background:white;
+.stat-card {
+    background: white;
 }
 
-.recipe-card{
-    background:white;
-    margin-bottom:20px;
+.recipe-card {
+    background: white;
+    margin-bottom: 20px;
 }
 
-.recipe-list .card-body{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
+.recipe-list .card-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.table{
-    margin-bottom:0;
+.table {
+    margin-bottom: 0;
 }
 
-.table th{
-    font-weight:600;
+.table th {
+    font-weight: 700;
+    color: #4a321a; /* Testo testate tabella scuro e leggibile */
+    background-color: #f5f0e6;
 }
 
-.form-control{
-    border-radius:10px;
+/* --- STILE INTERFACCIA PROFESSIONALE INPUT ED ETICHETTE --- */
+.form-control, .form-select {
+    border-radius: 12px;
+    border: 1px solid #c2b4a6; /* Bordo color corda chiaro */
+    padding: 0.6rem 0.9rem;
+    background-color: #ffffff;
+    color: #2b1810; /* Testo scritto dall'utente quasi nero per contrasto totale */
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
 }
 
-.btn{
-    border-radius:10px;
+.form-control:focus, .form-select:focus {
+    border-color: #8d6e63; /* Diventa marrone cuoio a fuoco */
+    box-shadow: 0 0 0 4px rgba(141, 110, 99, 0.2); /* Alone morbido iuta */
+    background-color: #ffffff;
+    color: #2b1810;
 }
 
-.alert{
-    border-radius:12px;
+/* Etichette dei campi (i titoli sopra le caselle) */
+.form-label {
+    margin-bottom: 0.4rem;
+    letter-spacing: 0.05em;
+    color: #5c4033 !important; /* Marrone scuro opaco, leggibilità perfetta */
+    font-weight: 700 !important;
 }
 
-h1,h2,h3,h4,h5{
-    font-weight:700;
+/* Testi di aiuto e descrizioni in grigio/marrone scuro leggibile */
+.text-muted {
+    color: #6d4c41 !important;
+    font-weight: 500;
+}
+
+.btn {
+    border-radius: 12px;
+    padding: 0.6rem 1.2rem;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+}
+
+.alert {
+    border-radius: 12px;
+}
+
+h1, h2, h3, h4, h5 {
+    font-weight: 700;
+    color: #2e1c0c;
+}
+
+/* --- TAVOLOZZA COLORI BANNER BILANCIATO (VIVI E AD ALTO CONTRASTO) --- */
+.header-anagrafica { background-color: #3e2723 !important; color: #ffffff !important; } /* Caffè scuro */
+.header-ingredienti { background-color: #d97706 !important; color: #ffffff !important; } /* Ambra/Farina viva */
+.header-teglie { background-color: #78350f !important; color: #ffffff !important; }      /* Terracotta Cotta */
+.header-configurazione { background-color: #4e342e !important; color: #ffffff !important; } /* Castagno scuro */
+.header-parametri { background-color: #2e7d32 !important; color: #ffffff !important; }    /* Verde Foglia biologico */
+.header-procedimento { background-color: #1a0c02 !important; color: #ffffff !important; } /* Ebano scuro */
+
+/* --- ALLINEAMENTO SIMMETRICO E CENTRATURA ORIZZONTALE DEI BANNER --- */
+.card-header {
+    height: 60px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    border-bottom: none !important;
+}
+
+/* =========================================================================
+   🔒 SEZIONE AGGIUNTA: CONTROLLO DIMENSIONI IMMAGINI E SFONDO BIANCO FISSO
+   ========================================================================= */
+
+/* 1. GRIGLIA DEL CATALOGO PUBBLICO - Blocca l'altezza ed impone lo sfondo bianco */
+.recipe-card-banner-wrapper {
+    position: relative !important;
+    width: 100% !important;
+    height: 180px !important; /* Forza i riquadri delle ricette a non ingrandirsi mai */
+    overflow: hidden !important;
+    background-color: #ffffff !important; /* Sfondo bianco puro dietro i PNG trasparenti */
+    background: #ffffff !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Evita distorsioni o allargamenti delle foto delle ricette */
+.recipe-card-main-img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important; /* Taglia l'immagine proporzionalmente senza deformare la card */
+    object-position: center !important;
+}
+
+/* 2. SCHEDA DETTAGLIO PUBBLICO - Forza dimensioni stabili e sfondo bianco */
+.detail-hero-img-wrapper {
+    width: 100% !important;
+    max-width: 320px !important;
+    height: 190px !important;
+    overflow: hidden !important;
+    border-radius: 14px !important;
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.detail-hero-main-img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+}
+
+/* 3. MINIATURE NELLA GALLERIA AMMINISTRATORE - Sfondo bianco protettivo */
+.gallery-img-thumbnail {
+    width: 100% !important;
+    height: 100px !important;
+    object-fit: cover !important;
+    background-color: #ffffff !important; /* Sfondo bianco puro per vedere bene i PNG trasparenti */
 }

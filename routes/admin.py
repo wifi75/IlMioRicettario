@@ -1,10 +1,14 @@
+import os
+import base64
+from datetime import datetime
 from flask import (
     Blueprint,
     render_template,
     request,
     redirect,
     url_for,
-    flash
+    flash,
+    jsonify
 )
 
 from flask_login import (
@@ -15,6 +19,7 @@ from flask_login import (
 )
 
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
 
 from extensions import db
 
@@ -34,6 +39,51 @@ admin_bp = Blueprint(
     __name__,
     url_prefix="/admin"
 )
+
+# =========================================================================
+# 📸 CONFIGURAZIONE MULTIMEDIALE AVANZATA (CON EDITOR DI RITAGLIO INTEGRATO)
+# =========================================================================
+UPLOAD_FOLDER = os.path.join('static', 'uploads', 'recipes')
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def handle_image_assignment(recipe_slug):
+    """Gestore unico professionale che riceve e decodifica l'immagine ritagliata dall'editor"""
+    
+    # 1. Intercettamento immediato dello scollegamento da interfaccia (Tasto X)
+    if request.form.get("clear_current_image_flag") == "true":
+        return None
+
+    # 2. Controllo se arriva un'immagine ritagliata via JavaScript (Stringa Base64)
+    cropped_base64 = request.form.get("cropped_image_base64", "").strip()
+    if cropped_base64 and "," in cropped_base64:
+        try:
+            os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+            # Separiamo l'intestazione MIME-type dai dati binari reali criptati della foto
+            header, base64_data = cropped_base64.split(",", 1)
+            image_binary_data = base64.b64decode(base64_data)
+            
+            # Salviamo il ritaglio controllato in formato nativo .png stabile ad alta definizione
+            filename = f"recipe_{recipe_slug}_{int(datetime.utcnow().timestamp())}.png"
+            secure_name = secure_filename(filename)
+            file_path = os.path.join(UPLOAD_FOLDER, secure_name)
+            
+            with open(file_path, "wb") as f:
+                f.write(image_binary_data)
+                
+            return secure_name
+        except Exception as e:
+            print(f"[-] Errore critico durante la decodifica del ritaglio foto: {e}")
+
+    # 3. Se non c'è un ritaglio fresco, controlla se l'utente ha scelto una foto esistente dalla galleria
+    selected_existing = request.form.get("selected_existing_image", "").strip()
+    if selected_existing:
+        return selected_existing
+
+    # Ritorna questo flag speciale se l'utente non ha apportato modifiche al reparto multimediale
+    return "__KEEP_OLD__"
 
 
 @admin_bp.route("/login", methods=["GET", "POST"])
@@ -124,8 +174,13 @@ def recipe_new():
         instructions_text = request.form.get("instructions", "").strip()
         preferment_text = request.form.get("preferment_instructions", "").strip()
         badge_text_input = request.form.get("badge_text", "Antica Formula Bilanciata").strip()
+        recipe_slug = request.form["slug"].strip()
 
-        # LETTURA CORAZZATA E SALVATAGGIO DEI VALORI LETTERALI UTENTE (NUOVA RICETTA)
+        # Intercettamento multimediale
+        image_name = handle_image_assignment(recipe_slug)
+        if image_name == "__KEEP_OLD__":
+            image_name = None
+
         try:
             fresco_raw = request.form.get("yeast_fresh_val", "3.0").replace(",", ".")
             secco_raw = request.form.get("yeast_dry_val", "1.0").replace(",", ".")
@@ -140,36 +195,32 @@ def recipe_new():
 
         recipe = Recipe(
             name=request.form["name"],
-            slug=request.form["slug"],
+            slug=recipe_slug,
             badge_text=badge_text_input if badge_text_input else "Antica Formula Bilanciata",
             description=request.form.get("description", "").strip(),
             instructions=instructions_text,
             is_published="is_published" in request.form,
+            image=image_name,
             
-            # Parametri fisici numerici
             temp_chiusura=float(request.form.get("temp_chiusura", 24.0)) if request.form.get("temp_chiusura") else 24.0,
             tempo_autolisi=int(request.form.get("tempo_autolisi", 0)) if request.form.get("tempo_autolisi") else 0,
             tempo_puntata=int(request.form.get("tempo_puntata", 0)) if request.form.get("tempo_puntata") else 0,
             tempo_appretto=int(request.form.get("tempo_appretto", 0)) if request.form.get("tempo_appretto") else 0,
             
-            # Toggle Booleani di visibilità dei parametri fisici
             show_chiusura="show_chiusura" in request.form,
             show_autolysis="show_autolysis" in request.form,
             show_puntata="show_puntata" in request.form,
             puntata_fino_al_raddoppio="puntata_fino_al_raddoppio" in request.form,
             show_appretto="show_appretto" in request.form,
             
-            # Schema fermentativo avanzato e istruzioni Fase 1
             fermentation_type=request.form.get("fermentation_type", "diretto"),
             preferment_instructions=preferment_text,
             
-            # Salvataggio simmetrico: sia il coefficiente che i numeri inseriti
             yeast_ratio=yeast_ratio_val,
             yeast_fresh_saved=fresco_val,
             yeast_dry_saved=secco_val
         )
 
-        # Associazione Many-to-Many con le Teglie selezionate
         selected_pan_ids = request.form.getlist("pans[]")
         for pan_id in selected_pan_ids:
             pan = MasterBakeryPan.query.get(int(pan_id))
@@ -179,7 +230,6 @@ def recipe_new():
         db.session.add(recipe)
         db.session.commit()
 
-        # Configurazione Feature Toggles locali della ricetta
         feature = RecipeFeature(
             recipe_id=recipe.id,
             enable_piece_count="enable_piece_count" in request.form,
@@ -191,7 +241,6 @@ def recipe_new():
         )
         db.session.add(feature)
 
-        # Salvataggio dinamico della lista ingredienti della ricetta con recupero forza W
         ing_names = request.form.getlist("ing_name[]")
         ing_qtys = request.form.getlist("ing_qty[]")
         ing_units = request.form.getlist("ing_unit[]")
@@ -306,8 +355,15 @@ def recipe_edit(id):
         instructions_text = request.form.get("instructions", "").strip()
         preferment_text = request.form.get("preferment_instructions", "").strip()
         badge_text_input = request.form.get("badge_text", "Antica Formula Bilanciata").strip()
+        recipe_slug = request.form["slug"].strip()
 
-        # LETTURA CORAZZATA E SALVATAGGIO DEI VALORI LETTERALI UTENTE (MODIFICA)
+        # Intercettamento immagine e controllo del mantenimento o della pulizia
+        new_image = handle_image_assignment(recipe_slug)
+        if new_image is None:
+            recipe.image = None  # Ricevuto comando clear del legame
+        elif new_image != "__KEEP_OLD__":
+            recipe.image = new_image  # Caricato nuovo file o scelta da libreria
+
         try:
             fresco_raw = request.form.get("yeast_fresh_val", "3.0").replace(",", ".")
             secco_raw = request.form.get("yeast_dry_val", "1.0").replace(",", ".")
@@ -322,36 +378,31 @@ def recipe_edit(id):
             yeast_ratio_val = 3.0
 
         recipe.name = request.form["name"]
-        recipe.slug = request.form["slug"]
+        recipe.slug = recipe_slug
         recipe.icon = request.form.get("icon", "bi-journal-text")
         recipe.badge_text = badge_text_input if badge_text_input else "Antica Formula Bilanciata"
         recipe.description = request.form.get("description", "").strip()
         recipe.instructions = instructions_text
         recipe.is_published = "is_published" in request.form
         
-        # Aggiornamento integrato di tutti i campi sul database
         recipe.yeast_ratio = yeast_ratio_val
         recipe.yeast_fresh_saved = fresco_val
         recipe.yeast_dry_saved = secco_val
 
-        # Aggiornamento parametri fisici numerici
         recipe.temp_chiusura = float(request.form.get("temp_chiusura", 24.0)) if request.form.get("temp_chiusura") else 24.0
         recipe.tempo_autolisi = int(request.form.get("tempo_autolisi", 0)) if request.form.get("tempo_autolisi") else 0
         recipe.tempo_puntata = int(request.form.get("tempo_puntata", 0)) if request.form.get("tempo_puntata") else 0
         recipe.tempo_appretto = int(request.form.get("tempo_appretto", 0)) if request.form.get("tempo_appretto") else 0
 
-        # Aggiornamento Toggle Booleani di visibilità
         recipe.show_chiusura = "show_chiusura" in request.form
         recipe.show_autolysis = "show_autolysis" in request.form
         recipe.show_puntata = "show_puntata" in request.form
         recipe.puntata_fino_al_raddoppio = "puntata_fino_al_raddoppio" in request.form
         recipe.show_appretto = "show_appretto" in request.form
 
-        # Aggiornamento schema fermentativo avanzato e istruzioni Fase 1
         recipe.fermentation_type = request.form.get("fermentation_type", "diretto")
         recipe.preferment_instructions = preferment_text
 
-        # Aggiornamento delle Feature Toggles della ricetta
         feature.enable_piece_count = "enable_piece_count" in request.form
         feature.enable_piece_weight = "enable_piece_weight" in request.form
         feature.enable_yeast_type = "enable_yeast_type" in request.form
@@ -359,7 +410,6 @@ def recipe_edit(id):
         feature.enable_poolish = recipe.fermentation_type == "poolish"
         feature.enable_biga = recipe.fermentation_type == "biga"
 
-        # Aggiornamento dell'associazione Many-to-Many con le Teglie
         recipe.pans.clear()
         selected_pan_ids = request.form.getlist("pans[]")
         for pan_id in selected_pan_ids:
@@ -367,7 +417,6 @@ def recipe_edit(id):
             if pan:
                 recipe.pans.append(pan)
 
-        # Ricostruzione della lista ingredienti per evitare frammentazioni con recupero forza W
         RecipeIngredient.query.filter_by(recipe_id=recipe.id).delete()
 
         ing_names = request.form.getlist("ing_name[]")
@@ -409,7 +458,6 @@ def recipe_edit(id):
     master_ingredients = MasterIngredient.query.order_by(MasterIngredient.name).all()
     master_pans = MasterBakeryPan.query.order_by(MasterBakeryPan.name).all()
 
-    # RESTITUIAMO AL TEMPLATE I DATI ORIGINARI SALVATI SENZA RIGENERAZIONI ARBITRARIE
     f_val = recipe.yeast_fresh_saved if recipe.yeast_fresh_saved is not None else (recipe.yeast_ratio if recipe.yeast_ratio else 3.0)
     d_val = recipe.yeast_dry_saved if recipe.yeast_dry_saved is not None else 1.0
 
@@ -420,9 +468,44 @@ def recipe_edit(id):
         ingredients=ingredients,
         master_ingredients_list=master_ingredients,
         master_pans_list=master_pans,
-        computed_fresh_val=f_val,  # Spedisce al form i tuoi dati salvati intatti (es. 8)
-        computed_dry_val=d_val     # Spedisce al form i tuoi dati salvati intatti (es. 3)
+        computed_fresh_val=f_val,  
+        computed_dry_val=d_val     
     )
+
+
+# ==========================================================
+# SEZIONE API MULTIMEDIALE: GALLERIA FOTO (PNG/JPG ACCETTATI)
+# ==========================================================
+
+@admin_bp.route("/api/images/list", methods=["GET"])
+@login_required
+def api_images_list():
+    """Restituisce l'elenco di tutte le immagini caricate precedentemente sul server"""
+    if not os.path.exists(UPLOAD_FOLDER):
+        return jsonify([])
+    files = [f for f in os.listdir(UPLOAD_FOLDER) if os.path.isfile(os.path.join(UPLOAD_FOLDER, f)) and f.lower().endswith(('.png', '.jpg', '.jpeg'))]
+    return jsonify(files)
+
+
+@admin_bp.route("/api/images/delete/<string:filename>", methods=["POST"])
+@login_required
+def api_image_delete(filename):
+    """Elimina definitivamente un file multimediale dal server"""
+    secure_name = secure_filename(filename)
+    file_path = os.path.join(UPLOAD_FOLDER, secure_name)
+    
+    if os.path.exists(file_path):
+        try:
+            os.remove(file_path)
+            recipes_using_it = Recipe.query.filter_by(image=secure_name).all()
+            for r in recipes_using_it:
+                r.image = None
+            db.session.commit()
+            return jsonify({"success": True, "message": "Immagine eliminata fisicamente dal server"})
+        except Exception as e:
+            return jsonify({"success": False, "message": str(e)}), 500
+            
+    return jsonify({"success": False, "message": "File non trovato"}), 404
 
 
 # ==========================================================

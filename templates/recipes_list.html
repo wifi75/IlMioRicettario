@@ -5,57 +5,57 @@
 {% endblock %}
 
 {% block content %}
-<div class="container px-3 px-sm-4 pt-0 pb-4 d-flex flex-column min-vh-100">
+<div class="container px-3 px-sm-4 pt-2 pb-4 d-flex flex-column">
     
-    <!-- HEADER IN ALTO ALTO E INCOLLATO -->
-    <div class="mt-0 mb-5 p-3 rounded-3 shadow-sm text-center text-md-start" 
-         style="background-color: #fdfaf6; border: 2px solid #e6dfd3 !important;">
+    <div class="mt-2 mb-5 p-4 rounded-4 shadow-sm public-hero-card text-center text-md-start">
         <div class="row align-items-center g-3">
             <div class="col-12 col-md-auto d-flex justify-content-center">
-                <span class="fs-2">🌾</span>
+                <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 64px; height: 64px; background-color: rgba(0,0,0,0.03);">
+                    <span class="fs-1">🌾</span>
+                </div>
             </div>
             <div class="col-12 col-md">
-                <h1 class="h4 fw-bold mb-1 tracking-tight" style="color: #4a3321; font-family: 'Georgia', serif;">
+                <h1 class="h3 fw-bold mb-1 tracking-tight">
                     {{ settings_data.site_name if settings_data and settings_data.site_name else "L'Arte Bianca - Ricettario Dinamico" }}
                 </h1>
-                <p class="mb-0 small fw-medium opacity-75" style="color: #6e5440; line-height: 1.4;">
+                <p class="mb-0 small fw-medium opacity-75 lh-base">
                     {{ settings_data.site_description if settings_data and settings_data.site_description else "Esplora le nostre antiche formule bilanciate professionali." }}
                 </p>
             </div>
         </div>
     </div>
 
-    <!-- GRIGLIA RICETTE IN MEZZO -->
     <div class="row g-4 justify-content-center mb-5 flex-grow-1 align-content-start">
         {% if recipes %}
             {% for recipe in recipes %}
             <div class="col-12 col-sm-6 col-lg-4 d-flex justify-content-center">
-                <div class="card shadow-sm rounded-3 overflow-hidden card-recipe-hover transition-all w-100" 
-                     style="background-color: #fdfaf6; border: 2px solid #e6dfd3 !important; max-width: 380px;">
+                <div class="card shadow-sm rounded-4 card-recipe-hover border transition-all w-100" style="max-width: 340px; height: 390px !important;">
                     
-                    <div class="card-body p-4 d-flex flex-column justify-content-between text-center">
-                        <div class="d-flex flex-column align-items-center">
-                            
-                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" 
-                                 style="width: 54px; height: 54px; background-color: #f4ece1; border: 2px double #8c6d53; box-shadow: 0 0 0 2px #f4ece1;">
-                                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#8c6d53" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M12 2v20M17 5l-5 4M7 5l5 4M17 10l-5 4M7 10l-5 4M17 15l-5 4M7 15l5 4"/>
-                                    <circle cx="12" cy="12" r="10" stroke="#8c6d53" stroke-width="0.75" stroke-dasharray="2,2" fill="none"/>
-                                </svg>
+                    <div class="recipe-card-banner-wrapper">
+                        {% if recipe.image %}
+                            <img src="/static/uploads/recipes/{{ recipe.image }}" class="recipe-card-main-img" alt="{{ recipe.name }}">
+                        {% else %}
+                            <div class="recipe-card-fallback-box">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center border border-2 shadow-sm" style="width: 75px; height: 75px; background-color: #ffffff; border-color: rgba(0,0,0,0.06) !important;">
+                                    <i class="bi {{ recipe.icon or 'bi-journal-text' }}" style="font-size: 32px; color: #4a3321;"></i>
+                                </div>
                             </div>
-                            
-                            <h2 class="h6 fw-bold mb-2 tracking-wide text-uppercase" style="color: #4a3321; font-family: 'Georgia', serif;">
+                        {% endif %}
+                    </div>
+
+                    <div class="card-body p-4 d-flex flex-column justify-content-between text-center pt-2" style="height: calc(100% - 140px) !important;">
+                        <div class="d-flex flex-column align-items-center justify-content-center my-auto">
+                            <h2 class="fw-bold mb-2 tracking-wide text-uppercase text-recipe-title" style="font-family: 'Georgia', serif; min-height: 52px; display: flex; align-items: center; justify-content: center;">
                                 {{ recipe.name }}
                             </h2>
-                            
-                            <p class="small lh-base text-muted mb-4 opacity-75 px-1 text-truncate-2" style="color: #6e5440; font-weight: 500; font-size: 13px;">
+                            <p class="lh-base text-muted mb-0 opacity-75 px-1 text-truncate-2 text-recipe-desc" style="font-weight: 500; min-height: 44px;">
                                 {{ recipe.description if recipe.description else "Formula tecnica bilanciata." }}
                             </p>
                         </div>
 
                         <a href="{{ url_for('recipes.public_detail', slug=recipe.slug) }}" 
-                           class="btn w-100 fw-bold py-2 rounded-2 shadow-none transition-all d-flex align-items-center justify-content-center gap-2 btn-vintage-action"
-                           style="font-size: 13px;">
+                           class="btn btn-outline-primary w-100 fw-bold py-2.5 rounded-3 d-flex align-items-center justify-content-center gap-2 transition-all shadow-none"
+                           style="font-size: 14px; height: 42px;">
                             <span>🔬 Visualizza e Calcola</span>
                             <i class="bi bi-arrow-right-short fs-5"></i>
                         </a>
@@ -65,64 +65,75 @@
             {% endfor %}
         {% else %}
             <div class="col-12 text-center py-5">
-                <div class="fs-6 fw-bold" style="color: #6e5440;">Nessuna formula pubblicata al momento nel database.</div>
+                <div class="fs-6 fw-bold text-muted">Nessuna formula pubblicata al momento nel database.</div>
             </div>
         {% endif %}
     </div>
 
-    <!-- IL FOOTER ISTITUZIONALE IN BASSO IN BASSO -->
-    <footer class="mt-auto pt-4 pb-2 border-top text-center" style="border-color: #e6dfd3 !important;">
-        <div class="d-flex flex-column align-items-center justify-content-center gap-2">
-            <p class="fw-semibold mb-0" style="font-size: 13px; color: #6e5440;">
-                © 2026 <a href="https://github.com/wifi75/IlMioRicettario" target="_blank" class="text-decoration-none fw-bold link-hover-underline" style="color: #8c6d53;">Il Mio Ricettario</a>
-            </p>
-            <p class="text-muted mb-1" style="font-size: 12px;">
-                Architettato e sviluppato da <span class="text-dark fw-bold">Tiziano Cassone</span>
-            </p>
-            
-            <!-- SE SEI LOGGATO: Il tasto nero va qui sotto, DOPO il copyright! -->
-            {% if current_user.is_authenticated %}
-            <div class="mt-2">
-                <a href="{{ url_for('admin.recipes') }}" class="btn btn-sm btn-dark fw-bold rounded-2 shadow-sm border px-3" style="font-size: 11px;">
-                    <i class="bi bi-arrow-left-right me-1 text-warning"></i> Pannello Controllo Admin
-                </a>
-            </div>
-            {% endif %}
-
-            <!-- SE NON SEI LOGGATO: Mostra il lucchetto standard -->
-            {% if not current_user.is_authenticated %}
-            <div>
-                <a href="/admin/login" class="btn btn-sm btn-light border fw-bold px-3 py-1 rounded-2 shadow-none d-inline-flex align-items-center gap-2" style="font-size: 11px; background-color: #f4ece1; color: #4a3321; border-color: #e6dfd3 !important;">
-                    <i class="bi bi-key-fill text-warning"></i>
-                    <span>Area Riservata Admin</span>
-                </a>
-            </div>
-            {% endif %}
-        </div>
-    </footer>
-
 </div>
 
 <style>
-    .btn-vintage-action {
-        background-color: transparent;
-        color: #8c6d53;
-        border: 2px solid #8c6d53;
+    /* 🔒 RIQUADRO FOTO COMPATTATO: RIDOTTO A 140PX PER RIDURRE LO SPAZIO BIANCO IN ECCESSO */
+    .recipe-card-banner-wrapper {
+        position: relative !important;
+        width: 100% !important;
+        height: 140px !important; /* Stringe l'altezza da 180px a 140px */
+        max-height: 140px !important;
+        overflow: hidden !important;
+        background-color: #ffffff !important; 
+        background: #ffffff !important;
+        border-bottom: 1px solid rgba(0,0,0,0.06) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 6px !important; /* Mantiene pochissimi pixel di margine pulito attorno all'immagine */
     }
-    .btn-vintage-action:hover {
-        background-color: #8c6d53;
-        color: #fdfaf6;
+    
+    /* Le dimensioni della foto rimangono perfette, non vengono toccate */
+    .recipe-card-main-img {
+        max-width: 100% !important;
+        max-height: 100% !important;
+        width: auto !important;
+        height: auto !important;
+        object-fit: contain !important;
+        background-color: #ffffff !important;
+        mix-blend-mode: multiply !important; 
+        transition: transform 0.2s ease-in-out !important;
     }
+    
+    .card-recipe-hover:hover .recipe-card-main-img {
+        transform: scale(1.04) !important;
+    }
+
+    /* CARATTERI INGRANDITI */
+    .text-recipe-title {
+        font-size: 20px !important; 
+        letter-spacing: 0.5px !important;
+    }
+
+    .text-recipe-desc {
+        font-size: 15px !important; 
+    }
+
+    .recipe-card-fallback-box {
+        width: 100% !important;
+        height: 100% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background: linear-gradient(135deg, rgba(0,0,0,0.01) 0%, rgba(0,0,0,0.03) 100%) !important;
+    }
+
     .card-recipe-hover {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out !important;
+        background-color: #fdfbf7 !important; 
     }
+    
     .card-recipe-hover:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 0.5rem 1.5rem rgba(140, 109, 83, 0.12) !important;
+        box-shadow: 0 10px 30px rgba(74, 50, 26, 0.12) !important;
+        transform: translateY(-2px);
     }
-    .link-hover-underline:hover {
-        text-decoration: underline !important;
-    }
+
     .text-truncate-2 {
         display: -webkit-box;
         -webkit-line-clamp: 2;

@@ -12,22 +12,57 @@
     {% endif %}
 {% endfor %}
 
+<style>
+    /* Dimensionamento fisso e proporzionato per l'immagine di testa nel dettaglio */
+    .detail-hero-img-wrapper {
+        width: 100%;
+        max-width: 320px;
+        height: 190px;
+        overflow: hidden;
+        border-radius: 14px;
+        border: 1px solid rgba(0,0,0,0.06);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        background-color: #ffffff !important; /* CORREZIONE: Forza lo sfondo bianco puro per far risaltare i PNG trasparenti */
+    }
+    .detail-hero-main-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+    }
+    @media (max-width: 767.98px) {
+        .detail-hero-img-wrapper {
+            max-width: 100%;
+            height: 200px;
+            margin-bottom: 0.5rem;
+        }
+    }
+</style>
+
 <div class="container py-4">
 
     <div class="card mb-4 border-0 shadow-sm rounded-4 overflow-hidden" style="background-color: #fdfaf6; border: 2px solid #e6dfd3 !important;">
-        <div class="card-body p-4 d-flex flex-column flex-md-row align-items-center gap-4 text-center text-md-start">
+        <div class="card-body p-4 d-flex flex-column {{ 'flex-md-row' if recipe.image else 'flex-md-row align-items-center' }} gap-4 text-center text-md-start">
             
-            <div class="d-inline-flex align-items-center justify-content-center rounded-circle flex-shrink-0" 
-                 style="width: 80px; height: 80px; background-color: #f4ece1; border: 3px double #8c6d53; box-shadow: 0 0 0 4px #f4ece1;">
-                <i class="bi {{ recipe.icon or 'bi-journal-text' }}" style="font-size: 34px; color: #8c6d53;"></i>
-            </div>
+            {% if recipe.image %}
+                <div class="detail-hero-img-wrapper mx-auto mx-md-0 flex-shrink-0">
+                    <img src="/static/uploads/recipes/{{ recipe.image }}" class="detail-hero-main-img" alt="{{ recipe.name }}">
+                </div>
+            {% else %}
+                <div class="d-inline-flex align-items-center justify-content-center rounded-circle flex-shrink-0 mx-auto mx-md-0" 
+                     style="width: 80px; height: 80px; background-color: #f4ece1; border: 3px double #8c6d53; box-shadow: 0 0 0 4px #f4ece1;">
+                    <i class="bi {{ recipe.icon or 'bi-journal-text' }}" style="font-size: 34px; color: #8c6d53;"></i>
+                </div>
+            {% endif %}
 
-            <div>
-                <span class="badge mb-2 text-uppercase fw-bold tracking-wider" style="background-color: #8c6d53; color: #fdfaf6; font-size: 10px; letter-spacing: 0.1em;">
-                    {{ recipe.badge_text or "Antica Formula Bilanciata" }}
-                </span>
+            <div class="d-flex flex-column justify-content-center py-1">
+                <div>
+                    <span class="badge mb-2 text-uppercase fw-bold tracking-wider" style="background-color: #8c6d53; color: #fdfaf6; font-size: 10px; letter-spacing: 0.1em;">
+                        {{ recipe.badge_text or "Antica Formula Bilanciata" }}
+                    </span>
+                </div>
                 <h1 class="fw-bold mb-1 tracking-tight" style="color: #4a3321; font-family: 'Georgia', serif; font-size: 2.2rem;">{{ recipe.name }}</h1>
-                <p class="mb-0 opacity-75 fs-5 fw-medium" style="color: #6e5440;">
+                <p class="mb-0 opacity-75 fs-5 fw-medium lh-sm" style="color: #6e5440;">
                     {{ recipe.description or "Formula di panificazione bilanciata ad alta precisione." }}
                 </p>
             </div>
@@ -359,7 +394,6 @@
         </div>
     </div>
     <style>
-        /* Gestione intelligente dei separatori grafici solo sugli elementi attivi a schermo */
         @media (min-width: 768px) {
             .separator-md { border-right: 1px solid #e2e8f0 !important; }
             .row > .col-md:last-child, 
