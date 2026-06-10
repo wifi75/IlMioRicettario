@@ -29,7 +29,7 @@ class Recipe(db.Model):
         nullable=False
     )
 
-    # --- NUOVO CAMPO TESTO BADGE PERSONALIZZATO ---
+    # --- TESTO BADGE PERSONALIZZATO ---
     badge_text = db.Column(
         db.String(100),
         nullable=True,
@@ -44,8 +44,14 @@ class Recipe(db.Model):
         db.Text
     )
 
-    image = db.Column(
-        db.String(255)
+    # --- NUOVA GESTIONE IMMAGINI CENTRALIZZATA ---
+    image_id = db.Column(
+        db.Integer,
+        db.ForeignKey(
+            "master_images.id",
+            ondelete="SET NULL"
+        ),
+        nullable=True
     )
 
     icon = db.Column(
@@ -59,7 +65,7 @@ class Recipe(db.Model):
         default=True
     )
 
-    # --- NUOVI CAMPI PARAMETRI DI PROCESSO AVANZATI ---
+    # --- PARAMETRI DI PROCESSO ---
     temp_chiusura = db.Column(
         db.Float,
         nullable=True,
@@ -84,7 +90,7 @@ class Recipe(db.Model):
         default=60
     )
 
-    # --- SOTTO-SISTEMA DI VISIBILITÀ CON SWITCH BOOLEANI ---
+    # --- VISIBILITÀ PARAMETRI ---
     show_chiusura = db.Column(
         db.Boolean,
         default=True
@@ -110,11 +116,11 @@ class Recipe(db.Model):
         default=True
     )
 
-    # --- GESTIONE AVANZATA PREFERMENTAZIONE (FASE 1) ---
+    # --- PREFERMENTAZIONI ---
     fermentation_type = db.Column(
         db.String(50),
         nullable=False,
-        default="diretto"  # 'diretto', 'poolish', 'biga'
+        default="diretto"
     )
 
     preferment_instructions = db.Column(
@@ -122,14 +128,13 @@ class Recipe(db.Model):
         nullable=True
     )
 
-    # --- RATIO CONVERSIONE LIEVITO PERSONALIZZATO RICETTA ---
+    # --- CONVERSIONE LIEVITO ---
     yeast_ratio = db.Column(
         db.Float,
         nullable=False,
         default=3.0
     )
 
-    # --- NUOVI CAMPI DI MEMORIZZAZIONE VALORI LIEVITO LETTERALI UTENTE ---
     yeast_fresh_saved = db.Column(
         db.Float,
         nullable=True,
@@ -153,7 +158,10 @@ class Recipe(db.Model):
         onupdate=datetime.utcnow
     )
 
-    # --- RELAZIONI E COLLEGAMENTI ---
+    # ==========================================================
+    # RELAZIONI
+    # ==========================================================
+
     ingredients = db.relationship(
         "RecipeIngredient",
         backref="recipe",
@@ -169,7 +177,12 @@ class Recipe(db.Model):
         lazy=True
     )
 
-    # Relazione Many-to-Many con la flotta delle teglie master infinite
+    featured_image = db.relationship(
+        "MasterImage",
+        foreign_keys=[image_id],
+        lazy="joined"
+    )
+
     pans = db.relationship(
         "MasterBakeryPan",
         secondary=recipe_pans,
@@ -177,28 +190,30 @@ class Recipe(db.Model):
         backref=db.backref("recipes", lazy=True)
     )
 
+    # ==========================================================
+    # METODI
+    # ==========================================================
 
     def ingredient_count(self):
         return len(self.ingredients)
-
 
     def total_flour(self):
         return sum(
             ingredient.quantity
             for ingredient in self.ingredients
             for ingredient_master in [getattr(ingredient, 'master_ingredient', None)]
-            if (ingredient_master and ingredient_master.is_flour) or getattr(ingredient, 'is_flour', False)
+            if (ingredient_master and ingredient_master.is_flour)
+            or getattr(ingredient, 'is_flour', False)
         )
-
 
     def total_liquids(self):
         return sum(
             ingredient.quantity
             for ingredient in self.ingredients
             for ingredient_master in [getattr(ingredient, 'master_ingredient', None)]
-            if (ingredient_master and ingredient_master.is_liquid) or getattr(ingredient, 'is_liquid', False)
+            if (ingredient_master and ingredient_master.is_liquid)
+            or getattr(ingredient, 'is_liquid', False)
         )
-
 
     def hydration(self):
         flour = self.total_flour()
@@ -210,7 +225,6 @@ class Recipe(db.Model):
             (self.total_liquids() / flour) * 100,
             1
         )
-
 
     def __repr__(self):
         return f"<Recipe {self.name}>"

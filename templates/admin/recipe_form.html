@@ -12,12 +12,64 @@
     .pan-checkbox-card { transition: all 0.2s ease-in-out; border: 1px solid #e2e8f0; }
     .pan-checkbox-card:hover { background-color: #f8fafc; border-color: #cbd5e1; }
     
-    /* Stili della Galleria Immagini Interna */
-    .gallery-img-wrapper { position: relative; border-radius: 10px; overflow: hidden; border: 2px solid #e2e8f0; transition: all 0.2s; cursor: pointer; }
-    .gallery-img-wrapper:hover { border-color: #d97706; transform: scale(1.03); }
-    .gallery-img-wrapper.selected { border-color: #2e7d32; box-shadow: 0 0 0 4px rgba(46, 125, 50, 0.2); }
-    .gallery-img-thumbnail { width: 100%; height: 100px; object-fit: cover; background-color: #f1f5f9; }
-    .gallery-img-delete-btn { position: absolute; top: 4px; right: 4px; z-index: 10; padding: 2px 6px; border-radius: 6px; font-size: 11px; }
+    /* Stili per il dropdown con preview */
+    .image-selector-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    .image-dropdown-section {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .image-preview-box {
+        border: 2px solid #cbd5e1;
+        border-radius: 12px;
+        padding: 1rem;
+        background-color: #f8fafc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 280px;
+        transition: all 0.3s ease;
+    }
+    
+    .image-preview-box img {
+        max-width: 100%;
+        max-height: 260px;
+        object-fit: contain;
+        mix-blend-mode: multiply;
+    }
+    
+    .image-preview-box.empty {
+        color: #94a3b8;
+        font-size: 14px;
+    }
+    
+    #image-selector {
+        padding: 0.5rem;
+        font-size: 14px;
+        min-height: 40px;
+        cursor: pointer;
+    }
+    
+    #image-selector option {
+        padding: 0.5rem;
+    }
+    
+    .image-button-group {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+    
+    .image-button-group button {
+        flex: 1;
+        min-width: 150px;
+    }
 </style>
 
 {% block content %}
@@ -41,7 +93,6 @@
 
 <form method="post" id="main-recipe-form" enctype="multipart/form-data">
 
-    <!-- 1. ANAGRAFICA FORMULA -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header header-anagrafica fw-bold py-3">
             📝 Scheda Anagrafica ed Identificativi Formula
@@ -87,66 +138,81 @@
         </div>
     </div>
 
-    <!-- 📸 PANNELLO MULTIMEDIALE PULITO E SEMPLIFICATO -->
+    <!-- ============================================================ -->
+    <!-- 📸 NUOVO GESTORE IMMAGINI CON DROPDOWN + PREVIEW DINAMICO     -->
+    <!-- ============================================================ -->
     <div class="card shadow-sm border-0 mb-4">
-        <div class="card-header header-configurazione fw-bold py-3">
-            📸 Gestore Allegati Fotografici e Libreria Multimediale
+        <div class="card-header text-white fw-bold py-3" style="background-color: #4a3321;">
+            📸 Gestore Allegati Fotografici - Seleziona o Carica Nuova Foto
         </div>
         <div class="card-body p-4">
-            <div class="row g-4">
-                <div class="col-md-6 border-end">
-                    <label class="form-label fw-bold small text-muted text-uppercase d-block mb-1">Seleziona o trascina una nuova foto</label>
-                    <input type="file" name="recipe_image_file" id="recipe-image-file" class="form-control form-control-sm mb-2" accept=".png, .jpg, .jpeg">
-                    
-                    <div class="form-text text-muted mb-3 lh-sm" style="font-size: 11.5px;">
-                        <i class="bi bi-info-circle-fill text-warning me-1"></i> 
-                        Formati supportati: <strong>.PNG, .JPG, .JPEG</strong>.<br>
-                        Dimensione massima consentita dal server: <strong class="text-danger">2 MB</strong>.<br>
-                        Risoluzione consigliata per il sito: <strong>800 x 600 pixel</strong>.
-                    </div>
-
-                    <!-- 🛠️ NUOVO TASTO MECCANICO PER IL SALVATAGGIO RAPIDO DELLA FOTO ALLEGATA -->
-                    <div class="mb-4">
-                        <button type="button" class="btn btn-sm btn-outline-success fw-bold px-3 shadow-sm" id="btn-save-image-only">
-                            📁 Carica e Associa Foto Subito
-                        </button>
-                    </div>
-                    
-                    {% if recipe and recipe.image %}
-                    <div id="current-image-preview-block" class="p-3 bg-light rounded border text-center" style="max-width: 70%;">
-                        <small class="text-muted d-block fw-bold mb-2">Immagine Attualmente Collegata alla Ricetta:</small>
-                        <img src="/static/uploads/recipes/{{ recipe.image }}" class="img-fluid rounded mb-2 border shadow-sm" style="max-height: 140px; object-fit: cover;">
-                        <button type="button" class="btn btn-sm btn-outline-danger w-100 d-block fw-bold" id="btn-clear-current-image">
-                            <i class="bi bi-x-circle me-1"></i> Scollega Foto della Ricetta
-                        </button>
-                    </div>
-                    {% endif %}
-                    
-                    <input type="hidden" name="clear_current_image_flag" id="clear_current_image_flag" value="false">
-                    <input type="hidden" name="selected_existing_image" id="selected_existing_image" value="">
-                    <!-- Mantenuto campo nascosto per retrocompatibilità del server ma svuotato da logiche cropper -->
-                    <input type="hidden" name="cropped_image_base64" id="cropped_image_base64" value="">
-                </div>
+            <div class="image-selector-container">
                 
-                <div class="col-md-6">
-                    <label class="form-label fw-bold small text-muted text-uppercase d-block mb-1">
-                        🗂️ Sfoglia la Libreria Multimediale Interna
-                    </label>
-                    
-                    <div class="form-text text-muted mb-2 lh-sm" style="font-size: 11.5px;">
-                        <i class="bi bi-hand-index-thumb text-success me-1"></i> 
-                        Fai <strong>click su una miniatura</strong> per associarla istantaneamente a questa formula.<br>
-                        Usa il <strong class="text-danger">cestino rosso</strong> su un'immagine per **eliminarla definitivamente dal server**.
+                <!-- SEZIONE SINISTRA: Caricamento locale -->
+                <div class="row g-4">
+                    <div class="col-12 col-lg-5">
+                        <label class="form-label fw-bold small text-muted text-uppercase d-block mb-2">
+                            📤 Carica una Nuova Foto dal tuo PC
+                        </label>
+                        <input type="file" name="recipe_image_file" id="recipe-image-file" class="form-control rounded-3 mb-3" accept=".png, .jpg, .jpeg">
+                        
+                        <div class="form-text text-muted mb-3 lh-sm" style="font-size: 11px;">
+                            <i class="bi bi-info-circle-fill text-warning me-1"></i> 
+                            Formati: <strong>.PNG, .JPG, .JPEG</strong> | 
+                            Max: <strong class="text-danger">2 MB</strong> | 
+                            Consigliato: <strong>800 x 600 px</strong>
+                        </div>
                     </div>
                     
-                    <div class="row row-cols-3 g-2 overflow-y-auto" id="gallery-images-container" style="max-height: 280px;">
+                    <!-- SEZIONE DESTRA: Dropdown + Preview -->
+                    <div class="col-12 col-lg-7">
+                        <label class="form-label fw-bold small text-muted text-uppercase d-block mb-2">
+                            🗂️ Oppure Scegli dalla Libreria Interna
+                        </label>
+                        
+                        <div class="input-group mb-3">
+                            <select id="image-selector" name="selected_master_image_id" class="form-select fw-semibold">
+                                <option value="">-- Seleziona un'immagine dalla libreria --</option>
+                                {% if master_images_list %}
+                                    {% for img in master_images_list %}
+                                    <option value="{{ img.id }}" data-url="/static/uploads/recipes/{{ img.filename }}" data-caption="{{ img.caption if img.caption else img.filename }}">
+                                        📷 {{ img.caption if img.caption else img.filename }} (ID: {{ img.id }})
+                                    </option>
+                                    {% endfor %}
+                                {% else %}
+                                    <option value="" disabled>Nessuna immagine disponibile</option>
+                                {% endif %}
+                            </select>
+                            <button type="button" class="btn btn-outline-primary fw-bold" id="btn-apply-image" title="Applica l'immagine selezionata">
+                                ✓ Applica
+                            </button>
+                        </div>
                     </div>
                 </div>
+
+                <!-- PREVIEW DINAMICO CENTRALIZZATO -->
+                <div class="image-preview-box" id="image-preview-display">
+                    <span class="empty">Nessuna immagine selezionata</span>
+                </div>
+
+                <!-- PULSANTI DI CONTROLLO -->
+                <div class="image-button-group">
+                    <button type="button" class="btn btn-sm btn-outline-success fw-bold" id="btn-save-image-now">
+                        <i class="bi bi-cloud-arrow-up me-1"></i> Salva Foto
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger fw-bold d-none" id="btn-clear-image">
+                        <i class="bi bi-x-circle me-1"></i> Scollega Foto
+                    </button>
+                </div>
+
+                <!-- CAMPI NASCOSTI -->
+                <input type="hidden" name="clear_current_image_flag" id="clear_current_image_flag" value="false">
+                <input type="hidden" name="selected_master_image_id_form" id="selected_master_image_id_form" value="">
+
             </div>
         </div>
     </div>
 
-    <!-- 2. BILANCIAMENTO INGREDIENTI -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header header-ingredienti fw-bold py-3 d-flex justify-content-between align-items-center">
             <span>📋 Bilanciamento Ingredienti Base (Su 100% Farina)</span>
@@ -246,7 +312,6 @@
         </div>
     </div>
 
-    <!-- 3. FLOTTA TEGLIE -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header header-teglie fw-bold py-3">
             📐 Flotta Teglie e Stampi Abilitati per questa Ricetta
@@ -275,7 +340,6 @@
         </div>
     </div>
 
-    <!-- 4. CONFIGURAZIONE TECNICA -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header header-configurazione fw-bold py-3">
             🎛️ Parametri di Configurazione Tecnica e Feature Toggles
@@ -310,8 +374,8 @@
                 </div>
                 <div class="col-md-3">
                     <label class="form-label small text-uppercase text-muted fw-bold mb-2">Schema Fermentativo Sottoscritto</label>
-                    <select name="preferment_type" id="preferment-type-select" class="form-select form-select-sm fw-semibold text-dark">
-                        <option value="none" {% if not recipe or recipe.fermentation_type == 'diretto' or recipe.fermentation_type == 'none' %}selected{% endif %}>Impasto Diretto</option>
+                    <select name="fermentation_type" id="preferment-type-select" class="form-select form-select-sm fw-semibold text-dark">
+                        <option value="diretto" {% if not recipe or recipe.fermentation_type == 'diretto' %}selected{% endif %}>Impasto Diretto</option>
                         <option value="poolish" {% if recipe and recipe.fermentation_type == 'poolish' %}selected{% endif %}>Poolish (100% Idratazione)</option>
                         <option value="biga" {% if recipe and recipe.fermentation_type == 'biga' %}selected{% endif %}>Biga Standard (44% Idratazione)</option>
                     </select>
@@ -349,7 +413,6 @@
         </div>
     </div>
 
-    <!-- 5. PARAMETRI FISICI -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header header-parametri fw-bold py-3">
             🎛️ Parametri Fisici e Tempi di Processo Forzati
@@ -397,7 +460,7 @@
 
     <div class="card shadow-sm border-0 mb-4 d-none" id="card-preferment-editor">
         <div class="card-header bg-info text-dark fw-bold py-3">
-            🧫 Fase 1: Istruzioni operative e Preparation del Prefermento
+            🧫 Fase 1: Istruzioni operative e Preparazione del Prefermento
         </div>
         <div class="card-body p-3">
             <div id="preferment-editor-container"></div>
@@ -405,7 +468,6 @@
         </div>
     </div>
 
-    <!-- 6. PROCEDIMENTO COMPLETO -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header header-procedimento text-white fw-bold py-3">
             📝 Istruzioni di Impasto e Procedimento Completo
@@ -434,136 +496,154 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     
-    // ==========================================================
-    // LOGICA DI CONTROLLO ALLEGATI E GALLERIA MULTIMEDIALE
-    // ==========================================================
+    // =========================================================================
+    // 🎯 NUOVO SISTEMA: DROPDOWN + PREVIEW DINAMICO (Anti-Caos 100 Foto)
+    // =========================================================================
+    const imageSelector = document.getElementById('image-selector');
+    const imagePreviewDisplay = document.getElementById('image-preview-display');
+    const btnApplyImage = document.getElementById('btn-apply-image');
+    const btnSaveImageNow = document.getElementById('btn-save-image-now');
+    const btnClearImage = document.getElementById('btn-clear-image');
+    const selectedMasterImageIdForm = document.getElementById('selected_master_image_id_form');
+    const clearCurrentImageFlag = document.getElementById('clear_current_image_flag');
     const imageFileInput = document.getElementById('recipe-image-file');
-    const btnSaveImageOnly = document.getElementById('btn-save-image-only');
+    // Mantiene sempre sincronizzato il campo hidden
+    imageSelector.addEventListener('change', function () {
+    selectedMasterImageIdForm.value = this.value;
+
+    console.log(
+        'IMAGE SELECTED:',
+        this.value
+    );
+    });
     
-    const galleryContainer = document.getElementById('gallery-images-container');
-    const hiddenSelectedImage = document.getElementById('selected_existing_image');
-    const hiddenClearFlag = document.getElementById('clear_current_image_flag');
-    const btnClearCurrent = document.getElementById('btn-clear-current-image');
-    const currentPreviewBlock = document.getElementById('current-image-preview-block');
+    // Carica l'immagine selezionata attualmente (se esiste)
+    function loadCurrentImage() {
+
+    console.log("LOAD CURRENT IMAGE START");
+
+    {% if recipe and recipe.featured_image %}
+
+        console.log("IMAGE FOUND");
+        console.log("ID:", "{{ recipe.featured_image.id }}");
+        console.log("FILE:", "{{ recipe.featured_image.filename }}");
+
+        const currentImageId = "{{ recipe.featured_image.id }}";
+        const imgUrl = "/static/uploads/recipes/{{ recipe.featured_image.filename }}";
+        const caption = "{{ recipe.featured_image.caption if recipe.featured_image.caption else 'Immagine ricetta' }}";
+
+        displayImagePreview(imgUrl, caption);
+
+        selectedMasterImageIdForm.value = currentImageId;
+        imageSelector.value = currentImageId;
+
+        btnClearImage.classList.remove('d-none');
+
+    {% else %}
+
+        console.log("NO IMAGE FOUND");
+
+    {% endif %}
+    }
+   
+    function displayImagePreview(imgUrl, caption) {
+        imagePreviewDisplay.innerHTML = `
+            <div class="text-center">
+                <img src="${imgUrl}" alt="Preview immagine ricetta" style="max-width: 100%; max-height: 260px; object-fit: contain; mix-blend-mode: multiply;">
+                <div class="mt-2 small text-muted fw-semibold">${caption}</div>
+            </div>
+        `;
+        imagePreviewDisplay.classList.remove('empty');
+    }
     
-    const activeRecipeImage = "{{ recipe.image if recipe and recipe.image else '' }}";
-
-    // 🔒 CONTROLLO DI SICUREZZA PREVENTIVO SUL FILE (DIMENSIONI E FORMATO)
-    if (imageFileInput) {
-        imageFileInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            // Validazione peso massimo 2 Megabyte
-            if (file.size > 2 * 1024 * 1024) {
-                alert("Attenzione! Questo file supera la dimensione massima di 2 MB.\nScegli un'immagine più leggera o rimpiccioliscila.");
-                this.value = "";
-                return;
-            }
-
-            // Azzera la selezione della libreria multimediale se l'utente sceglie un nuovo file locale
-            document.querySelectorAll('.gallery-img-wrapper').forEach(w => w.classList.remove('selected'));
-            hiddenSelectedImage.value = "";
-            hiddenClearFlag.value = "false";
-        });
+    function clearPreview() {
+        imagePreviewDisplay.innerHTML = '<span class="empty">Nessuna immagine selezionata</span>';
+        imagePreviewDisplay.classList.add('empty');
     }
-
-    // 📁 LOGICA DEL TASTO DEDICATO "SALVA FOTO"
-    if (btnSaveImageOnly) {
-        btnSaveImageOnly.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (!imageFileInput || imageFileInput.files.length === 0) {
-                alert("Per caricare una nuova foto devi prima selezionare un file dal computer usando il tasto 'Scegli file'.");
-                return;
-            }
-            
-            // Forza il salvataggio immediato inviando i dati del modulo corrente
-            document.getElementById('main-recipe-form').submit();
-        });
-    }
-
-    function loadGalleryImages() {
-        if (!galleryContainer) return;
+    
+    // ✨ Event: Dropdown cambia - mostra preview dell'immagine selezionata
+    imageSelector.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        if (selectedOption.value === '') {
+            clearPreview();
+            return;
+        }
         
-        fetch("/admin/api/images/list")
-            .then(res => res.json())
-            .then(files => {
-                galleryContainer.innerHTML = "";
-                if (files.length === 0) {
-                    galleryContainer.innerHTML = '<div class="col-12 text-muted small p-3 text-center">Nessuna foto presente nella galleria globale. Caricane una a sinistra!</div>';
-                    return;
-                }
-                
-                files.forEach(filename => {
-                    const col = document.createElement('div');
-                    col.className = "col";
-                    
-                    const isSelected = (filename === activeRecipeImage);
-                    const wrapperClass = isSelected ? "gallery-img-wrapper selected" : "gallery-img-wrapper";
-                    if(isSelected) { hiddenSelectedImage.value = filename; }
+        const imgUrl = selectedOption.getAttribute('data-url');
+        const caption = selectedOption.getAttribute('data-caption');
+        displayImagePreview(imgUrl, caption);
+    });
+    
+    // ✨ Pulsante APPLICA - salva la selezione dal dropdown
+    btnApplyImage.addEventListener('click', function(e) {
 
-                    col.innerHTML = `
-                        <div class="${wrapperClass}" data-filename="${filename}">
-                            <img src="/static/uploads/recipes/${filename}" class="gallery-img-thumbnail">
-                            <button type="button" class="btn btn-sm btn-danger gallery-img-delete-btn" data-filename="${filename}">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </div>
-                    `;
-                    galleryContainer.appendChild(col);
-                });
+    e.preventDefault();
 
-                document.querySelectorAll('.gallery-img-wrapper').forEach(wrapper => {
-                    wrapper.addEventListener('click', function(e) {
-                        if (e.target.closest('.gallery-img-delete-btn')) return;
-                        
-                        document.querySelectorAll('.gallery-img-wrapper').forEach(w => w.classList.remove('selected'));
-                        this.classList.add('selected');
-                        hiddenSelectedImage.value = this.getAttribute('data-filename');
-                        hiddenClearFlag.value = "false";
-                        
-                        if (imageFileInput) imageFileInput.value = "";
-                    });
-                });
+    const selectedId = imageSelector.value;
 
-                // 🗑️ RIMOZIONE FISICA DELLA FOTO DALLA LISTA MULTIMEDIALE
-                document.querySelectorAll('.gallery-img-delete-btn').forEach(btn => {
-                    btn.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        const filename = this.getAttribute('data-filename');
-                        if (confirm(`Vuoi davvero eliminare la foto "${filename}" dal server?\nQuesta azione la scollegherà da ogni ricetta.`)) {
-                            fetch(`/admin/api/images/delete/${filename}`, { method: 'POST' })
-                                .then(res => res.json())
-                                .then(data => {
-                                    if(data.success) {
-                                        loadGalleryImages();
-                                        if (hiddenSelectedImage.value === filename) {
-                                            hiddenSelectedImage.value = "";
-                                        }
-                                        if (activeRecipeImage === filename && currentPreviewBlock) {
-                                            currentPreviewBlock.remove();
-                                        }
-                                    } else {
-                                        alert("Errore nell'eliminazione: " + data.message);
-                                    }
-                                });
-                        }
-                    });
-                });
-            });
+    if (!selectedId) {
+        alert("Seleziona prima un'immagine dal dropdown!");
+        return;
     }
 
-    if(btnClearCurrent) {
-        btnClearCurrent.addEventListener('click', function(e) {
-            e.stopPropagation(); 
-            hiddenClearFlag.value = "true";
-            hiddenSelectedImage.value = "";
-            document.querySelectorAll('.gallery-img-wrapper').forEach(w => w.classList.remove('selected'));
-            if(currentPreviewBlock) currentPreviewBlock.innerHTML = '<small class="text-danger fw-bold">La foto verrà scollegata al salvataggio.</small>';
-        });
-    }
+    const selectedOption =
+        imageSelector.options[imageSelector.selectedIndex];
 
-    loadGalleryImages();
+    const imgUrl = selectedOption.dataset.url;
+    const caption = selectedOption.dataset.caption;
+
+    selectedMasterImageIdForm.value = selectedId;
+
+    displayImagePreview(imgUrl, caption);
+
+    clearCurrentImageFlag.value = "false";
+    imageFileInput.value = "";
+
+    btnClearImage.classList.remove("d-none");
+
+    console.log("IMAGE APPLIED:", selectedId);
+    });
+    
+    // ✨ Pulsante SCOLLEGA - rimuove l'immagine
+    btnClearImage.addEventListener('click', function(e) {
+        e.preventDefault();
+        selectedMasterImageIdForm.value = '';
+        clearCurrentImageFlag.value = 'true';
+        imageSelector.value = '';
+        imageFileInput.value = '';
+        clearPreview();
+        btnClearImage.classList.add('d-none');
+    });
+    
+    // ✨ Caricamento file locale - preview immediata
+    imageFileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        if (file.size > 2 * 1024 * 1024) {
+            alert('Attenzione! Il file supera i 2 MB. Scegli un\'immagine più leggera.');
+            this.value = '';
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            displayImagePreview(event.target.result, 'Anteprima file locale');
+            selectedMasterImageIdForm.value = '';
+            clearCurrentImageFlag.value = 'false';
+            imageSelector.value = '';
+            btnClearImage.classList.remove('d-none');
+        };
+        reader.readAsDataURL(file);
+    });
+    
+    // ✨ Pulsante SALVA FOTO - invia il form
+    btnSaveImageNow.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('main-recipe-form').submit();
+    });
+    
+    loadCurrentImage();
 
     // ==========================================================
     // LOGICA DI CONTROLLO INTERFACCIA EDITING ED AUTOCOMPLETE
@@ -595,7 +675,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const prefermentCard = document.getElementById('card-preferment-editor');
 
     function checkPrefermentCardVisibility() {
-        if (prefermentSelect && prefermentSelect.value !== 'none') {
+        if (prefermentSelect && prefermentSelect.value !== 'diretto') {
             prefermentCard.classList.remove('d-none');
         } else {
             prefermentCard.classList.add('d-none');
@@ -787,6 +867,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         }
+    }
+
+    // Sincronizzazione campi hidden Quill prima dell'invio finale del form
+    const formElement = document.getElementById('main-recipe-form');
+    if (formElement) {
+        formElement.addEventListener('submit', function() {
+            document.getElementById('hidden-instructions-field').value = quillGeneral.root.innerHTML;
+            document.getElementById('hidden-preferment-field').value = quillPreferment.root.innerHTML;
+        });
     }
 
     document.querySelectorAll('.ingredient-row').forEach(row => bindRowEvents(row));

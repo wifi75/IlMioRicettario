@@ -32,6 +32,7 @@ from models.setting import Setting
 from models.wiki import WikiArticle
 from models.ingredient_master import MasterIngredient
 from models.bakery_pan import MasterBakeryPan
+from models.image import MasterImage
 
 
 admin_bp = Blueprint(
@@ -56,10 +57,15 @@ def handle_image_assignment(recipe_slug):
     if request.form.get("clear_current_image_flag") == "true":
         return None
 
-    # 2. Controllo se l'utente ha scelto una foto esistente cliccando sulla galleria interna
-    selected_existing = request.form.get("selected_existing_image", "").strip()
-    if selected_existing:
-        return selected_existing
+    # 2. Controllo se l'utente ha scelto una foto esistente dal dropdown (MasterImage ID)
+    selected_image_id = request.form.get("selected_master_image_id_form", "").strip()
+    if selected_image_id and selected_image_id.isdigit():
+        try:
+            master_img = MasterImage.query.get(int(selected_image_id))
+            if master_img:
+                return ("master_image", int(selected_image_id))  # Ritorna tupla (tipo, ID)
+        except:
+            pass
 
     # 3. Controllo se arriva un nuovo file standard caricato dal computer
     if 'recipe_image_file' in request.files:
@@ -79,7 +85,17 @@ def handle_image_assignment(recipe_slug):
                     
                     # Salviamo il file reale sul disco fisso del server
                     file.save(file_path)
-                    return secure_name
+                    
+                    # Creiamo un record MasterImage per catalogare l'immagine
+                    new_master_image = MasterImage(
+                        filename=secure_name,
+                        caption=recipe_slug,
+                        alt_text=f"Immagine per ricetta {recipe_slug}"
+                    )
+                    db.session.add(new_master_image)
+                    db.session.commit()
+                    
+                    return ("master_image", new_master_image.id)
                 except Exception as e:
                     print(f"[-] Errore critico durante il salvataggio del file immagine: {e}")
             else:
@@ -180,9 +196,15 @@ def recipe_new():
         recipe_slug = request.form["slug"].strip()
 
         # Intercettamento multimediale
-        image_name = handle_image_assignment(recipe_slug)
-        if image_name == "__KEEP_OLD__":
-            image_name = None
+        image_result = handle_image_assignment(recipe_slug)
+        image_id = None
+        
+        if image_result == "__KEEP_OLD__":
+            image_id = None
+        elif image_result is None:
+            image_id = None
+        elif isinstance(image_result, tuple) and image_result[0] == "master_image":
+            image_id = image_result[1]
 
         try:
             fresco_raw = request.form.get("yeast_fresh_val", "3.0").replace(",", ".")
@@ -203,7 +225,7 @@ def recipe_new():
             description=request.form.get("description", "").strip(),
             instructions=instructions_text,
             is_published="is_published" in request.form,
-            image=image_name,
+            image_id=image_id,
             
             temp_chiusura=float(request.form.get("temp_chiusura", 24.0)) if request.form.get("temp_chiusura") else 24.0,
             tempo_autolisi=int(request.form.get("tempo_autolisi", 0)) if request.form.get("tempo_autolisi") else 0,
@@ -276,11 +298,13 @@ def recipe_new():
 
     master_ingredients = MasterIngredient.query.order_by(MasterIngredient.name).all()
     master_pans = MasterBakeryPan.query.order_by(MasterBakeryPan.name).all()
+    master_images = MasterImage.query.order_by(MasterImage.upload_date.desc()).all()
     
     return render_template(
         "admin/recipe_form.html",
         master_ingredients_list=master_ingredients,
         master_pans_list=master_pans,
+        master_images_list=master_images,
         computed_fresh_val=3.0,
         computed_dry_val=1.0
     )
@@ -361,11 +385,13 @@ def recipe_edit(id):
         recipe_slug = request.form["slug"].strip()
 
         # Intercettamento immagine e controllo del mantenimento o della pulizia
-        new_image = handle_image_assignment(recipe_slug)
-        if new_image is None:
-            recipe.image = None  # Ricevuto comando clear del legame
-        elif new_image != "__KEEP_OLD__":
-            recipe.image = new_image  # Caricato nuovo file o scelta da libreria
+        image_result = handle_image_assignment(recipe_slug)
+        
+        if image_result is None:
+            recipe.image_id = None  # Ricevuto comando clear del legame
+        elif image_result != "__KEEP_OLD__":
+            if isinstance(image_result, tuple) and image_result[0] == "master_image":
+                recipe.image_id = image_result[1]
 
         try:
             fresco_raw = request.form.get("yeast_fresh_val", "3.0").replace(",", ".")
@@ -460,6 +486,7 @@ def recipe_edit(id):
 
     master_ingredients = MasterIngredient.query.order_by(MasterIngredient.name).all()
     master_pans = MasterBakeryPan.query.order_by(MasterBakeryPan.name).all()
+    master_images = MasterImage.query.order_by(MasterImage.upload_date.desc()).all()
 
     f_val = recipe.yeast_fresh_saved if recipe.yeast_fresh_saved is not None else (recipe.yeast_ratio if recipe.yeast_ratio else 3.0)
     d_val = recipe.yeast_dry_saved if recipe.yeast_dry_saved is not None else 1.0
@@ -471,6 +498,7 @@ def recipe_edit(id):
         ingredients=ingredients,
         master_ingredients_list=master_ingredients,
         master_pans_list=master_pans,
+        master_images_list=master_images,
         computed_fresh_val=f_val,  
         computed_dry_val=d_val     
     )
@@ -480,35 +508,62 @@ def recipe_edit(id):
 # SEZIONE API MULTIMEDIALE: GALLERIA FOTO (PNG/JPG ACCETTATI)
 # ==========================================================
 
+@admin_bp.route("/api/images/debug", methods=["GET"])
+@login_required
+def api_images_debug():
+    """DEBUG: Controlla quante immagini ci sono nel DB"""
+    count = MasterImage.query.count()
+    images = MasterImage.query.all()
+    result = {
+        "total_count": count,
+        "images": [{"id": img.id, "filename": img.filename} for img in images]
+    }
+    return jsonify(result)
+
+
 @admin_bp.route("/api/images/list", methods=["GET"])
 @login_required
 def api_images_list():
-    """Restituisce l'elenco di tutte le immagini caricate precedentemente sul server"""
-    if not os.path.exists(UPLOAD_FOLDER):
-        return jsonify([])
-    files = [f for f in os.listdir(UPLOAD_FOLDER) if os.path.isfile(os.path.join(UPLOAD_FOLDER, f)) and f.lower().endswith(('.png', '.jpg', '.jpeg'))]
-    return jsonify(files)
+    """Restituisce l'elenco di tutte le immagini catalogate nel database"""
+    try:
+        images = MasterImage.query.order_by(MasterImage.upload_date.desc()).all()
+        result = [img.to_dict() for img in images]
+        return jsonify(result)
+    except Exception as e:
+        print(f"Errore API images/list: {e}")
+        return jsonify([]), 500
 
 
-@admin_bp.route("/api/images/delete/<string:filename>", methods=["POST"])
+@admin_bp.route("/api/images/delete/<int:image_id>", methods=["POST"])
 @login_required
-def api_image_delete(filename):
-    """Elimina definitivamente un file multimediale dal server"""
-    secure_name = secure_filename(filename)
-    file_path = os.path.join(UPLOAD_FOLDER, secure_name)
+def api_image_delete(image_id):
+    """Elimina definitivamente un record MasterImage e il file dal server"""
+    master_img = MasterImage.query.get(image_id)
     
-    if os.path.exists(file_path):
-        try:
+    if not master_img:
+        return jsonify({"success": False, "message": "Immagine non trovata"}), 404
+    
+    filename = master_img.filename
+    file_path = os.path.join(UPLOAD_FOLDER, filename)
+    
+    try:
+        # Elimina il file fisico dal server
+        if os.path.exists(file_path):
             os.remove(file_path)
-            recipes_using_it = Recipe.query.filter_by(image=secure_name).all()
-            for r in recipes_using_it:
-                r.image = None
-            db.session.commit()
-            return jsonify({"success": True, "message": "Immagine eliminata fisicamente dal server"})
-        except Exception as e:
-            return jsonify({"success": False, "message": str(e)}), 500
-            
-    return jsonify({"success": False, "message": "File non trovato"}), 404
+        
+        # Scollega tutte le ricette che usano questa immagine
+        recipes_using_it = Recipe.query.filter_by(image_id=image_id).all()
+        for r in recipes_using_it:
+            r.image_id = None
+        
+        # Elimina il record dal database
+        db.session.delete(master_img)
+        db.session.commit()
+        
+        return jsonify({"success": True, "message": "Immagine eliminata"})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "message": str(e)}), 500
 
 
 # ==========================================================
