@@ -1,79 +1,363 @@
-# 📖 Manuale Utente - Guida all'Utilizzo del Ricettario Scientifico
+# 📖 Manuale Utente - Il Mio Ricettario (v2.2.0)
 
-Benvenuto nel manuale d'uso ufficiale dell'applicazione. Questa guida è stata scritta per spiegare in modo semplice e immediato come raggiungere il servizio, come navigare tra le ricette pubbliche e come sfruttare al massimo il pannello di controllo Amministratore per il bilanciamento professionale degli impasti.
+Benvenuto nel manuale ufficiale di **Il Mio Ricettario**.
 
----
-
-## 🌐 1. Come Raggiungere l'Applicazione (Indirizzo e Porta)
-
-L'applicazione gira come un servizio web continuo. Per aprirla sul tuo computer, tablet o smartphone, assicurasi di essere connesso alla rete e digita l'indirizzo nella barra del tuo browser internet (Chrome, Safari, Edge, Firefox):
-
-* **Se usi l'app sul tuo computer in locale (Sviluppo):** http://127.0.0.1:8080
-* **Se usi l'app installata sul Server Linux (Produzione):** http://IP_DEL_SERVER:8080
-  *(Nota: La porta di ascolto predefinita configurata per il servizio è la **8080**)*
+Questa guida descrive il funzionamento dell'applicazione sia dal punto di vista dell'utilizzatore finale che dell'amministratore incaricato della gestione delle formule.
 
 ---
 
-## 🍕 2. L'Interfaccia Pubblica (Il Simulatore Dinamico)
+# 🌐 1. Accesso all'Applicazione
 
-La pagina principale dell'applicazione mostra il catalogo di tutte le ricette approvate e pubblicate. Cliccando su una ricetta (ad esempio *"Panini all'olio"*), entrerai nel **Simulatore ad Alta Precisione**.
+L'applicazione è disponibile tramite browser web.
 
-Questa schermata permette a qualsiasi utente di personalizzare l'impasto prima di iniziare a impastare:
-* **Sezione Manuali Tecnici (Nuova Wiki):** In cima alla pagina, sopra il blocco del titolo principale, è presente il pulsante grande "Esplora la Wiki & Linee Guida Tecniche". Con un clic, gli utenti vengono indirizzati alla pagina `/wiki`, dove è possibile consultare i manuali di panificazione professionale.
-* **Pezzatura e Flotta Teglie:** L'utente può scegliere tra due metodi di calcolo. Nel metodo *Peso Impasto*, basta inserire i grammi desiderati; nel metodo *Teglie Assegnate*, il sistema carica le teglie consigliate per la ricetta permettendo all'utente di aggiungere le quantità tramite tasti visivi (+/-) puliti. Il calcolatore ridimensiona la lista della spesa automaticamente al grammo.
-* **Esposizione della Forza (W):** Nella tabella degli ingredienti calcolati, la forza specifica delle farine viene mostrata tramite un badge grigio ad alta leggibilità. Gli elementi non farinacei lasceranno tale spazio completamente vuoto.
-* **Selettore del Lievito:** Un menu a tendina permette di cambiare il tipo di lievito da "Fresco" a "Secco". Il sistema applicherà il coefficiente matematico memorizzato per ridurre o aumentare i grammi del lievito aggiornando i totali finali.
-* **Cursore Idratazione:** Sbloccando l'interruttore dedicato, è possibile variare a piacere la percentuale di acqua della formula tramite uno slider scorrevole.
-* **Schede dei Processi Dinamici:** In fondo alla pagina, l'interfaccia si divide in Tab. Se la ricetta prevede un Prefermento (Biga/Poolish) o la tecnica del Tangzhong (Roux), compariranno le schede dedicate con le dosi separate pronte da prelevare dal totale calcolato e le istruzioni operative per la loro preparazione.
+## Ambiente di Sviluppo
 
----
+```text
+http://127.0.0.1:8080
+```
 
-## 🔐 3. Come Entrare nel Pannello Amministratore
+## Ambiente di Produzione
 
-Il Pannello Admin è l'area riservata per creare formule, gestire database ingredienti, anagrafica teglie e impostazioni del sito.
+```text
+http://IP_DEL_SERVER:8080
+```
 
-1. Dal menù nella home page pubblica in basso clicca sul bottone **"Area Riservata Admin"** oppure digita nel browser: `http://IP_DEL_SERVER:8080/admin/login`
-2. Inserisci le tue credenziali (Nome Utente e Password).
-3. Una volta effettuato l'accesso, verrai reindirizzato direttamente alla **Gestione Formule ("Ricette")**, che costituisce il fulcro operativo del tuo ricettario.
-4. Per uscire in sicurezza in qualsiasi momento, clicca sul pulsante rosso **Logout** in fondo al menu laterale o sul tasto **Pannello Controllo Admin** posizionato nel footer qualora ti trovassi nella visualizzazione del sito pubblico.
+La porta predefinita del servizio è:
 
----
-
-## 🧫 4. Gestione dei Vari Pannelli Amministrativi
-
-Una volta dentro l'area Admin, avrai a disposizione le sezioni principali nel menu di navigazione:
-
-### A. Gestione Formule ("Ricette")
-In questo pannello puoi creare i tuoi capolavori.
-* **Editor Istruzioni (Quill.js):** Troverai integrato un editor avanzato stile Microsoft Word. Al salvataggio, il testo lineare viene memorizzato mantenendo i caratteri nativi di a capo (`\n`). Quando la ricetta viene renderizzata nel frontend, l'algoritmo autonomo di Jinja2 elabora il testo riga per riga, generando un elenco numerato progressivo e inserendo in grassetto la primissima parola di ogni riga.
-* **Composizione Ingredienti & Valore W:** Quando inserisci una materia prima nel form, la cerchi e la selezioni dalla lista globale. Il sistema identificherà autonomamente se si tratta di farina o liquido e importerà il valore della sua forza (W) dal database madre (fissando tale valore tramite array nascosto per la precisione di archiviazione SQL).
-* **Assegnazione Teglie:** Un pannello di interruttori ti permette di spuntare quali forme della tua flotta (rotonde, teglie in ferro blu, stampi da panettone) sono ottimali o idonee per l'impasto in lavorazione.
-
-### B. L'Anagrafica Centralizzata ("Master Ingredienti")
-Prima di aggiungere un ingrediente a una ricetta, esso deve esistere in questa lista globale.
-* Clicca su **Aggiungi Ingrediente**.
-* Inserisci il nome (es. *Farina Manitoba*).
-* **Controllo Interbloccato:** Il modulo di inserimento possiede un controllo JavaScript che impedisce a un ingrediente di essere contemporaneamente una farina e un liquido.
-* **La Forza della Farina (W):** Se l'ingrediente che stai creando è marcato come "È una Farina", il sistema abiliterà il campo numerico del parametro $W$. Se non lo è (es. *Acqua*), l'indicatore verrà azzerato. Tale censimento renderà la creazione successiva delle ricette istantanea.
-
-### C. L'Anagrafica Teglie ("Master Stampi")
-Simile all'anagrafica ingredienti, questo dizionario globale permette di censire l'armamentario del panificatore.
-* Crea un nuovo stampo definendo un **Nome**, una **Tipologia Estetica** (Tonda, Rettangolare, ecc.) e, soprattutto, la **Capacità Numerica** in grammi (Es. `1200` per una teglia di focaccia 40x30). Il calcolatore in frontend moltiplicherà la capacità per il numero di teglie inserite dal panificatore.
-
-### D. Impostazioni Globali: Lieviti e Design del Sito
-In questa sezione gestisci la potenza del motore di calcolo e l'estetica del progetto.
-* **Bilanciamento Lieviti:** Troverai due campi intuitivi (Grammi Fresco e Grammi Secco Equivalenti) per calcolare globalmente il rapporto di conversione e i parametri base di farina/liquidi usati nel Tangzhong (Roux).
-* **Design e Temi Sito:** Questo pannello agisce sui *Settings* strutturali dell'interfaccia. Potrai scrivere il nome generale della panetteria, personalizzare il testo del sottotitolo nella Home Page e applicare con un clic il tuo **Tema Cromatico** preferito (Es. *Antica Panetteria*, *Borgo Antico*, *Forno di Paese*, *Pizzeria Industriale*), mutando i colori dell'intero ecosistema.
-
-### E. Sicurezza Account
-Una sezione dedicata alla protezione del profilo amministratore. Ti permette di modificare la password di accesso inserendo la chiave attuale e definendo una nuova password (minimo 6 caratteri). Il sistema si occuperà di crittografarla tramite algoritmo sicuro (`password_hash`) in tempo reale, senza mai salvarla come testo in chiaro nel database locale SQLite.
+```text
+8080
+```
 
 ---
 
-## 💡 Consigli per un Bilanciamento Perfetto e Linee Guida Grafiche
+# 🍞 2. Catalogo Pubblico delle Ricette
 
-Quando inserisci elementi o nuove ricette nel sistema come Amministratore, per fare in modo che la matematica del simulatore funzioni al 100% e la grafica resti in perfetto ordine, ricordati di:
-1. **Nomi in Maiuscolo:** Digita i titoli delle ricette interamente in MAIUSCOLO (es. `FOCACCIA BARESE`). Questo blinda la resa geometrica ed estetica dentro i rettangoli bianchi delle card.
-2. **Descrizioni Brevi:** Mantieni la descrizione della formula contenuta entro le due righe per preservare la perfetta simmetria orizzontale e verticale della griglia.
-3. **Immagini Chiari/Trasparenti:** Carica foto di copertina del prodotto finito con sfondi neutri o bianchi. Il programma applica un filtro nativo di fusione che rimuoverà automaticamente gli antiestetici stacchi quadrati.
-4. **Tag di Classificazione:** Scegli materie prime la cui anagrafica centrale sia correttamente "taggata" con l'opzione **Farina** attiva per la polvere principale e **Liquido** attiva per l'idratazione.
+La schermata principale mostra l'elenco delle formule pubblicate.
+
+Ogni ricetta viene rappresentata tramite una card contenente:
+
+* immagine di copertina;
+* nome formula;
+* descrizione;
+* pulsante di accesso al calcolatore.
+
+---
+
+# 📚 3. Wiki Tecnica Pubblica
+
+Nella parte superiore della home page è disponibile il pulsante:
+
+```text
+Esplora la Wiki & Linee Guida Tecniche
+```
+
+La Wiki è accessibile tramite:
+
+```text
+/wiki
+```
+
+e contiene:
+
+* tecniche di panificazione;
+* guide operative;
+* documentazione dell'arte bianca;
+* materiale di approfondimento.
+
+---
+
+# 🧮 4. Calcolatore Dinamico delle Formule
+
+Entrando in una ricetta si accede al simulatore professionale.
+
+Il sistema ricalcola automaticamente:
+
+* grammature;
+* idratazione;
+* lieviti;
+* pezzature;
+* teglie;
+* prefermenti.
+
+---
+
+## Gestione Pezzature
+
+L'utente può:
+
+* impostare il numero dei panetti;
+* definire il peso del singolo pezzo;
+* ottenere il nuovo totale impasto.
+
+---
+
+## Gestione Teglie
+
+Se la ricetta possiede teglie associate:
+
+* vengono mostrate automaticamente;
+* è possibile aumentare o diminuire le quantità;
+* il sistema ricalcola l'impasto necessario.
+
+---
+
+## Conversione Lieviti
+
+Supporto per:
+
+* lievito fresco;
+* lievito secco.
+
+La conversione viene effettuata automaticamente utilizzando il rapporto definito nelle impostazioni globali.
+
+---
+
+## Idratazione Dinamica
+
+Quando abilitata dalla ricetta:
+
+* l'idratazione può essere modificata tramite slider;
+* acqua e percentuali vengono aggiornate in tempo reale.
+
+---
+
+## Visualizzazione Forza Farine (W)
+
+Le farine mostrano un badge dedicato contenente il valore:
+
+```text
+W
+```
+
+Gli ingredienti non classificati come farine non mostrano alcun badge.
+
+---
+
+# 🥣 5. Tangzhong
+
+Se la ricetta utilizza il modulo Tangzhong:
+
+* il sistema isola automaticamente una quota di farina;
+* viene calcolata la quantità di liquido necessaria;
+* viene mostrata la procedura di preparazione.
+
+---
+
+# 🧫 6. Poolish e Biga
+
+Il sistema supporta:
+
+## Poolish
+
+* idratazione 100%.
+
+## Biga
+
+* idratazione 44%.
+
+Le quantità vengono automaticamente separate dal totale impasto.
+
+---
+
+# 🔐 7. Accesso all'Area Amministrativa
+
+Per accedere al pannello di controllo:
+
+```text
+http://IP_DEL_SERVER:8080/admin/login
+```
+
+Inserire:
+
+* nome utente;
+* password.
+
+Una volta autenticati si accede al pannello amministrativo.
+
+---
+
+# ⚙️ 8. Gestione Ricette
+
+La sezione più importante del sistema.
+
+Permette:
+
+* creazione formule;
+* modifica formule;
+* eliminazione formule;
+* gestione ingredienti;
+* gestione immagini;
+* configurazione moduli.
+
+---
+
+## Editor Istruzioni (Quill.js)
+
+Le istruzioni vengono inserite tramite editor visuale.
+
+Funzioni principali:
+
+* testo formattato;
+* paragrafi;
+* elenchi;
+* allineamenti.
+
+Al salvataggio il contenuto viene trasferito automaticamente al database.
+
+---
+
+## Gestione Ingredienti
+
+Durante la compilazione della ricetta:
+
+* gli ingredienti vengono selezionati dall'anagrafica centrale;
+* il sistema recupera automaticamente il valore W;
+* i dati vengono storicizzati nella formula.
+
+---
+
+## Gestione Teglie
+
+È possibile associare una o più teglie ad una singola ricetta.
+
+Le teglie vengono selezionate dalla flotta globale.
+
+---
+
+# 🖼️ 9. Libreria Immagini Centralizzata (Novità v2.2.0)
+
+La gestione immagini è stata completamente riprogettata.
+
+---
+
+## Archivio Centrale
+
+Le immagini vengono archiviate una sola volta tramite:
+
+```text
+MasterImage
+```
+
+e possono essere riutilizzate da più ricette.
+
+---
+
+## Associazione Immagine
+
+Nel form della ricetta è presente un selettore dedicato.
+
+Procedura:
+
+1. Aprire il menu a tendina.
+2. Selezionare l'immagine desiderata.
+3. Premere:
+
+```text
+✓ Applica
+```
+
+4. Salvare la ricetta.
+
+---
+
+## Anteprima Dinamica
+
+Dopo la selezione:
+
+* compare immediatamente l'anteprima;
+* viene mostrata la miniatura;
+* l'associazione viene mantenuta dopo il salvataggio.
+
+---
+
+## Scollegamento Immagine
+
+Per rimuovere l'immagine:
+
+1. Aprire la ricetta.
+2. Premere:
+
+```text
+Scollega Immagine
+```
+
+3. Salvare.
+
+---
+
+# 🧾 10. Gestione Ingredienti (Master Ingredienti)
+
+Archivio globale degli ingredienti.
+
+Campi principali:
+
+* Nome;
+* È una Farina;
+* È un Liquido;
+* Valore W.
+
+---
+
+## Regola di Sicurezza
+
+Un ingrediente non può essere contemporaneamente:
+
+* farina;
+* liquido.
+
+Il controllo viene eseguito automaticamente tramite JavaScript.
+
+---
+
+# 🍕 11. Gestione Teglie (Master Bakery Pan)
+
+Archivio globale delle teglie.
+
+Ogni elemento possiede:
+
+* nome;
+* tipologia;
+* capacità in grammi.
+
+---
+
+# 🎨 12. Impostazioni Globali
+
+Permettono di configurare:
+
+* nome sito;
+* descrizione sito;
+* rapporto lieviti;
+* parametri Tangzhong;
+* tema grafico.
+
+---
+
+# 🔒 13. Sicurezza Account
+
+Permette di modificare:
+
+* password amministrativa;
+* credenziali di accesso.
+
+Le password vengono salvate esclusivamente tramite hash crittografico.
+
+---
+
+# 💡 Buone Pratiche
+
+Per ottenere il massimo dal sistema:
+
+1. Utilizzare immagini con sfondo chiaro.
+2. Mantenere descrizioni brevi.
+3. Verificare sempre i flag Farina/Liquido.
+4. Utilizzare nomi ricetta coerenti.
+5. Aggiornare regolarmente la libreria ingredienti.
+
+---
+
+# 👨‍💻 Credits
+
+Architettato e sviluppato da Tiziano Cassone.
+
+© 2026 - Il Mio Ricettario

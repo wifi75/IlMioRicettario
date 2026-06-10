@@ -1,63 +1,417 @@
 ===================================================================
 CONTEXT DI PROGETTO: "IL MIO RICETTARIO" (Aggiornato: Giugno 2026)
-===================================================================
+==================================================================
 
 PROGETTO
-- Nome: Il Mio Ricettario
-- Sviluppatore Principale: Tiziano Cassone
-- Versione Architetturale: v2.1.0 (Stabile)
-- Repository GitHub: https://github.com/wifi75/IlMioRicettario
 
--------------------------------------------------------------------
-STACK TECNOLOGICO CORRENTE
--------------------------------------------------------------------
+* Nome: Il Mio Ricettario
+* Sviluppatore Principale: Tiziano Cassone
+* Versione Architetturale: v2.2.0 (Stabile)
+* Repository GitHub: https://github.com/wifi75/IlMioRicettario
+
+---
+
+## STACK TECNOLOGICO CORRENTE
+
+Backend
+
 * Python 3.13
-* Flask (Flask-SQLAlchemy, Flask-Login)
+* Flask 3.1.2
+* Flask-SQLAlchemy 3.1.1
+* Flask-Login 0.6.3
+* Flask-Migrate 4.1.0
+* Werkzeug 3.1.3
+
+Database
+
 * SQLite
-* Bootstrap 5.3 & Bootstrap Icons
-* HTML / CSS / JavaScript (Vanilla / Client-side Engine)
+
+Frontend
+
+* Bootstrap 5.3
+* Bootstrap Icons
+* HTML5
+* CSS3
+* JavaScript Vanilla
+
+Editor
+
+* Quill.js v1.3.6
+
+Documentazione PDF
+
+* ReportLab 4.4.3
+
+Template Engine
+
 * Jinja2
-* Quill.js v1.3.6 (Editor WYSIWYG integrato nei form)
 
--------------------------------------------------------------------
-STATO STRUTTURALE DEL LAYOUT & LEGGE CROMATICA (V2)
--------------------------------------------------------------------
-1. BASE GRAPHIC DESIGN: Lo sfondo del 'body' è bloccato universalmente sul grigio ardesia chiaro '#f8fafc' per tutti i temi chiari. Il tema 'forno_paese' è sanificato con testi scuri ardesia e blu notte profondi per garantire contrasti nitidi.
-2. BOX INTESTAZIONE HERO ('recipes_list.html'): Un unico rettangolo bianco compatto con larghezza fissa a '850px'. L'icona della spiga '🌾' è ancorata a sinistra in posizionamento assoluto ('position: absolute; left: 24px; top: 50%; transform: translateY(-50%);'), mantenendo il titolo H1 e il testo descrittivo agganciati al centro geometrico spaccato del contenitore.
-3. ALLINEAMENTO ORIZZONTALE/VERTICALE BADGE: Tutti i badge della forza ('w_value') e i tag categorie (es. "TEST") implementano la proprietà Flexbox 'display: inline-flex !important; align-items: center !important; justify-content: center !important;' che costringe il testo scritto al perfetto centro simmetrico della forma.
+---
 
--------------------------------------------------------------------
-STRUTTURA DEL DATABASE (MODELLI SQLALCHEMY)
--------------------------------------------------------------------
-* User: Gestione utenti e credenziali amministrative. Password protette tramite 'password_hash' (autenticazione via Flask-Login).
-* MasterIngredient: Anagrafica centralizzata delle materie prime (ID, nome, flag 'is_flour', flag 'is_liquid', forza 'w_value'). Popolata via seeding automatico in app.py.
-* MasterBakeryPan: Anagrafica centralizzata delle teglie e degli stampi (ID, name, pan_type, weight_capacity) assegnabili dinamicamente come flotta alle singole ricette.
-* Recipe: Testata della formula (id, name, slug, description, instructions, temp_chiusura, tempo_autolisi, tempo_puntata, tempo_appretto). Include la relazione Many-to-Many con la flotta teglie ('pans').
-* RecipeIngredient: Relazione Many-to-Many tra ricette e ingredienti con l'aggiunta di metadati di calcolo cristallizzati (quantity, unit, is_flour, is_liquid, w_value, sort_order).
-* RecipeFeature: Flag booleani per attivare/disattivare i singoli moduli e automatismi su ogni specifica ricetta (enable_piece_count, enable_piece_weight, enable_yeast_type, enable_tangzhong, enable_poolish, enable_biga).
-* Setting: Parametri globali del sistema (fresh_to_dry_ratio, tangzhong_flour_percent, tangzhong_liquid_multiplier, site_name, site_description, theme_active).
-* wiki: Classe di modello definita in 'models/wiki.py' interamente in caratteri minuscoli per la gestione degli articoli enciclopedici.
+## STATO STRUTTURALE DEL LAYOUT & LEGGE CROMATICA (V2)
 
--------------------------------------------------------------------
-LOGICHE OPERATIVE CHIAVE (DA PRESERVARE TASSATIVAMENTE)
--------------------------------------------------------------------
-1. APPLICAZIONE ROTTA WIKI PUBBLICA IMMORTALE:
-   - La visualizzazione pubblica della Wiki avviene tramite la rotta '/wiki' gestita in 'routes/recipes.py' dalla funzione 'wiki_public_list()'.
-   - Per immunizzare l'applicazione da crash all'avvio derivanti dalla classe 'wiki' minuscola o da assenza di tabelle, i dati del manuale d'uso d'arte bianca sono pre-caricati e passati via dizionario a 'wiki_public.html'.
-   - Il collegamento in frontend è gestito da un link statico a href="/wiki" inserito sopra l'header di 'recipes_list.html'.
+1. BASE GRAPHIC DESIGN
 
-2. REGOLE DI SALVATAGGIO & EDITOR WORD (Quill.js):
-   - Nei form di inserimento e modifica ricetta è integrato l'editor Quill.js che inietta il testo lineare in un input hidden con name="instructions".
+* Lo sfondo del body è fissato su:
 
-3. ALGORITMO DI PARSING DELLE ISTRUZIONI (Jinja2):
-   - Il testo delle istruzioni viene elaborato riga per riga tramite Jinja2 (.split('\n')), generando un elenco numerato progressivo ordinato e racchiudendo automaticamente la primissima parola dentro il tag <strong>.
+  #f8fafc
 
-4. PROTEZIONE DEI DATI LOCALI:
-   - Il file '.gitignore' esclude tassativamente l'upload su GitHub della cartella 'instance/', dei file '.db' e delle cartelle '__pycache__/'.
+* Tutti i temi chiari devono mantenere questo colore come riferimento.
 
--------------------------------------------------------------------
-REGOLE PER LE FUTURE AI IN CHAT (REGOLE TASSATIVE)
--------------------------------------------------------------------
-- Fornire SEMPRE codici completi dei file modificati, pronti al copia-incolla diretto. Non usare mai placeholder o commenti di interruzione del codice.
-- Mantenere intatta la firma dell'autore nel footer dell'amministrazione (base.html): "Architettato e sviluppato da Tiziano Cassone".
-- Non inserire query pesanti o cicliche all'interno di '@app.context_processor'. Tutte le interrogazioni al DB devono essere isolate e veicolate tramite i rispettivi Blueprint.
+* Il tema "forno_paese" utilizza testi scuri ad alto contrasto per garantire la massima leggibilità.
+
+---
+
+2. HERO HEADER PUBBLICO (recipes_list.html)
+
+* Contenitore bianco compatto.
+
+* Larghezza massima:
+
+  850px
+
+* L'icona della spiga 🌾 è posizionata tramite:
+
+  position: absolute;
+  left: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+
+* Titolo e descrizione devono rimanere geometricamente centrati.
+
+---
+
+3. BADGE W E TAG CONDIZIONALI
+
+Tutti i badge devono utilizzare:
+
+```
+display: inline-flex !important;
+align-items: center !important;
+justify-content: center !important;
+```
+
+per garantire l'allineamento perfetto del contenuto.
+
+---
+
+## ARCHITETTURA DATABASE (MODELLI SQLALCHEMY)
+
+User
+
+* Gestione utenti amministratori.
+* Password protette tramite password_hash.
+* Autenticazione Flask-Login.
+
+---
+
+MasterIngredient
+
+Anagrafica ingredienti centralizzata.
+
+Campi principali:
+
+* id
+* name
+* is_flour
+* is_liquid
+* w_value
+
+Popolamento automatico tramite seeding.
+
+---
+
+MasterBakeryPan
+
+Anagrafica teglie e stampi.
+
+Campi principali:
+
+* id
+* name
+* pan_type
+* weight_capacity
+
+Utilizzata tramite relazione Many-to-Many con Recipe.
+
+---
+
+MasterImage
+
+Nuovo modello introdotto nella v2.2.0.
+
+Archivio immagini centralizzato.
+
+Campi principali:
+
+* id
+* filename
+* caption
+* alt_text
+* upload_date
+
+Funzioni:
+
+* archivio unico immagini;
+* riutilizzo su più ricette;
+* anteprima dinamica;
+* associazione persistente.
+
+---
+
+Recipe
+
+Testata principale della formula.
+
+Campi principali:
+
+* id
+* name
+* slug
+* description
+* instructions
+* image
+* image_id
+* temp_chiusura
+* tempo_autolisi
+* tempo_puntata
+* tempo_appretto
+
+Relazioni:
+
+* RecipeIngredient
+* RecipeFeature
+* MasterBakeryPan
+* MasterImage
+
+---
+
+RecipeIngredient
+
+Relazione ingredienti ↔ ricette.
+
+Metadati:
+
+* quantity
+* unit
+* is_flour
+* is_liquid
+* w_value
+* sort_order
+
+---
+
+RecipeFeature
+
+Abilitazione dinamica dei moduli:
+
+* enable_piece_count
+* enable_piece_weight
+* enable_yeast_type
+* enable_tangzhong
+* enable_poolish
+* enable_biga
+
+---
+
+Setting
+
+Parametri globali applicazione.
+
+Include:
+
+* fresh_to_dry_ratio
+* tangzhong_flour_percent
+* tangzhong_liquid_multiplier
+* site_name
+* site_description
+* theme_active
+
+---
+
+wiki
+
+Classe definita in:
+
+```
+models/wiki.py
+```
+
+Il nome della classe rimane volutamente:
+
+```
+wiki
+```
+
+(interamente minuscolo).
+
+---
+
+## LOGICHE OPERATIVE CRITICHE (DA PRESERVARE)
+
+1. WIKI PUBBLICA IMMORTALE
+
+Rotta:
+
+```
+/wiki
+```
+
+Gestita tramite:
+
+```
+routes/recipes.py
+```
+
+Funzione:
+
+```
+wiki_public_list()
+```
+
+La Wiki deve continuare a funzionare anche in caso di:
+
+* assenza tabelle;
+* problemi del modello wiki;
+* database incompleto.
+
+Il contenuto base viene precaricato tramite dizionario Python.
+
+---
+
+2. QUILL.JS
+
+Nei form di creazione e modifica ricetta:
+
+* Quill.js gestisce l'editor.
+* Il testo viene salvato tramite:
+
+  name="instructions"
+
+all'interno di un campo hidden.
+
+---
+
+3. PARSING DELLE ISTRUZIONI
+
+Le istruzioni vengono elaborate tramite:
+
+```
+.split('\n')
+```
+
+e convertite automaticamente in:
+
+* elenco numerato;
+* prima parola in grassetto.
+
+---
+
+4. GESTIONE FORZA W
+
+Il valore W:
+
+* viene letto da MasterIngredient;
+* viene copiato in RecipeIngredient;
+* viene storicizzato nella ricetta.
+
+Il badge W deve apparire solamente sugli ingredienti marcati come farine.
+
+---
+
+5. SISTEMA IMMAGINI CENTRALIZZATO
+
+Nuova architettura v2.2.0.
+
+Le immagini vengono gestite tramite:
+
+```
+MasterImage
+```
+
+e collegate alle ricette tramite:
+
+```
+Recipe.image_id
+```
+
+Backend:
+
+* selezione tramite dropdown;
+* anteprima dinamica;
+* pulsante applica;
+* pulsante scollega.
+
+L'associazione deve persistere dopo il salvataggio.
+
+Non devono essere reintrodotti sistemi basati su elenchi completi di miniature.
+
+---
+
+6. PROTEZIONE DATI LOCALI
+
+Il file .gitignore deve escludere:
+
+```
+instance/
+*.db
+__pycache__/
+*.pyc
+```
+
+---
+
+## REGOLE PER LE FUTURE AI IN CHAT
+
+1. Fornire SEMPRE file completi.
+
+Mai fornire:
+
+* patch parziali;
+* placeholder;
+* sezioni omesse.
+
+---
+
+2. Mantenere sempre la firma:
+
+   Architettato e sviluppato da Tiziano Cassone
+
+nel footer amministrativo.
+
+---
+
+3. Non inserire query pesanti dentro:
+
+   @app.context_processor
+
+Le query devono essere eseguite esclusivamente:
+
+* nelle rotte;
+* nei blueprint;
+* nei servizi dedicati.
+
+---
+
+4. Prima di modificare la gestione immagini verificare sempre:
+
+* modello Recipe;
+* modello MasterImage;
+* routes/admin.py;
+* recipe_form.html;
+
+poiché la selezione immagini è ora basata sul collegamento:
+
+```
+Recipe.image_id
+```
+
+e non più sul solo campo:
+
+```
+Recipe.image
+```
+
+---
+
+## FINE CONTESTO
