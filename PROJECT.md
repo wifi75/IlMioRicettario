@@ -1,9 +1,11 @@
-# PROGETTO: Il Mio Ricettario (V1 - Milestone v1.2.0)
+### 📝 2. `PROJECT.md`
+```markdown
+# PROGETTO: Il Mio Ricettario (V2 - Milestone v2.1.0)
 
 ## PANORAMICA
 * **Nome:** Il Mio Ricettario
-* **Versione:** V1 (In sviluppo attivo)
-* **Milestone Corrente:** v1.2.0 - Integrazione Forza (W) Farine, Anagrafica Teglie, Theming Estetico e Sicurezza completati.
+* **Versione:** V2 (In sviluppo attivo - Interfaccia Pubblica Consolidata)
+* **Milestone Corrente:** v2.1.0 - Revisione dell'allineamento dei temi pubblici, leggibilità ad alto contrasto, centratura assoluta dei badge con Flexbox e rotta Wiki sicura completati.
 * **Repository GitHub:** https://github.com/wifi75/IlMioRicettario
 
 ---
@@ -14,9 +16,9 @@ Il Mio Ricettario è una piattaforma web professionale per la gestione di ricett
 ---
 
 ## STACK TECNOLOGICO
-* **Backend:** Python 3 + Flask (Flask-SQLAlchemy, Flask-Login)
+* **Backend:** Python 3.13 + Flask (Flask-SQLAlchemy, Flask-Login)
 * **Database:** SQLite
-* **Frontend:** Bootstrap 5, Bootstrap Icons, HTML5, CSS3, JavaScript (Vanilla)
+* **Frontend:** Bootstrap 5.3, Bootstrap Icons, HTML5, CSS3, JavaScript (Vanilla)
 * **Editor di Testo:** Quill.js v1.3.6 (Editor WYSIWYG integrato nei form)
 * **Motore di Template:** Jinja2
 
@@ -30,6 +32,7 @@ Ogni ricetta può abilitare o disabilitare funzionalità specifiche (Features) t
 3. **Modulo Lievito & Conversioni:** Scelta dell'agente lievitante (Fresco, Secco Caputo, o Madre). La proporzione di conversione (Ratio) è definita globalmente nelle impostazioni.
 4. **Modulo Tangzhong (Water Roux):** Sottrae automaticamente una percentuale di farina e un moltiplicatore di liquido dall'impasto principale per isolarli in una sezione dedicata (i coefficienti sono modificabili globalmente).
 5. **Moduli Avanzati (Pre-impasti):** Gestione e calcolo automatizzato di Poolish (100% idro) e Biga (44% idro).
+6. **Modulo Enciclopedico Wiki:** Nuova sezione espositiva pubblica front-end integrata per visualizzare manuali d'uso d'arte bianca in maniera elegante e flessibile.
 
 ---
 
@@ -42,15 +45,15 @@ Ogni ricetta può abilitare o disabilitare funzionalità specifiche (Features) t
 * `RecipeFeature`: Flag booleani per abilitare/disabilitare i singoli motori di calcolo sulla ricetta.
 * `RecipeParameter`: Parametri di configurazione locali della ricetta (es. peso panetto impostato).
 * `Setting`: Configurazione globale dei parametri del sito (rapporto lieviti, parametri tangzhong, `site_name`, `site_description`, `theme_active`).
-* `WikiArticle`: Articoli enciclopedici della sezione Wiki (CRUD completo).
+* `wiki`: Classe di modello (definita in `models/wiki.py` interamente in minuscolo) per gli articoli enciclopedici della sezione Wiki gestiti tramite CRUD amministrativo.
 
 ---
 
 ## REGOLE DI SVILUPPO (TASSATIVE)
 1. **File Completi:** Fornire sempre codici interi pronti al copia-incolla per evitare frammentazioni o omissioni. No patch parziali o commenti placeholder.
-2. **Nessun Loop nel Database:** Non appesantire il Context Processor globale (`@app.context_processor`) con query dinamiche o pesanti. Passare i dati esplicitamente tramite i Blueprint.
+2. **Nessun Loop nel Database:** Non appesantire il Context Processor globale (`@app.context_processor`) con query dinamiche o pesanti. Passare i dati esplicitamente tramite i Blueprint o renderizzarli direttamente a livello di rotta.
 3. **Isolamento Condizionale:** Mantenere i tag condizionali di Jinja (`{% if %}`) strutturalmente solidi e bilanciati per non interrompere il rendering dell'HTML (`base.html`).
-4. **Mobile First & UI:** Layout pulito, responsive con classi native di Bootstrap 5. Interfaccia scura per la sidebar admin e card bianche minimaliste su sfondo slate leggero per i contenuti.
+4. **Mobile First & UI:** Layout pulito, responsive con classi native di Bootstrap 5. Interfaccia scura per la sidebar admin e card bianche minimaliste su sfondo slate leggero `#f8fafc` per i contenuti.
 
 ---
 
@@ -58,15 +61,4 @@ Ogni ricetta può abilitare o disabilitare funzionalità specifiche (Features) t
 1. **Integrazione Quill.js:** Al submit dei form di creazione/modifica ricetta, un listener JavaScript cattura il testo lineare (`quill.getText().trim()`) e lo inietta in un input hidden `name="instructions"`.
 2. **Parsing Istruzioni Frontend:** Nel rendering del dettaglio ricetta, il testo delle istruzioni viene elaborato dinamicamente via Jinja2 (`.split('\n')`), generando un elenco numerato progressivo automatico e formattando in grassetto (`<strong>`) la prima parola di ogni riga.
 3. **Gestione della Forza (W) delle Farine:** Il valore della forza viene censito centralmente. Nel form della ricetta, JavaScript preleva il W dal `<datalist>` e lo inserisce in un array nascosto `ing_w[]`. Python lo intercetta nel POST e lo storicizza in `RecipeIngredient`. Sul frontend, il badge `W` appare visivamente SOLO se l'ingrediente ha il flag `is_flour` attivo.
-
----
-
-## STATO ATTUALE (COMPLETATO & COLLAUDATO SU GIT)
-* **Autenticazione & Sicurezza:** Login/Logout funzionante con account di fabbrica automatico (`admin`/`admin123`). Schermata "Sicurezza Account" attiva per hash sicuro.
-* **Layout Base Consolidato:** Tasto di navigazione admin spostato logicamente nel footer sul sito pubblico.
-* **Anagrafica Centralizzata Ingredienti:** Tabella `MasterIngredient` attiva. Form interbloccato JS (impedisce flag farina e liquido contemporanei).
-* **Forza delle Farine (W):** Sincronizzazione perfetta del parametro W dal DB centrale alla ricetta locale. UI pulita (nessun badge "—" per sale, acqua, ecc.).
-* **Flotta Teglie:** Creata anagrafica globale `MasterBakeryPan` e sistema di assegnazione multipla sulle ricette. Interfaccia calcolatore frontend ottimizzata con tasti +/- puliti.
-* **Core Calcoli:** Calcolo dinamico in tempo reale di farine, liquidi e idratazione reale.
-* **Personalizzazione Globale:** Implementato il salvataggio dei testi istituzionali e dei temi estetici CSS direttamente nel database `Setting`.
-* **Git & Backup:** Working tree pulito, cartella `instance/`, file `.db` e cache Python esclusi in sicurezza tramite `.gitignore`.
+4. **Isolamento della Rotta Wiki Pubblica:** Per prevenire conflitti strutturali derivanti da nomenclature instabili del database (es. classe `wiki` minuscola o assenza di record), il manuale tecnico d'uso è pre-iniettato a livello di dizionario Python in `routes/recipes.py` e mandato in pasto in modo sicuro a `wiki_public.html`.

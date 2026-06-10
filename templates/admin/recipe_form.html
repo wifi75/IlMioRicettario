@@ -4,7 +4,6 @@
 {% block page_title %}{% if recipe %}Modifica Formula: {{ recipe.name }}{% else %}Inserimento Nuova Formula Bilanciata{% endif %}{% endblock %}
 
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-<link href="{{ url_for('static', filename='admin/css/cropper.min.css') }}" rel="stylesheet">
 
 <style>
     .ql-editor { min-height: 200px; font-size: 16px; color: #334155; background-color: #ffffff; }
@@ -19,22 +18,6 @@
     .gallery-img-wrapper.selected { border-color: #2e7d32; box-shadow: 0 0 0 4px rgba(46, 125, 50, 0.2); }
     .gallery-img-thumbnail { width: 100%; height: 100px; object-fit: cover; background-color: #f1f5f9; }
     .gallery-img-delete-btn { position: absolute; top: 4px; right: 4px; z-index: 10; padding: 2px 6px; border-radius: 6px; font-size: 11px; }
-
-    /* ✂️ AREA DI ANTEPRIMA LIMITATA AL 50% RIGIDO PER IL RITAGLIO */
-    .cropper-preview-wrapper {
-        width: 50% !important; 
-        height: 250px !important; 
-        background-color: #f8fafc;
-        border: 2px dashed #cbd5e1;
-        border-radius: 8px;
-        overflow: hidden;
-        display: block;
-        position: relative;
-    }
-    .cropper-preview-wrapper img {
-        max-width: 100% !important;
-        height: auto !important;
-    }
 </style>
 
 {% block content %}
@@ -58,6 +41,7 @@
 
 <form method="post" id="main-recipe-form" enctype="multipart/form-data">
 
+    <!-- 1. ANAGRAFICA FORMULA -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header header-anagrafica fw-bold py-3">
             📝 Scheda Anagrafica ed Identificativi Formula
@@ -103,41 +87,44 @@
         </div>
     </div>
 
+    <!-- 📸 PANNELLO MULTIMEDIALE PULITO E SEMPLIFICATO -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header header-configurazione fw-bold py-3">
-            📸 Gestore File Multimediali ed Editor di Ritaglio Integrato
+            📸 Gestore Allegati Fotografici e Libreria Multimediale
         </div>
         <div class="card-body p-4">
             <div class="row g-4">
                 <div class="col-md-6 border-end">
-                    <label class="form-label fw-bold small text-muted text-uppercase d-block mb-1">Carica o trascina una foto</label>
-                    <input type="file" name="recipe_image_file" id="recipe-image-file" class="form-control form-control-sm mb-1" accept=".png, .jpg, .jpeg">
+                    <label class="form-label fw-bold small text-muted text-uppercase d-block mb-1">Seleziona o trascina una nuova foto</label>
+                    <input type="file" name="recipe_image_file" id="recipe-image-file" class="form-control form-control-sm mb-2" accept=".png, .jpg, .jpeg">
                     
                     <div class="form-text text-muted mb-3 lh-sm" style="font-size: 11.5px;">
                         <i class="bi bi-info-circle-fill text-warning me-1"></i> 
-                        Supportati: <strong>.PNG, .JPG, .JPEG</strong>. Peso max: <strong>2 MB</strong>.<br>
-                        <span class="text-success fw-bold"><i class="bi bi-scissors"></i> Trascina i bordi della griglia per ritagliare la foto.</span>
+                        Formati supportati: <strong>.PNG, .JPG, .JPEG</strong>.<br>
+                        Dimensione massima consentita dal server: <strong class="text-danger">2 MB</strong>.<br>
+                        Risoluzione consigliata per il sito: <strong>800 x 600 pixel</strong>.
                     </div>
 
-                    <div id="cropper-container-block" class="mb-3 d-none">
-                        <small class="text-secondary fw-bold d-block mb-1">Inquadra la porzione da ritagliare:</small>
-                        <div class="cropper-preview-wrapper">
-                            <img id="cropper-target-image" src="">
-                        </div>
+                    <!-- 🛠️ NUOVO TASTO MECCANICO PER IL SALVATAGGIO RAPIDO DELLA FOTO ALLEGATA -->
+                    <div class="mb-4">
+                        <button type="button" class="btn btn-sm btn-outline-success fw-bold px-3 shadow-sm" id="btn-save-image-only">
+                            📁 Carica e Associa Foto Subito
+                        </button>
                     </div>
                     
                     {% if recipe and recipe.image %}
-                    <div id="current-image-preview-block" class="p-3 bg-light rounded border text-center" style="max-width: 50%;">
-                        <small class="text-muted d-block fw-bold mb-2">Immagine Attualmente Collegata:</small>
-                        <img src="/static/uploads/recipes/{{ recipe.image }}" class="img-fluid rounded mb-2 border shadow-sm" style="max-height: 120px; object-fit: cover;">
+                    <div id="current-image-preview-block" class="p-3 bg-light rounded border text-center" style="max-width: 70%;">
+                        <small class="text-muted d-block fw-bold mb-2">Immagine Attualmente Collegata alla Ricetta:</small>
+                        <img src="/static/uploads/recipes/{{ recipe.image }}" class="img-fluid rounded mb-2 border shadow-sm" style="max-height: 140px; object-fit: cover;">
                         <button type="button" class="btn btn-sm btn-outline-danger w-100 d-block fw-bold" id="btn-clear-current-image">
-                            <i class="bi bi-x-circle me-1"></i> Scollega Foto dalla Ricetta
+                            <i class="bi bi-x-circle me-1"></i> Scollega Foto della Ricetta
                         </button>
                     </div>
                     {% endif %}
                     
                     <input type="hidden" name="clear_current_image_flag" id="clear_current_image_flag" value="false">
                     <input type="hidden" name="selected_existing_image" id="selected_existing_image" value="">
+                    <!-- Mantenuto campo nascosto per retrocompatibilità del server ma svuotato da logiche cropper -->
                     <input type="hidden" name="cropped_image_base64" id="cropped_image_base64" value="">
                 </div>
                 
@@ -149,16 +136,17 @@
                     <div class="form-text text-muted mb-2 lh-sm" style="font-size: 11.5px;">
                         <i class="bi bi-hand-index-thumb text-success me-1"></i> 
                         Fai <strong>click su una miniatura</strong> per associarla istantaneamente a questa formula.<br>
-                        Usa il <strong class="text-danger">cestino rosso</strong> su un'immagine per **eliminarla fisicamente dal server**.
+                        Usa il <strong class="text-danger">cestino rosso</strong> su un'immagine per **eliminarla definitivamente dal server**.
                     </div>
                     
-                    <div class="row row-cols-3 g-2 overflow-y-auto" id="gallery-images-container" style="max-height: 250px;">
+                    <div class="row row-cols-3 g-2 overflow-y-auto" id="gallery-images-container" style="max-height: 280px;">
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- 2. BILANCIAMENTO INGREDIENTI -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header header-ingredienti fw-bold py-3 d-flex justify-content-between align-items-center">
             <span>📋 Bilanciamento Ingredienti Base (Su 100% Farina)</span>
@@ -258,6 +246,7 @@
         </div>
     </div>
 
+    <!-- 3. FLOTTA TEGLIE -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header header-teglie fw-bold py-3">
             📐 Flotta Teglie e Stampi Abilitati per questa Ricetta
@@ -286,6 +275,7 @@
         </div>
     </div>
 
+    <!-- 4. CONFIGURAZIONE TECNICA -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header header-configurazione fw-bold py-3">
             🎛️ Parametri di Configurazione Tecnica e Feature Toggles
@@ -359,6 +349,7 @@
         </div>
     </div>
 
+    <!-- 5. PARAMETRI FISICI -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header header-parametri fw-bold py-3">
             🎛️ Parametri Fisici e Tempi di Processo Forzati
@@ -414,6 +405,7 @@
         </div>
     </div>
 
+    <!-- 6. PROCEDIMENTO COMPLETO -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header header-procedimento text-white fw-bold py-3">
             📝 Istruzioni di Impasto e Procedimento Completo
@@ -438,18 +430,15 @@
 </form>
 
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-<script src="{{ url_for('static', filename='admin/js/cropper.min.js') }}"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     
     // ==========================================================
-    // LOGICA DI CONTROLLO INTERATTIVO RITAGLIO FOTO (CROPPER.JS)
+    // LOGICA DI CONTROLLO ALLEGATI E GALLERIA MULTIMEDIALE
     // ==========================================================
     const imageFileInput = document.getElementById('recipe-image-file');
-    const cropperContainerBlock = document.getElementById('cropper-container-block');
-    const cropperTargetImage = document.getElementById('cropper-target-image');
-    const hiddenBase64Field = document.getElementById('cropped_image_base64');
+    const btnSaveImageOnly = document.getElementById('btn-save-image-only');
     
     const galleryContainer = document.getElementById('gallery-images-container');
     const hiddenSelectedImage = document.getElementById('selected_existing_image');
@@ -457,54 +446,41 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnClearCurrent = document.getElementById('btn-clear-current-image');
     const currentPreviewBlock = document.getElementById('current-image-preview-block');
     
-    let activeCropperInstance = null;
     const activeRecipeImage = "{{ recipe.image if recipe and recipe.image else '' }}";
 
+    // 🔒 CONTROLLO DI SICUREZZA PREVENTIVO SUL FILE (DIMENSIONI E FORMATO)
     if (imageFileInput) {
         imageFileInput.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
 
+            // Validazione peso massimo 2 Megabyte
+            if (file.size > 2 * 1024 * 1024) {
+                alert("Attenzione! Questo file supera la dimensione massima di 2 MB.\nScegli un'immagine più leggera o rimpiccioliscila.");
+                this.value = "";
+                return;
+            }
+
+            // Azzera la selezione della libreria multimediale se l'utente sceglie un nuovo file locale
             document.querySelectorAll('.gallery-img-wrapper').forEach(w => w.classList.remove('selected'));
             hiddenSelectedImage.value = "";
             hiddenClearFlag.value = "false";
-
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                if (activeCropperInstance) {
-                    activeCropperInstance.destroy();
-                }
-
-                cropperTargetImage.src = event.target.result;
-                cropperContainerBlock.classList.remove('d-none');
-
-                // Inizializzazione pulita e forzata localmente
-                activeCropperInstance = new Cropper(cropperTargetImage, {
-                    aspectRatio: 4 / 3,
-                    viewMode: 1,        
-                    autoCropArea: 0.8,  
-                    background: true,   
-                    responsive: true,
-                    restore: false
-                });
-            };
-            reader.readAsDataURL(file);
         });
     }
 
-    var recipeForm = document.getElementById('main-recipe-form');
-    recipeForm.addEventListener('submit', function(e) {
-        document.getElementById('hidden-instructions-field').value = quillGeneral.getText().trim();
-        document.getElementById('hidden-preferment-field').value = quillPreferment.root.innerHTML.trim();
-
-        if (activeCropperInstance) {
-            const canvas = activeCropperInstance.getClippedCanvas({
-                width: 800,
-                height: 600
-            });
-            hiddenBase64Field.value = canvas.toDataURL('image/png');
-        }
-    });
+    // 📁 LOGICA DEL TASTO DEDICATO "SALVA FOTO"
+    if (btnSaveImageOnly) {
+        btnSaveImageOnly.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (!imageFileInput || imageFileInput.files.length === 0) {
+                alert("Per caricare una nuova foto devi prima selezionare un file dal computer usando il tasto 'Scegli file'.");
+                return;
+            }
+            
+            // Forza il salvataggio immediato inviando i dati del modulo corrente
+            document.getElementById('main-recipe-form').submit();
+        });
+    }
 
     function loadGalleryImages() {
         if (!galleryContainer) return;
@@ -547,14 +523,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         hiddenClearFlag.value = "false";
                         
                         if (imageFileInput) imageFileInput.value = "";
-                        cropperContainerBlock.classList.add('d-none');
-                        if (activeCropperInstance) {
-                            activeCropperInstance.destroy();
-                            activeCropperInstance = null;
-                        }
                     });
                 });
 
+                // 🗑️ RIMOZIONE FISICA DELLA FOTO DALLA LISTA MULTIMEDIALE
                 document.querySelectorAll('.gallery-img-delete-btn').forEach(btn => {
                     btn.addEventListener('click', function(e) {
                         e.stopPropagation();
@@ -572,7 +544,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                             currentPreviewBlock.remove();
                                         }
                                     } else {
-                                        alert("Errore: " + data.message);
+                                        alert("Errore nell'eliminazione: " + data.message);
                                     }
                                 });
                         }

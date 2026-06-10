@@ -41,7 +41,7 @@ admin_bp = Blueprint(
 )
 
 # =========================================================================
-# 📸 CONFIGURAZIONE MULTIMEDIALE AVANZATA (CON EDITOR DI RITAGLIO INTEGRATO)
+# 📸 CONFIGURAZIONE MULTIMEDIALE STANDARD (SEMPLIFICATA E CORAZZATA)
 # =========================================================================
 UPLOAD_FOLDER = os.path.join('static', 'uploads', 'recipes')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
@@ -50,37 +50,40 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def handle_image_assignment(recipe_slug):
-    """Gestore unico professionale che riceve e decodifica l'immagine ritagliata dall'editor"""
+    """Gestore unico professionale che riceve i file standard e amministra la libreria"""
     
     # 1. Intercettamento immediato dello scollegamento da interfaccia (Tasto X)
     if request.form.get("clear_current_image_flag") == "true":
         return None
 
-    # 2. Controllo se arriva un'immagine ritagliata via JavaScript (Stringa Base64)
-    cropped_base64 = request.form.get("cropped_image_base64", "").strip()
-    if cropped_base64 and "," in cropped_base64:
-        try:
-            os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-            # Separiamo l'intestazione MIME-type dai dati binari reali criptati della foto
-            header, base64_data = cropped_base64.split(",", 1)
-            image_binary_data = base64.b64decode(base64_data)
-            
-            # Salviamo il ritaglio controllato in formato nativo .png stabile ad alta definizione
-            filename = f"recipe_{recipe_slug}_{int(datetime.utcnow().timestamp())}.png"
-            secure_name = secure_filename(filename)
-            file_path = os.path.join(UPLOAD_FOLDER, secure_name)
-            
-            with open(file_path, "wb") as f:
-                f.write(image_binary_data)
-                
-            return secure_name
-        except Exception as e:
-            print(f"[-] Errore critico durante la decodifica del ritaglio foto: {e}")
-
-    # 3. Se non c'è un ritaglio fresco, controlla se l'utente ha scelto una foto esistente dalla galleria
+    # 2. Controllo se l'utente ha scelto una foto esistente cliccando sulla galleria interna
     selected_existing = request.form.get("selected_existing_image", "").strip()
     if selected_existing:
         return selected_existing
+
+    # 3. Controllo se arriva un nuovo file standard caricato dal computer
+    if 'recipe_image_file' in request.files:
+        file = request.files['recipe_image_file']
+        if file and file.filename != '':
+            if allowed_file(file.filename):
+                try:
+                    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+                    
+                    # Estraiamo l'estensione nativa originale del file (.jpg, .png, ecc.)
+                    ext = file.filename.rsplit('.', 1)[1].lower()
+                    
+                    # Rinominiamo il file in modo pulito e sicuro per il server Linux
+                    filename = f"recipe_{recipe_slug}_{int(datetime.utcnow().timestamp())}.{ext}"
+                    secure_name = secure_filename(filename)
+                    file_path = os.path.join(UPLOAD_FOLDER, secure_name)
+                    
+                    # Salviamo il file reale sul disco fisso del server
+                    file.save(file_path)
+                    return secure_name
+                except Exception as e:
+                    print(f"[-] Errore critico durante il salvataggio del file immagine: {e}")
+            else:
+                print("[-] Formato file non consentito o estensione non valida.")
 
     # Ritorna questo flag speciale se l'utente non ha apportato modifiche al reparto multimediale
     return "__KEEP_OLD__"
