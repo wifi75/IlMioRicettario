@@ -14,9 +14,14 @@ class MasterImage(db.Model):
     caption = db.Column(db.String(255), nullable=True)
     alt_text = db.Column(db.String(255), nullable=True)
     upload_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    
+
     # Relazione con Recipe (One-to-Many: una immagine può essere usata da molte ricette)
-    recipes = db.relationship('Recipe', backref='featured_image_obj', lazy=True, foreign_keys='Recipe.image_id')
+    recipes = db.relationship(
+        'Recipe',
+        backref='featured_image_obj',
+        lazy=True,
+        foreign_keys='Recipe.image_id'
+    )
 
     def __repr__(self):
         return f"<MasterImage {self.id}: {self.filename}>"

@@ -21,6 +21,8 @@ from models.parameter import RecipeParameter
 from models.ingredient_master import MasterIngredient
 # IMPORTAZIONE NUOVO MODELLO DELLE TEGLIE MASTER
 from models.bakery_pan import MasterBakeryPan
+# IMPORTAZIONE NUOVO MODELLO IMMAGINI MASTER
+from models.image import MasterImage
 
 from routes.recipes import recipes_bp
 # BLINDATO: Forza il caricamento del Blueprint corretto per evitare conflitti di sotto-cartelle
@@ -104,6 +106,16 @@ with app.app_context():
         db.session.rollback()
 
     # =========================================================================
+    # BLINDATURA NUOVA: Aggiungi colonna image_id a recipes (FK a MasterImage)
+    # =========================================================================
+    try:
+        db.session.execute(db.text("ALTER TABLE recipes ADD COLUMN image_id INTEGER"))
+        db.session.commit()
+        print("Allineamento Database: colonna 'image_id' aggiunta a recipes!")
+    except Exception:
+        db.session.rollback()
+
+    # =========================================================================
     # DA QUI IN POI LE QUERY POSSONO GIRARE IN TOTALE SICUREZZA
     # =========================================================================
     admin = User.query.filter_by(
@@ -165,7 +177,7 @@ with app.app_context():
             tangzhong_flour_percent=5.0,
             tangzhong_liquid_multiplier=5.0,
             site_name="Il Mio Ricettario",
-            site_description="Esplora le nostre antiche formule bilanciate professionali. Utilizza i motori di calcolo integrati ad alta precisione per ridimensionare istantaneamente ogni impasto.",
+            site_description="Esplora le nostre antiche formule bilanciate professionali. Utilizza i motori di calcolo integrati ad alta precisione per ridimensionare istantaneamente ogni impasto[...]",
             default_unit="g",
             allow_public_recipes=True,
             theme_active="modern"
@@ -175,7 +187,7 @@ with app.app_context():
     else:
         try:
             db.session.execute(db.text("UPDATE settings SET theme_active = 'modern' WHERE theme_active IS NULL"))
-            db.session.execute(db.text("UPDATE settings SET site_description = 'Esplora le nostre antiche formule bilanciate professionali. Utilizza i motori di calcolo integrati ad alta precisione per ridimensionare istantaneamente ogni impasto.' WHERE site_description IS NULL"))
+            db.session.execute(db.text("UPDATE settings SET site_description = 'Esplora le nostre antiche formule bilanciate professionali. Utilizza i motori di calcolo integrati ad alta precisio[...]' WHERE site_description IS NULL"))
             db.session.commit()
         except Exception:
             db.session.rollback()

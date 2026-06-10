@@ -58,6 +58,70 @@
             font-size: 11px !important;
         }
 
+        /* 🔒 FIX TOTALE SLIDER IDRATAZIONE (image_d33856.png): Forza la barra visibile ad alto contrasto su tutti i temi */
+        input[type="range"] {
+            -webkit-appearance: none !important;
+            appearance: none !important;
+            background: transparent !important;
+            width: 100% !important;
+        }
+
+        /* Sfondo della barra (track) per Chrome, Edge, Safari e Opera */
+        input[type="range"]::-webkit-slider-runnable-track {
+            width: 100% !important;
+            height: 8px !important;
+            background: #cbd5e1 !important; /* Grigio medio visibilissimo su fondi chiari/crema */
+            border-radius: 4px !important;
+            border: 1px solid rgba(0, 0, 0, 0.05) !important;
+        }
+
+        /* Sfondo della barra (track) per Firefox */
+        input[type="range"]::-moz-range-track {
+            width: 100% !important;
+            height: 8px !important;
+            background: #cbd5e1 !important;
+            border-radius: 4px !important;
+            border: 1px solid rgba(0, 0, 0, 0.05) !important;
+        }
+
+        /* Pulsante di scorrimento (thumb) per Chrome, Edge, Safari e Opera */
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none !important;
+            appearance: none !important;
+            margin-top: -5px !important; /* Allinea il cursore in altezza rispetto alla barra */
+            background-color: #0d6efd !important; /* Colore blu di sistema */
+            border-radius: 50% !important;
+            height: 18px !important;
+            width: 18px !important;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15) !important;
+            cursor: pointer !important;
+        }
+
+        /* Pulsante di scorrimento (thumb) per Firefox */
+        input[type="range"]::-moz-range-thumb {
+            border: none !important;
+            background-color: #0d6efd !important;
+            border-radius: 50% !important;
+            height: 18px !important;
+            width: 18px !important;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15) !important;
+            cursor: pointer !important;
+        }
+
+        /* Adattamento cromatico specifico per lo slider nel Tema Scuro (Pizzeria Industriale) */
+        body.pizzeria_industriale input[type="range"]::-webkit-slider-runnable-track {
+            background: #4b5563 !important; /* Grigio scuro per emergere sullo sfondo scuro dell'app */
+        }
+        body.pizzeria_industriale input[type="range"]::-moz-range-track {
+            background: #4b5563 !important;
+        }
+        body.pizzeria_industriale input[type="range"]::-webkit-slider-thumb {
+            background-color: #e67e22 !important; /* Pallino arancione abbinato al tema dark */
+        }
+        body.pizzeria_industriale input[type="range"]::-moz-range-thumb {
+            background-color: #e67e22 !important;
+        }
+
         /* 2. ANTICA PANETTERIA */
         body.antica_panetteria { color: #2B2621 !important; font-family: 'Georgia', serif !important; }
         body.antica_panetteria .card, body.antica_panetteria .card-body { background-color: #FCFAF7 !important; border-color: #E1D4BB !important; border-radius: 12px !important; color: #2B2621 !important; box-shadow: 0 4px 15px rgba(0,0,0,0.03) !important; }
@@ -125,11 +189,6 @@
         body.pizzeria_industriale span[style*="background-color:#212529"] {
             background-color: #3f444e !important;
             color: #fff !important;
-        }
-        body.pizzeria_industriale span[style*="background-color"][style*="color"] {
-            background-color: #e67e22 !important;
-            color: #22252A !important;
-            border: none !important;
         }
 
         .hover-sidebar { transition: all 0.2s ease-in-out; }
