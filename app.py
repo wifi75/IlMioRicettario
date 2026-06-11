@@ -191,7 +191,19 @@ with app.app_context():
             db.session.commit()
         except Exception:
             db.session.rollback()
+    import os
 
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+
+for directory in [
+    "data",
+    "static/uploads",
+    "static/uploads/recipes"
+]:
+    os.makedirs(
+        os.path.join(BASE_DIR, directory),
+        exist_ok=True
+    )
 
 if __name__ == "__main__":
     app.run(debug=True, port=8080)

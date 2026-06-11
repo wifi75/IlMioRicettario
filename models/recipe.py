@@ -178,9 +178,10 @@ class Recipe(db.Model):
     )
 
     featured_image = db.relationship(
-        "MasterImage",
-        foreign_keys=[image_id],
-        lazy="joined"
+    "MasterImage",
+    foreign_keys=[image_id],
+    lazy="joined",
+    back_populates="recipes"
     )
 
     pans = db.relationship(

@@ -40,10 +40,9 @@ class MasterImage(db.Model):
     # Relazione con Recipe (One-to-Many)
     recipes = db.relationship(
         "Recipe",
-        backref="featured_image_obj",
+        back_populates="featured_image",
         lazy=True,
-        foreign_keys="Recipe.image_id",
-        overlaps="featured_image"
+        foreign_keys="Recipe.image_id"
     )
 
     def __repr__(self):

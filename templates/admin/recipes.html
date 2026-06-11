@@ -10,9 +10,7 @@ Ricette
 
 <div class="d-flex justify-content-between align-items-center mb-4">
 
-```
 <div>
-
     <h1 class="fw-bold mb-0">
         Ricette
     </h1>
@@ -20,16 +18,12 @@ Ricette
     <small class="text-muted">
         Gestione ricette
     </small>
-
 </div>
 
 <a href="/admin/recipes/new"
    class="btn btn-success btn-lg">
-
     ➕ Nuova Ricetta
-
 </a>
-```
 
 </div>
 
@@ -37,53 +31,43 @@ Ricette
 
 <div class="row">
 
-```
 {% for recipe in recipes %}
 
-<div class="col-xl-3 col-lg-4">
+<div class="col-xl-3 col-lg-4 mb-4">
 
-    <div class="card recipe-card">
+    <div class="card recipe-card h-100">
 
         <div class="card-body">
 
-            <div>
+            <div class="mb-2">
 
-                <div class="mb-2">
+                <span class="badge bg-primary">
+                    ID {{ recipe.id }}
+                </span>
 
-                    <span class="badge bg-primary">
-                        ID {{ recipe.id }}
-                    </span>
-
-                    {% if recipe.is_published %}
-
-                    <span class="badge bg-success">
-                        Pubblicata
-                    </span>
-
-                    {% else %}
-
-                    <span class="badge bg-secondary">
-                        Bozza
-                    </span>
-
-                    {% endif %}
-
-                </div>
-
-                <h4 class="mb-1">
-                    {{ recipe.name }}
-                </h4>
-
-                <div class="text-muted mb-2">
-                    {{ recipe.slug }}
-                </div>
-
-                <small class="text-muted">
-                    {{ recipe.ingredient_count() }}
-                    ingredienti
-                </small>
+                {% if recipe.is_published %}
+                <span class="badge bg-success">
+                    Pubblicata
+                </span>
+                {% else %}
+                <span class="badge bg-secondary">
+                    Bozza
+                </span>
+                {% endif %}
 
             </div>
+
+            <h4 class="mb-1">
+                {{ recipe.name }}
+            </h4>
+
+            <div class="text-muted mb-2">
+                {{ recipe.slug }}
+            </div>
+
+            <small class="text-muted">
+                {{ recipe.ingredient_count() }} ingredienti
+            </small>
 
             <div class="mt-3">
 
@@ -107,7 +91,6 @@ Ricette
 </div>
 
 {% endfor %}
-```
 
 </div>
 
@@ -115,7 +98,6 @@ Ricette
 
 <div class="card recipe-card">
 
-```
 <div class="card-body text-center p-5">
 
     <h3>
@@ -128,13 +110,10 @@ Ricette
 
     <a href="/admin/recipes/new"
        class="btn btn-success">
-
         ➕ Crea Ricetta
-
     </a>
 
 </div>
-```
 
 </div>
 

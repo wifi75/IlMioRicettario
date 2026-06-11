@@ -49,15 +49,18 @@
                 <div class="card shadow-sm rounded-4 card-recipe-hover border transition-all w-100" style="max-width: 340px; height: 330px !important; background-color: #ffffff !important; background: #ffffff !important;">
                     
                     <div class="recipe-card-banner-wrapper" style="background-color: #ffffff !important; background: #ffffff !important;">
-                        {% if recipe.image %}
-                            <img src="/static/uploads/recipes/{{ recipe.image }}" class="recipe-card-main-img" alt="{{ recipe.name }}" style="background-color: #ffffff !important; background: #ffffff !important;">
-                        {% else %}
-                            <div class="recipe-card-fallback-box" style="background-color: #ffffff !important; background: #ffffff !important;">
-                                <div class="rounded-circle d-flex align-items-center justify-content-center border border-2 shadow-sm" style="width: 75px; height: 75px; background-color: #ffffff !important; border-color: rgba(0,0,0,0.06) !important;">
-                                    <i class="bi {{ recipe.icon or 'bi-journal-text' }}" style="font-size: 32px; color: #4a3321;"></i>
-                                </div>
-                            </div>
-                        {% endif %}
+                        {% if recipe.featured_image %}
+    <img src="/static/uploads/recipes/{{ recipe.featured_image.filename }}"
+         class="recipe-card-main-img"
+         alt="{{ recipe.name }}"
+         style="background-color: #ffffff !important; background: #ffffff !important;">
+{% else %}
+    <div class="recipe-card-fallback-box" style="background-color: #ffffff !important; background: #ffffff !important;">
+        <div class="rounded-circle d-flex align-items-center justify-content-center border border-2 shadow-sm" style="width: 75px; height: 75px; background-color: #ffffff !important; border-color: rgba(0,0,0,0.06) !important;">
+            <i class="bi {{ recipe.icon or 'bi-journal-text' }}" style="font-size: 32px; color: #4a3321;"></i>
+        </div>
+    </div>
+{% endif %}
                     </div>
 
                     <div class="card-body p-4 d-flex flex-column justify-content-between text-center pt-2" style="height: calc(100% - 140px) !important; background-color: #ffffff !important; background: #ffffff !important;">
