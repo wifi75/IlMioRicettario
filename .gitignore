@@ -4,10 +4,8 @@ __pycache__/
 *.pyo
 *.pyd
 
-# Database personale di Tiziano (Non caricare mai!)
-instance/
-*.db
-data/*.db
-
 # File di configurazione locale o segreti
 .env
+
+# Instance locale
+instance/
