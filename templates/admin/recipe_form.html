@@ -26,22 +26,22 @@
     }
     
     .image-preview-box {
-        border: 2px solid #cbd5e1;
-        border-radius: 12px;
-        padding: 1rem;
-        background-color: #f8fafc;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 280px;
-        transition: all 0.3s ease;
+    border: 2px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 0.5rem;
+    background-color: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 140px;
+    transition: all 0.3s ease;
     }
-    
+
     .image-preview-box img {
-        max-width: 100%;
-        max-height: 260px;
-        object-fit: contain;
-        mix-blend-mode: multiply;
+    max-width: 100%;
+    max-height: 120px;
+    object-fit: contain;
+    mix-blend-mode: multiply;
     }
     
     .image-preview-box.empty {
@@ -150,7 +150,7 @@
                 
                 <!-- SEZIONE SINISTRA: Caricamento locale -->
                 <div class="row g-4">
-                    <div class="col-12 col-lg-5">
+                    <div class="col-12 col-lg-4">
                         <label class="form-label fw-bold small text-muted text-uppercase d-block mb-2">
                             📤 Carica una Nuova Foto dal tuo PC
                         </label>
@@ -165,7 +165,7 @@
                     </div>
                     
                     <!-- SEZIONE DESTRA: Dropdown + Preview -->
-                    <div class="col-12 col-lg-7">
+                    <div class="col-12 col-lg-5">
                         <label class="form-label fw-bold small text-muted text-uppercase d-block mb-2">
                             🗂️ Oppure Scegli dalla Libreria Interna
                         </label>
@@ -312,8 +312,9 @@
         </div>
     </div>
 
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-header header-teglie fw-bold py-3">
+    <div class="card shadow-sm border-0 mb-4"
+     id="card-pans-selector">
+    <div class="card-header header-teglie fw-bold py-3">
             📐 Flotta Teglie e Stampi Abilitati per questa Ricetta
         </div>
         <div class="card-body p-4">
@@ -354,11 +355,33 @@
                     </div>
                 </div>
                 <div class="col-md-3 border-end">
-                    <label class="form-label small text-uppercase text-muted fw-bold mb-3">Geometria e Pezzature</label>
-                    <div class="form-check form-switch mb-2 shadow-none">
-                        <input class="form-check-input" type="checkbox" name="enable_piece_count" id="enable_piece_count" {% if feature and feature.enable_piece_count %}checked{% elif not feature %}checked{% endif %}>
-                        <label class="form-check-label small fw-bold text-dark" for="enable_piece_count">Abilita Input N. Pezzi / Peso</label>
-                    </div>
+                    <label class="form-label small text-uppercase text-muted fw-bold mb-3">
+    Geometria e Pezzature
+</label>
+
+<div class="form-check form-switch mb-2 shadow-none">
+    <input class="form-check-input"
+           type="checkbox"
+           name="enable_piece_count"
+           id="enable_piece_count"
+           {% if feature and feature.enable_piece_count %}checked{% elif not feature %}checked{% endif %}>
+    <label class="form-check-label small fw-bold text-dark"
+           for="enable_piece_count">
+        Abilita Input N. Pezzi / Peso
+    </label>
+</div>
+
+<div class="form-check form-switch mb-2 shadow-none">
+    <input class="form-check-input"
+           type="checkbox"
+           name="enable_pans"
+           id="enable_pans"
+           {% if feature and feature.enable_pans %}checked{% endif %}>
+    <label class="form-check-label small fw-bold text-dark"
+           for="enable_pans">
+        Abilita Calcolo Teglie e Stampi
+    </label>
+</div>
                 </div>
                 <div class="col-md-3 border-end">
                     <label class="form-label small text-uppercase text-muted fw-bold mb-3">Opzioni Calcolatore Scientifico</label>
@@ -547,13 +570,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
    
     function displayImagePreview(imgUrl, caption) {
-        imagePreviewDisplay.innerHTML = `
-            <div class="text-center">
-                <img src="${imgUrl}" alt="Preview immagine ricetta" style="max-width: 100%; max-height: 260px; object-fit: contain; mix-blend-mode: multiply;">
-                <div class="mt-2 small text-muted fw-semibold">${caption}</div>
-            </div>
-        `;
-        imagePreviewDisplay.classList.remove('empty');
+    imagePreviewDisplay.innerHTML = `
+        <div class="text-center">
+            <img src="${imgUrl}" alt="Preview immagine ricetta" style="max-width:100%; max-height:120px; object-fit:contain; mix-blend-mode:multiply;">
+            <div class="mt-1 small text-muted fw-semibold">${caption}</div>
+        </div>
+    `;
+    imagePreviewDisplay.classList.remove('empty');
     }
     
     function clearPreview() {
@@ -713,12 +736,34 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (wrapperYeastRatio) {
             wrapperYeastRatio.classList.add('d-none');
         }
+    const enablePans = document.getElementById('enable_pans');
+    const cardPans = document.getElementById('card-pans-selector');
+
+    function togglePansCard() {
+
+    if (!enablePans || !cardPans) {
+        return;
+    }
+
+    if (enablePans.checked) {
+        cardPans.classList.remove('d-none');
+    } else {
+        cardPans.classList.add('d-none');
+    }
+
     }
     if (checkYeastType) {
         checkYeastType.addEventListener('change', toggleYeastRatioVisibility);
         toggleYeastRatioVisibility();
     }
+    if (enablePans) {
+    enablePans.addEventListener(
+        'change',
+        togglePansCard
+    );
 
+    togglePansCard();
+    }
     const nameInput = document.getElementById('recipe-name');
     if (nameInput) {
         nameInput.addEventListener('input', function() {

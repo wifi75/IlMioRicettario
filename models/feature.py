@@ -27,6 +27,11 @@ class RecipeFeature(db.Model):
         default=False
     )
 
+    enable_pans = db.Column(
+        db.Boolean,
+        default=False
+    )
+
     enable_hydration = db.Column(
         db.Boolean,
         default=False

@@ -10,24 +10,26 @@ Ricette
 
 <div class="d-flex justify-content-between align-items-center mb-4">
 
-    <div>
+```
+<div>
 
-        <h1 class="fw-bold mb-0">
-            Ricette
-        </h1>
+    <h1 class="fw-bold mb-0">
+        Ricette
+    </h1>
 
-        <small class="text-muted">
-            Gestione ricette
-        </small>
+    <small class="text-muted">
+        Gestione ricette
+    </small>
 
-    </div>
+</div>
 
-    <a href="/admin/recipes/new"
-       class="btn btn-success btn-lg">
+<a href="/admin/recipes/new"
+   class="btn btn-success btn-lg">
 
-        ➕ Nuova Ricetta
+    ➕ Nuova Ricetta
 
-    </a>
+</a>
+```
 
 </div>
 
@@ -35,72 +37,66 @@ Ricette
 
 <div class="row">
 
-    {% for recipe in recipes %}
+```
+{% for recipe in recipes %}
 
-    <div class="col-xl-3 col-lg-4">
+<div class="col-xl-3 col-lg-4">
 
-        <div class="card recipe-card">
+    <div class="card recipe-card">
 
-            <div class="card-body">
+        <div class="card-body">
 
-                <div>
+            <div>
 
-                    <div class="mb-2">
+                <div class="mb-2">
 
-                        <span class="badge bg-primary">
-                            ID {{ recipe.id }}
-                        </span>
+                    <span class="badge bg-primary">
+                        ID {{ recipe.id }}
+                    </span>
 
-                        {% if recipe.is_published %}
+                    {% if recipe.is_published %}
 
-                        <span class="badge bg-success">
-                            Pubblicata
-                        </span>
+                    <span class="badge bg-success">
+                        Pubblicata
+                    </span>
 
-                        {% else %}
+                    {% else %}
 
-                        <span class="badge bg-secondary">
-                            Bozza
-                        </span>
+                    <span class="badge bg-secondary">
+                        Bozza
+                    </span>
 
-                        {% endif %}
-
-                    </div>
-
-                    <h4 class="mb-1">
-                        {{ recipe.name }}
-                    </h4>
-
-                    <div class="text-muted mb-2">
-                        {{ recipe.slug }}
-                    </div>
-
-                    <small class="text-muted">
-                        {{ recipe.ingredient_count() }}
-                        ingredienti
-                    </small>
+                    {% endif %}
 
                 </div>
 
-                <div class="mt-3">
+                <h4 class="mb-1">
+                    {{ recipe.name }}
+                </h4>
 
-                    <a href="/admin/recipe/{{ recipe.id }}"
-                       class="btn btn-primary btn-sm">
-                        Apri
-                    </a>
-
-                    <a href="/admin/recipe/edit/{{ recipe.id }}"
-                       class="btn btn-warning btn-sm">
-                        Modifica
-                    </a>
-
-                    <a href="/admin/recipes/delete/{{ recipe.id }}"
-                       class="btn btn-danger btn-sm"
-                       onclick="return confirm('Eliminare la ricetta?');">
-                        Elimina
-                    </a>
-
+                <div class="text-muted mb-2">
+                    {{ recipe.slug }}
                 </div>
+
+                <small class="text-muted">
+                    {{ recipe.ingredient_count() }}
+                    ingredienti
+                </small>
+
+            </div>
+
+            <div class="mt-3">
+
+                <a href="/admin/recipe/edit/{{ recipe.id }}"
+                   class="btn btn-warning btn-sm">
+                    Modifica
+                </a>
+
+                <a href="/admin/recipes/delete/{{ recipe.id }}"
+                   class="btn btn-danger btn-sm"
+                   onclick="return confirm('Eliminare la ricetta?');">
+                    Elimina
+                </a>
 
             </div>
 
@@ -108,7 +104,10 @@ Ricette
 
     </div>
 
-    {% endfor %}
+</div>
+
+{% endfor %}
+```
 
 </div>
 
@@ -116,24 +115,26 @@ Ricette
 
 <div class="card recipe-card">
 
-    <div class="card-body text-center p-5">
+```
+<div class="card-body text-center p-5">
 
-        <h3>
-            Nessuna ricetta presente
-        </h3>
+    <h3>
+        Nessuna ricetta presente
+    </h3>
 
-        <p class="text-muted">
-            Inizia creando la tua prima ricetta.
-        </p>
+    <p class="text-muted">
+        Inizia creando la tua prima ricetta.
+    </p>
 
-        <a href="/admin/recipes/new"
-           class="btn btn-success">
+    <a href="/admin/recipes/new"
+       class="btn btn-success">
 
-            ➕ Crea Ricetta
+        ➕ Crea Ricetta
 
-        </a>
+    </a>
 
-    </div>
+</div>
+```
 
 </div>
 

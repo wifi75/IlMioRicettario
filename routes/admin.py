@@ -256,13 +256,14 @@ def recipe_new():
         db.session.commit()
 
         feature = RecipeFeature(
-            recipe_id=recipe.id,
-            enable_piece_count="enable_piece_count" in request.form,
-            enable_piece_weight="enable_piece_weight" in request.form,
-            enable_yeast_type="enable_yeast_type" in request.form,
-            enable_tangzhong="enable_tangzhong" in request.form,
-            enable_poolish=recipe.fermentation_type == "poolish",
-            enable_biga=recipe.fermentation_type == "biga"
+        recipe_id=recipe.id,
+        enable_piece_count="enable_piece_count" in request.form,
+        enable_piece_weight="enable_piece_weight" in request.form,
+        enable_pans="enable_pans" in request.form,
+        enable_yeast_type="enable_yeast_type" in request.form,
+        enable_tangzhong="enable_tangzhong" in request.form,
+        enable_poolish=recipe.fermentation_type == "poolish",
+        enable_biga=recipe.fermentation_type == "biga"
         )
         db.session.add(feature)
 
@@ -434,6 +435,7 @@ def recipe_edit(id):
 
         feature.enable_piece_count = "enable_piece_count" in request.form
         feature.enable_piece_weight = "enable_piece_weight" in request.form
+        feature.enable_pans = "enable_pans" in request.form
         feature.enable_yeast_type = "enable_yeast_type" in request.form
         feature.enable_tangzhong = "enable_tangzhong" in request.form
         feature.enable_poolish = recipe.fermentation_type == "poolish"

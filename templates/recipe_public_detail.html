@@ -78,45 +78,108 @@
                 </h5>
 
                 <div class="mb-3">
-                    <label class="form-label small text-secondary fw-bold text-uppercase" style="font-size: 11px;">Metodo di Calcolo</label>
-                    <select id="calc-scale-mode" class="form-select form-select-sm fw-bold rounded-3" autocomplete="off">
-                        <option value="weight" {% if recipe.pans|length == 0 and not feature.enable_piece_count %}selected{% endif %}>⚖️ Peso Impasto Desiderato</option>
-                        
-                        {% if feature and feature.enable_piece_count %}
-                        <option value="pieces" {% if recipe.pans|length == 0 %}selected{% endif %}>🍔 Calcolo per N. Pezzi e Peso</option>
-                        {% endif %}
+    <label class="form-label small text-secondary fw-bold text-uppercase" style="font-size: 11px;">
+        Metodo di Calcolo
+    </label>
 
-                        {% if recipe.pans|length > 0 %}
-                        <option value="tray" selected>📐 Calcolo per Teglie Assegnate</option>
-                        {% endif %}
-                    </select>
-                </div>
+    <select id="calc-scale-mode"
+            class="form-select form-select-sm fw-bold rounded-3"
+            autocomplete="off">
 
-                <div id="wrapper-weight-input" class="mb-3 d-none">
-                    <label class="form-label small text-secondary fw-bold text-uppercase" style="font-size: 11px;">Grammi Impasto Desiderati</label>
-                    <input type="number" id="calc-target-weight" class="form-control text-center fw-bold fs-5 rounded-3" value="1000" step="50" autocomplete="off">
-                </div>
+        <option value="weight"
+                {% if recipe.pans|length == 0 and not feature.enable_piece_count %}
+                selected
+                {% endif %}>
+            ⚖️ Peso Impasto Desiderato
+        </option>
 
-                {% if feature and feature.enable_piece_count %}
-                <div id="wrapper-pieces-input" class="mb-3 d-none">
-                    <label class="form-label small text-secondary fw-bold text-uppercase d-block mb-2" style="font-size: 11px;">Pezzatura Impasto</label>
-                    <div class="row g-2">
-                        <div class="col-6">
-                            <div class="input-group input-group-sm">
-                                <span class="input-group-text bg-light text-secondary fw-bold" style="font-size: 11px;">Pezzi</span>
-                                <input type="number" id="calc-pieces-count" class="form-control text-center fw-bold text-primary fs-6" value="10" min="1" autocomplete="off">
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="input-group input-group-sm">
-                                <span class="input-group-text bg-light text-secondary fw-bold" style="font-size: 11px;">Peso</span>
-                                <input type="number" id="calc-pieces-weight" class="form-control text-center fw-bold text-dark fs-6" value="100" min="1" autocomplete="off">
-                                <span class="input-group-text bg-light text-secondary fw-bold" style="font-size: 11px;">g</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
+        {% if feature and feature.enable_piece_count %}
+        <option value="pieces"
+                {% if recipe.pans|length == 0 %}
+                selected
+                {% endif %}>
+            🍔 Calcolo per N. Pezzi e Peso
+        </option>
+        {% endif %}
+
+        {% if feature and feature.enable_pans and recipe.pans|length > 0 %}
+        <option value="tray" selected>
+            📐 Calcolo per Teglie Assegnate
+        </option>
+        {% endif %}
+
+    </select>
+</div>
+
+<div id="wrapper-weight-input" class="mb-3 d-none">
+    <label class="form-label small text-secondary fw-bold text-uppercase"
+           style="font-size: 11px;">
+        Grammi Impasto Desiderati
+    </label>
+
+    <input type="number"
+           id="calc-target-weight"
+           class="form-control text-center fw-bold fs-5 rounded-3"
+           value="1000"
+           step="50"
+           autocomplete="off">
+</div>
+
+{% if feature and feature.enable_piece_count %}
+<div id="wrapper-pieces-input" class="mb-3 d-none">
+
+    <label class="form-label small text-secondary fw-bold text-uppercase d-block mb-2"
+           style="font-size: 11px;">
+        Pezzatura Impasto
+    </label>
+
+    <div class="row g-2">
+
+        <div class="col-6">
+            <div class="input-group input-group-sm">
+
+                <span class="input-group-text bg-light text-secondary fw-bold"
+                      style="font-size: 11px;">
+                    Pezzi
+                </span>
+
+                <input type="number"
+                       id="calc-pieces-count"
+                       class="form-control text-center fw-bold text-primary fs-6"
+                       value="10"
+                       min="1"
+                       autocomplete="off">
+
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="input-group input-group-sm">
+
+                <span class="input-group-text bg-light text-secondary fw-bold"
+                      style="font-size: 11px;">
+                    Peso
+                </span>
+
+                <input type="number"
+                       id="calc-pieces-weight"
+                       class="form-control text-center fw-bold text-dark fs-6"
+                       value="100"
+                       min="1"
+                       autocomplete="off">
+
+                <span class="input-group-text bg-light text-secondary fw-bold"
+                      style="font-size: 11px;">
+                    g
+                </span>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endif %}
 
                 {% if recipe.pans|length > 0 %}
                 <div id="wrapper-tray-input" class="mb-3 d-none">
