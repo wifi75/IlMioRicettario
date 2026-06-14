@@ -496,7 +496,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const recipeSlug = "{{ recipe.slug }}";
-    const storageKey = `recipe_settings_${recipeSlug}`;
+    const storageKey = `recipe_settings_v3_${recipeSlug}`;
 
     const freshToDryRatio = parseFloat("{{ recipe.yeast_ratio if recipe and recipe.yeast_ratio else 3.0 }}");
     const tzFlourPctGlobal = parseFloat("{{ settings_data.tangzhong_flour_percent if settings_data else 5.0 }}") / 100;
@@ -541,7 +541,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const saved = JSON.parse(savedDataRaw);
             
             if (saved.scaleMode && scaleModeSelect) scaleModeSelect.value = saved.scaleMode;
-            if (saved.targetWeight && inputTargetWeight) inputTargetWeight.value = saved.targetWeight;
+            // Il peso iniziale deve sempre arrivare dalla ricetta originale, non dalla cache browser.
+            // if (saved.targetWeight && inputTargetWeight) inputTargetWeight.value = saved.targetWeight;
             if (saved.piecesCount && inputPiecesCount) inputPiecesCount.value = saved.piecesCount;
             if (saved.piecesWeight && inputPiecesWeight) inputPiecesWeight.value = saved.piecesWeight;
             if (saved.yeastType && yeastSelect) yeastSelect.value = saved.yeastType;
@@ -581,7 +582,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const settingsToSave = {
             scaleMode: scaleModeSelect ? scaleModeSelect.value : null,
-            targetWeight: inputTargetWeight ? inputTargetWeight.value : null,
+            // Non salviamo il peso target: ogni apertura deve partire dal totale originale ricetta.
+            targetWeight: null,
             piecesCount: inputPiecesCount ? inputPiecesCount.value : null,
             piecesWeight: inputPiecesWeight ? inputPiecesWeight.value : null,
             yeastType: yeastSelect ? yeastSelect.value : null,
