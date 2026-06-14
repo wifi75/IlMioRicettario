@@ -1,9 +1,9 @@
-# PROGETTO: Il Mio Ricettario (V2.2.0)
+# PROGETTO: Il Mio Ricettario (V2.2.3)
 
 ## PANORAMICA
 
 * **Nome:** Il Mio Ricettario
-* **Versione Architetturale:** V2.2.0
+* **Versione Architetturale:** V2.2.3
 * **Stato:** Produzione Stabile
 * **Repository GitHub:** https://github.com/wifi75/IlMioRicettario
 * **Sviluppatore Principale:** Tiziano Cassone
@@ -12,18 +12,21 @@
 
 # DESCRIZIONE
 
-Il Mio Ricettario è una piattaforma professionale per la gestione avanzata di ricette da forno e lievitazione.
+Il Mio Ricettario è una piattaforma professionale per la gestione avanzata di ricette di panificazione, lievitazione e arte bianca.
 
-A differenza di un semplice ricettario statico, ogni formula può attivare moduli dinamici di calcolo che permettono:
+A differenza di un semplice archivio statico, ogni ricetta può attivare moduli dinamici che consentono:
 
 * ricalcolo automatico delle grammature;
-* gestione delle pezzature;
-* gestione delle teglie;
-* conversione dei lieviti;
-* utilizzo di Tangzhong;
-* gestione di Poolish e Biga;
-* associazione immagini centralizzata;
-* consultazione della Wiki tecnica pubblica.
+* gestione pezzature;
+* gestione teglie;
+* conversione lieviti;
+* gestione Tangzhong;
+* gestione Poolish;
+* gestione Biga;
+* libreria immagini centralizzata;
+* Wiki tecnica pubblica;
+* calcolo dinamico del peso impasto;
+* frontend responsive per consultazione pubblica.
 
 ---
 
@@ -35,6 +38,7 @@ A differenza di un semplice ricettario statico, ogni formula può attivare modul
 * Flask
 * Flask-SQLAlchemy
 * Flask-Login
+* Flask-Migrate
 
 ## Database
 
@@ -50,7 +54,7 @@ A differenza di un semplice ricettario statico, ogni formula può attivare modul
 
 ## Editor
 
-* Quill.js v1.3.6
+* Quill.js 1.3.6
 
 ## Template Engine
 
@@ -58,9 +62,39 @@ A differenza di un semplice ricettario statico, ogni formula può attivare modul
 
 ---
 
+# ARCHITETTURA GENERALE
+
+## Area Pubblica
+
+Permette la consultazione delle ricette pubblicate.
+
+Funzionalità:
+
+* visualizzazione ricette;
+* visualizzazione immagini;
+* calcolo ingredienti;
+* gestione pezzature;
+* gestione teglie;
+* consultazione Wiki.
+
+## Area Amministrativa
+
+Protetta tramite Flask-Login.
+
+Funzionalità:
+
+* gestione ricette;
+* gestione ingredienti;
+* gestione immagini;
+* gestione teglie;
+* gestione impostazioni;
+* gestione Wiki.
+
+---
+
 # ARCHITETTURA MODULARE
 
-Ogni ricetta può attivare o disattivare funzionalità specifiche tramite il modello:
+Ogni ricetta può attivare o disattivare moduli specifici tramite il modello:
 
 ```python
 RecipeFeature
@@ -68,25 +102,21 @@ RecipeFeature
 
 ## Modulo Pezzature
 
-Gestione:
+Gestisce:
 
 * numero panetti;
 * peso singolo;
 * peso totale impasto.
 
----
-
 ## Modulo Teglie
 
-Integrazione con:
+Basato sul modello:
 
 ```python
 MasterBakeryPan
 ```
 
-Permette il calcolo automatico dell'impasto necessario in base alla capacità della teglia.
-
----
+Permette il calcolo automatico della quantità di impasto necessaria.
 
 ## Modulo Conversione Lieviti
 
@@ -95,9 +125,7 @@ Supporta:
 * lievito fresco;
 * lievito secco.
 
-Il rapporto di conversione è configurabile globalmente.
-
----
+Rapporto configurabile tramite Setting.
 
 ## Modulo Tangzhong
 
@@ -105,19 +133,9 @@ Gestione automatica di:
 
 * farina dedicata;
 * liquidi dedicati;
-* procedura guidata.
-
-Parametri configurabili tramite:
-
-```python
-Setting
-```
-
----
+* percentuali configurabili.
 
 ## Modulo Prefermentazione
-
-Supporto per:
 
 ### Poolish
 
@@ -126,18 +144,6 @@ Supporto per:
 ### Biga
 
 * idratazione 44%.
-
----
-
-## Modulo Wiki Pubblica
-
-Rotta:
-
-```text
-/wiki
-```
-
-Sistema indipendente dal database per garantire la stabilità dell'applicazione.
 
 ---
 
@@ -153,65 +159,45 @@ Funzioni:
 * autorizzazione;
 * password hashate.
 
----
-
 ## MasterIngredient
 
-Archivio centralizzato ingredienti.
+Archivio ingredienti centralizzato.
 
 Campi principali:
 
 * nome;
+* forza W;
 * flag farina;
-* flag liquido;
-* forza W.
-
----
+* flag liquido.
 
 ## MasterBakeryPan
 
-Archivio centralizzato:
-
-* teglie;
-* stampi;
-* contenitori.
-
----
+Archivio teglie e stampi.
 
 ## MasterImage
 
-Archivio immagini centralizzato introdotto nella v2.2.0.
+Archivio immagini centralizzato.
 
-Permette:
-
-* upload unico;
-* riutilizzo tra più ricette;
-* gestione metadati;
-* anteprima dinamica.
-
-Campi principali:
+Campi:
 
 * filename;
 * caption;
 * alt_text;
 * upload_date.
 
----
-
 ## Recipe
 
-Modello principale delle formule.
+Modello principale.
 
-Include:
+Contiene:
 
 * descrizione;
 * istruzioni;
-* immagine associata;
+* immagine;
 * fermentazione;
 * tempi tecnici;
+* prefermenti;
 * teglie abilitate.
-
----
 
 ## RecipeIngredient
 
@@ -222,148 +208,72 @@ Contiene:
 * quantità;
 * unità;
 * ordine;
-* flag tecnici;
-* forza W storicizzata.
-
----
+* valore W storicizzato.
 
 ## RecipeFeature
 
-Flag booleani per attivazione moduli.
-
----
+Attivazione dinamica dei moduli.
 
 ## Setting
 
-Configurazione globale applicazione.
+Configurazioni globali.
 
-Include:
+## Wiki
 
-* ratio lieviti;
-* parametri Tangzhong;
-* nome sito;
-* descrizione sito;
-* tema attivo.
+Documentazione pubblica.
 
 ---
 
-## wiki
+# GESTIONE ISTRUZIONI
 
-Classe definita in:
+## Quill.js
 
-```text
-models/wiki.py
-```
+Le istruzioni vengono salvate come HTML generato da Quill.js.
 
-Mantiene volutamente il nome:
+Durante il salvataggio il sistema esegue una sanificazione del contenuto per eliminare:
 
-```python
-wiki
-```
+* immagini emoji esterne;
+* attributi HTML indesiderati;
+* markup proveniente da Facebook;
+* codice HTML superfluo.
 
-in minuscolo.
-
----
-
-# REGOLE DI SVILUPPO
-
-## 1. File Completi
-
-Fornire sempre file completi pronti al copia-incolla.
-
-Sono vietati:
-
-* placeholder;
-* patch parziali;
-* sezioni omesse.
+Il frontend renderizza direttamente l'HTML sanificato.
 
 ---
 
-## 2. Nessuna Query nel Context Processor
+# CALCOLATORE DINAMICO FRONTEND
 
-È vietato inserire query pesanti in:
+Il frontend pubblico consente:
 
-```python
-@app.context_processor
-```
+* ridimensionamento ingredienti;
+* calcolo peso impasto;
+* calcolo pezzature;
+* calcolo teglie;
+* conversione lievito.
 
-Le interrogazioni devono essere eseguite:
+## Regola Fondamentale
 
-* nelle rotte;
-* nei blueprint;
-* nei servizi dedicati.
+Il peso iniziale deve sempre essere il peso reale della ricetta.
 
----
-
-## 3. Stabilità Jinja
-
-Tutti i blocchi:
-
-```jinja2
-{% if %}
-{% for %}
-{% block %}
-```
-
-devono essere sempre chiusi correttamente.
+Il browser non deve alterare automaticamente la formula originale.
 
 ---
 
-## 4. Mobile First
+# GESTIONE CACHE FRONTEND
 
-Interfaccia:
+Le preferenze vengono memorizzate tramite Local Storage versionato.
 
-* responsive;
-* Bootstrap nativo;
-* sidebar amministrativa scura;
-* contenuti su sfondo slate:
+Possono essere salvati:
 
-```css
-#f8fafc
-```
+* modalità di calcolo;
+* preferenze utente;
+* impostazioni frontend.
 
----
-
-# LOGICHE OPERATIVE CRITICHE
-
-## Integrazione Quill.js
-
-Il contenuto dell'editor viene salvato tramite:
-
-```html
-<input hidden name="instructions">
-```
-
-alimentato da JavaScript.
+Non deve essere memorizzato il peso iniziale della ricetta.
 
 ---
 
-## Parsing Istruzioni
-
-Le istruzioni vengono elaborate tramite:
-
-```python
-.split('\n')
-```
-
-e renderizzate come:
-
-* elenco numerato;
-* prima parola in grassetto.
-
----
-
-## Gestione Forza W
-
-Il valore W viene:
-
-1. letto da MasterIngredient;
-2. copiato in RecipeIngredient;
-3. storicizzato nella ricetta.
-
----
-
-## Libreria Immagini Centralizzata
+# LIBRERIA IMMAGINI CENTRALIZZATA
 
 Le immagini vengono gestite tramite:
 
@@ -377,27 +287,129 @@ e collegate tramite:
 Recipe.image_id
 ```
 
-La selezione avviene tramite:
+Funzionalità:
 
-* dropdown;
+* upload centralizzato;
+* riutilizzo tra ricette;
 * preview dinamica;
 * associazione persistente.
 
 ---
 
-## Rotta Wiki Pubblica
+# WIKI PUBBLICA
 
-La rotta:
+Rotta:
 
 ```text
 /wiki
 ```
 
-deve rimanere immune da errori dovuti a:
+La Wiki deve restare indipendente da eventuali errori delle altre sezioni.
 
-* assenza tabelle;
-* migrazioni incomplete;
-* problemi del modello wiki.
+---
+
+# REGOLE DI SVILUPPO
+
+## 1. File Completi
+
+Fornire sempre file completi pronti al copia-incolla.
+
+Vietati:
+
+* placeholder;
+* patch parziali;
+* sezioni omesse.
+
+## 2. Nessuna Query nel Context Processor
+
+Non inserire query pesanti in:
+
+```python
+@app.context_processor
+```
+
+Le query devono essere eseguite:
+
+* nelle rotte;
+* nei servizi;
+* nei blueprint.
+
+## 3. Stabilità Jinja
+
+Tutti i blocchi devono essere chiusi correttamente:
+
+```jinja2
+{% if %}
+{% for %}
+{% block %}
+```
+
+## 4. Mobile First
+
+Interfaccia:
+
+* responsive;
+* Bootstrap nativo;
+* sidebar amministrativa scura;
+* layout ottimizzato mobile.
+
+## 5. Database Mai Versionato
+
+Il database SQLite non deve essere pubblicato nel repository Git.
+
+File da escludere:
+
+```text
+data/database.db
+data/*.db
+data/*.sqlite
+```
+
+Il database deve esistere esclusivamente nei sistemi locali o di produzione.
+
+---
+
+# DEPLOY PRODUZIONE
+
+## Servizio Systemd
+
+Nome servizio:
+
+```text
+ilmioricettario.service
+```
+
+Funzioni:
+
+* avvio automatico al boot;
+* riavvio automatico in caso di errore;
+* gestione tramite systemctl.
+
+## Comandi Principali
+
+```bash
+systemctl start ilmioricettario
+systemctl stop ilmioricettario
+systemctl restart ilmioricettario
+systemctl status ilmioricettario
+```
+
+## Log
+
+```bash
+journalctl -u ilmioricettario -f
+```
+
+---
+
+# ROADMAP V3
+
+* media ponderata automatica del W;
+* gestione completa lievito madre;
+* statistiche avanzate;
+* backup automatici;
+* import/export ricette;
+* API REST pubbliche.
 
 ---
 

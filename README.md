@@ -1,10 +1,10 @@
 # 🧫 Il Mio Ricettario - Professional Baking Suite
 
-![Versione](https://img.shields.io/badge/version-v2.2.0-orange?style=for-the-badge)
-![Python](https://img.shields.io/badge/Python-3.13-blue?style=for-the-badge\&logo=python)
-![Framework](https://img.shields.io/badge/Framework-Flask-blue?style=for-the-badge\&logo=flask)
-![Database](https://img.shields.io/badge/Database-SQLite-green?style=for-the-badge\&logo=sqlite)
-![Bootstrap](https://img.shields.io/badge/UI-Bootstrap%205.3-purple?style=for-the-badge\&logo=bootstrap)
+![Versione](https://img.shields.io/badge/version-v2.2.3-orange?style=for-the-badge)
+![Python](https://img.shields.io/badge/Python-3.13-blue?style=for-the-badge&logo=python)
+![Framework](https://img.shields.io/badge/Framework-Flask-blue?style=for-the-badge&logo=flask)
+![Database](https://img.shields.io/badge/Database-SQLite-green?style=for-the-badge&logo=sqlite)
+![Bootstrap](https://img.shields.io/badge/UI-Bootstrap%205.3-purple?style=for-the-badge&logo=bootstrap)
 
 ---
 
@@ -14,19 +14,53 @@
 
 Il sistema permette di:
 
-* archiviare formule professionali;
-* gestire ingredienti centralizzati;
-* monitorare idratazione e percentuali baker;
-* gestire prefermenti;
-* utilizzare Tangzhong;
-* amministrare una libreria immagini centralizzata;
-* consultare una Wiki tecnica pubblica dedicata all'arte bianca.
+* Archiviare formule professionali
+* Gestire ingredienti centralizzati
+* Monitorare idratazione e percentuali baker
+* Gestire prefermenti
+* Utilizzare Tangzhong
+* Amministrare una libreria immagini centralizzata
+* Consultare una Wiki tecnica pubblica dedicata all'arte bianca
 
 L'applicazione è stata progettata per essere utilizzata sia in ambiente domestico che professionale.
 
+Repository ufficiale:
+
+https://github.com/wifi75/IlMioRicettario
+
 ---
 
-# 🚀 Novità della Versione 2.2.0
+# 📄 Licenza
+
+Progetto sviluppato da Tiziano Cassone.
+
+Tutti i diritti riservati.
+
+---
+
+# 🚀 Novità della Serie 2.2
+
+## v2.2.3
+
+### Calcolatore Ricette
+
+* Corretto il peso iniziale delle ricette
+* Il frontend utilizza ora il peso reale della formula
+* Eliminata l'influenza delle vecchie impostazioni memorizzate nel browser
+
+### Gestione Cache
+
+* Nuovo sistema Local Storage versionato
+* Compatibilità migliorata dopo gli aggiornamenti
+* Eliminati problemi causati da cache obsolete
+
+### Editor Procedure
+
+* Migliorata la pulizia del contenuto incollato da siti esterni
+* Gestione più robusta di HTML, emoji e contenuti provenienti dai social network
+* Procedure più leggere e compatibili con il frontend
+
+---
 
 ## Libreria Immagini Centralizzata
 
@@ -38,33 +72,13 @@ MasterImage
 
 Le immagini vengono archiviate una sola volta e possono essere associate dinamicamente alle ricette.
 
-Funzionalità:
+### Funzionalità
 
-* upload immagini centralizzato;
-* anteprima immediata;
-* selezione tramite menu a tendina;
-* associazione persistente alle ricette;
-* gestione ottimizzata di grandi librerie fotografiche.
-
----
-
-## Miglioramento Backend Ricette
-
-Nuovo sistema di selezione immagini:
-
-* dropdown intelligente;
-* anteprima dinamica;
-* sincronizzazione automatica;
-* mantenimento della selezione dopo il salvataggio.
-
----
-
-## Stabilizzazione Interfaccia
-
-* miglioramenti responsive;
-* ottimizzazione delle card amministrative;
-* pulizia dell'interfaccia;
-* correzione bug di associazione immagini.
+* Upload immagini centralizzato
+* Anteprima immediata
+* Selezione tramite menu a tendina
+* Associazione persistente alle ricette
+* Gestione ottimizzata di grandi librerie fotografiche
 
 ---
 
@@ -76,6 +90,7 @@ Nuovo sistema di selezione immagini:
 * Flask
 * Flask-SQLAlchemy
 * Flask-Login
+* Flask-Migrate
 
 ## Database
 
@@ -93,6 +108,10 @@ Nuovo sistema di selezione immagini:
 
 * Quill.js 1.3.6
 
+## Template Engine
+
+* Jinja2
+
 ---
 
 # 🗄️ Struttura Principale del Database
@@ -101,11 +120,9 @@ Nuovo sistema di selezione immagini:
 
 Gestione utenti amministratori.
 
-Funzioni:
-
-* login sicuro;
-* password hashate;
-* protezione Flask-Login.
+* Login sicuro
+* Password hashate
+* Protezione Flask-Login
 
 ---
 
@@ -113,12 +130,10 @@ Funzioni:
 
 Anagrafica centralizzata degli ingredienti.
 
-Campi principali:
-
-* nome;
-* forza W;
-* flag farina;
-* flag liquido.
+* Nome
+* Forza W
+* Flag farina
+* Flag liquido
 
 ---
 
@@ -134,12 +149,10 @@ Permette l'associazione di più teglie ad una singola ricetta.
 
 Archivio centralizzato immagini.
 
-Campi principali:
-
-* filename;
-* caption;
-* alt_text;
-* upload_date.
+* Filename
+* Caption
+* Alt Text
+* Upload Date
 
 ---
 
@@ -147,14 +160,13 @@ Campi principali:
 
 Archivio principale delle formule.
 
-Include:
-
-* descrizione;
-* istruzioni;
-* tempi di fermentazione;
-* immagine associata;
-* teglie abilitate;
-* prefermenti.
+* Descrizione
+* Istruzioni
+* Immagine associata
+* Image ID
+* Tempi di fermentazione
+* Teglie abilitate
+* Prefermenti
 
 ---
 
@@ -162,12 +174,11 @@ Include:
 
 Relazione ingredienti ↔ ricette.
 
-Contiene:
-
-* quantità;
-* unità;
-* metadati di calcolo;
-* ordinamento.
+* Quantità
+* Unità
+* Metadati di calcolo
+* Ordinamento
+* Valore W storicizzato
 
 ---
 
@@ -175,11 +186,11 @@ Contiene:
 
 Attivazione dinamica dei moduli:
 
-* Tangzhong;
-* Poolish;
-* Biga;
-* gestione lieviti;
-* gestione pezzature.
+* Tangzhong
+* Poolish
+* Biga
+* Gestione lieviti
+* Gestione pezzature
 
 ---
 
@@ -189,7 +200,7 @@ Configurazioni globali applicazione.
 
 ---
 
-## wiki
+## Wiki
 
 Archivio articoli tecnici della documentazione pubblica.
 
@@ -203,14 +214,12 @@ La Wiki pubblica è accessibile tramite:
 /wiki
 ```
 
-La sezione contiene:
+Contiene:
 
-* guide tecniche;
-* documentazione;
-* procedure operative;
-* manualistica dell'arte bianca.
-
-Il sistema è progettato per non generare errori di avvio anche in assenza della tabella database.
+* Guide tecniche
+* Documentazione
+* Procedure operative
+* Manualistica dell'arte bianca
 
 ---
 
@@ -220,69 +229,198 @@ Il sistema è progettato per non generare errori di avvio anche in assenza della
 
 Calcolo automatico dell'idratazione totale.
 
----
-
 ## Conversione Lieviti
 
 Supporto:
 
-* lievito fresco;
-* lievito secco.
-
----
+* Lievito fresco
+* Lievito secco
 
 ## Tangzhong
 
 Gestione automatica:
 
-* farina dedicata;
-* liquidi dedicati;
-* procedura guidata.
-
----
+* Farina dedicata
+* Liquidi dedicati
+* Procedura guidata
 
 ## Poolish
 
 Supporto automatico:
 
-* idratazione 100%.
-
----
+* Idratazione 100%
 
 ## Biga
 
 Supporto automatico:
 
-* idratazione 44%.
+* Idratazione 44%
 
 ---
 
-# 💻 Installazione Rapida Linux
+# 💻 Installazione Produzione Linux
 
-## Clonazione
+## Clonazione Repository
 
 ```bash
+cd /var/www
+
 git clone https://github.com/wifi75/IlMioRicettario.git
+
 cd IlMioRicettario
 ```
 
-## Ambiente Virtuale
+---
+
+## Creazione Ambiente Virtuale
 
 ```bash
+apt update
+
+apt install python3 python3-venv python3-pip -y
+
 python3 -m venv venv
+
 source venv/bin/activate
 ```
 
-## Dipendenze
+---
+
+## Installazione Dipendenze
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Avvio
+---
+
+## Cartelle Automatiche
+
+Al primo avvio vengono create automaticamente:
+
+```text
+data/
+static/uploads/
+static/uploads/recipes/
+```
+
+Non è necessario creare manualmente alcuna cartella.
+
+> L'applicazione crea automaticamente le cartelle necessarie al primo avvio.
+>
+> Se il database SQLite è già presente sul sistema, non è richiesta alcuna inizializzazione manuale.
+
+---
+
+## Avvio Applicazione
 
 ```bash
 python app.py
+```
+
+Configurazione predefinita:
+
+```text
+Host: 0.0.0.0
+Porta: 8100
+```
+
+---
+
+# ⚙️ Installazione come Servizio Systemd
+
+Creare:
+
+```bash
+nano /etc/systemd/system/ilmioricettario.service
+```
+
+Contenuto:
+
+```ini
+[Unit]
+Description=Il Mio Ricettario Flask
+After=network.target
+
+[Service]
+User=root
+Group=root
+
+WorkingDirectory=/var/www/IlMioRicettario
+
+Environment="PATH=/var/www/IlMioRicettario/venv/bin"
+
+ExecStart=/var/www/IlMioRicettario/venv/bin/python /var/www/IlMioRicettario/app.py
+
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+---
+
+## Attivazione Servizio
+
+```bash
+systemctl daemon-reload
+
+systemctl enable ilmioricettario
+
+systemctl start ilmioricettario
+```
+
+Verifica:
+
+```bash
+systemctl status ilmioricettario
+```
+
+---
+
+## Aggiornamento Applicazione
+
+```bash
+cd /var/www/IlMioRicettario
+
+git pull origin main
+```
+
+Aggiornare le dipendenze:
+
+```bash
+source venv/bin/activate
+
+pip install -r requirements.txt
+```
+
+Riavviare:
+
+```bash
+systemctl restart ilmioricettario
+```
+
+---
+
+## Log
+
+Visualizzazione continua:
+
+```bash
+journalctl -u ilmioricettario -f
+```
+
+Ultimi 100 eventi:
+
+```bash
+journalctl -u ilmioricettario -n 100 --no-pager
+```
+
+Errori:
+
+```bash
+journalctl -xeu ilmioricettario
 ```
 
 ---
@@ -291,20 +429,28 @@ python app.py
 
 Il progetto utilizza:
 
-* hashing password Werkzeug;
-* autenticazione Flask-Login;
-* protezione amministrativa delle rotte;
-* esclusione database tramite `.gitignore`.
+* Hashing password Werkzeug
+* Autenticazione Flask-Login
+* Protezione amministrativa delle rotte
+* Gestione utenti sicura
 
 ---
 
 # 📁 File Esclusi da Git
 
 ```text
+data/database.db
+data/*.db
+data/*.sqlite
+
 instance/
-*.db
+
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+
+.env
 ```
 
 ---
@@ -313,16 +459,17 @@ __pycache__/
 
 ## V3
 
-* Media ponderata automatica del W.
-* Gestione completa del lievito madre.
-* Statistiche avanzate.
-* Backup automatici.
-* Import/Export ricette.
+* Media ponderata automatica del W
+* Gestione completa del lievito madre
+* Statistiche avanzate
+* Backup automatici
+* Import/Export ricette
+* API REST pubbliche
 
 ---
 
 # 👨‍💻 Autore
 
-Architettato e sviluppato da **Tiziano Cassone**.
+Architettato e sviluppato da **Tiziano Cassone**
 
 © 2026 - Il Mio Ricettario

@@ -81,40 +81,7 @@ with app.app_context():
 
     db.create_all()
 
-    # =========================================================================
-    # BLINDATURA STRUTTURALE ANTICRASH ANTICIPATA (SQL CRUDO A FREDDO)
-    # Eseguiamo le alterazioni prima di qualsiasi interazione ORM
-    # =========================================================================
-    try:
-        db.session.execute(db.text("ALTER TABLE settings ADD COLUMN theme_active VARCHAR(50) DEFAULT 'modern'"))
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-
-    try:
-        db.session.execute(db.text("ALTER TABLE settings ADD COLUMN site_description TEXT"))
-        db.session.commit()
-        print("Allineamento Database: colonna 'site_description' verificata e inserita!")
-    except Exception:
-        db.session.rollback()
-
-    try:
-        db.session.execute(db.text("ALTER TABLE recipe_ingredients ADD COLUMN w_value INTEGER DEFAULT 0"))
-        db.session.commit()
-        print("Allineamento Ingredienti: colonna 'w_value' verificata e inserita con successo!")
-    except Exception:
-        db.session.rollback()
-
-    # =========================================================================
-    # BLINDATURA NUOVA: Aggiungi colonna image_id a recipes (FK a MasterImage)
-    # =========================================================================
-    try:
-        db.session.execute(db.text("ALTER TABLE recipes ADD COLUMN image_id INTEGER"))
-        db.session.commit()
-        print("Allineamento Database: colonna 'image_id' aggiunta a recipes!")
-    except Exception:
-        db.session.rollback()
-
+    
     # =========================================================================
     # DA QUI IN POI LE QUERY POSSONO GIRARE IN TOTALE SICUREZZA
     # =========================================================================
