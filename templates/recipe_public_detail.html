@@ -48,6 +48,16 @@
             margin-bottom: 0.5rem;
         }
     }
+
+    .recipe-instructions-content p {
+        margin-bottom: 0.9rem;
+    }
+
+    .recipe-instructions-content img {
+        max-width: 22px;
+        height: auto;
+        vertical-align: middle;
+    }
 </style>
 
 <div class="container py-4">
@@ -341,12 +351,12 @@
                         <h6 class="fw-bold mb-3 text-secondary text-uppercase tracking-wide" style="font-size: 11px;">Procedura Operativa di Chiusura</h6>
                         <div style="line-height: 2; letter-spacing: 0.01em;" class="text-dark fs-6 fw-medium">
                             {% if recipe.instructions %}
-    <div class="recipe-instructions-content">
-        {{ recipe.instructions | safe }}
-    </div>
-{% else %}
-    <p class="text-muted">Nessuna procedura inserita.</p>
-{% endif %}
+                            <div class="recipe-instructions-content">
+                                {{ recipe.instructions | safe }}
+                            </div>
+                            {% else %}
+                            <p class="text-muted">Nessuna procedura inserita.</p>
+                            {% endif %}
                         </div>
                     </div>
                     
