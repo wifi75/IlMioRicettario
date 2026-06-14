@@ -710,10 +710,19 @@ def master_ingredient_add():
     if name:
         existing = MasterIngredient.query.filter_by(name=name).first()
         if not existing:
+            is_flour = "is_flour" in request.form
+            is_liquid = "is_liquid" in request.form
+
+            try:
+                w_value = int(request.form.get("w_value", 0)) if is_flour else 0
+            except (ValueError, TypeError):
+                w_value = 0
+
             new_ing = MasterIngredient(
                 name=name,
-                is_flour="is_flour" in request.form,
-                is_liquid="is_liquid" in request.form
+                is_flour=is_flour,
+                is_liquid=is_liquid,
+                w_value=w_value
             )
             db.session.add(new_ing)
             db.session.commit()

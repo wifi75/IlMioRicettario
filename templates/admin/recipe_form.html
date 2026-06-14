@@ -691,7 +691,7 @@ document.addEventListener('DOMContentLoaded', function() {
         placeholder: 'Scrivi qui la procedura di preparazione della biga o del poolish...'
     });
 
-    quillGeneral.setText(document.getElementById('raw-instructions-source').value);
+    quillGeneral.root.innerHTML = document.getElementById('raw-instructions-source').value;
     quillPreferment.root.innerHTML = document.getElementById('raw-preferment-source').value;
 
     const prefermentSelect = document.getElementById('preferment-type-select');
