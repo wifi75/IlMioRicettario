@@ -1,14 +1,19 @@
-# 📖 Manuale Utente - Il Mio Ricettario (v2.2.0)
+# 📖 Manuale Utente - Il Mio Ricettario (v2.2.3)
 
-Benvenuto nel manuale ufficiale di **Il Mio Ricettario**.
+Benvenuto in **Il Mio Ricettario**, la piattaforma professionale per la gestione di ricette di panificazione, pizza, focaccia, grandi lievitati e arte bianca.
 
-Questa guida descrive il funzionamento dell'applicazione sia dal punto di vista dell'utilizzatore finale che dell'amministratore incaricato della gestione delle formule.
+Questo manuale descrive tutte le funzionalità disponibili sia per l'utente che consulta le ricette sia per l'amministratore che gestisce il catalogo.
 
 ---
 
 # 🌐 1. Accesso all'Applicazione
 
-L'applicazione è disponibile tramite browser web.
+L'applicazione è accessibile tramite qualsiasi browser moderno:
+
+* Google Chrome
+* Microsoft Edge
+* Firefox
+* Safari
 
 ## Ambiente di Sviluppo
 
@@ -19,152 +24,198 @@ http://127.0.0.1:8080
 ## Ambiente di Produzione
 
 ```text
-http://IP_DEL_SERVER:8080
-```
-
-La porta predefinita del servizio è:
-
-```text
-8080
+http://INDIRIZZO_SERVER
 ```
 
 ---
 
-# 🍞 2. Catalogo Pubblico delle Ricette
+# 🍞 2. Catalogo Ricette
 
-La schermata principale mostra l'elenco delle formule pubblicate.
+La pagina principale mostra tutte le ricette pubblicate.
 
-Ogni ricetta viene rappresentata tramite una card contenente:
+Ogni ricetta presenta:
 
 * immagine di copertina;
-* nome formula;
+* nome della ricetta;
 * descrizione;
-* pulsante di accesso al calcolatore.
+* accesso al dettaglio completo.
+
+Le ricette non pubblicate non sono visibili agli utenti.
 
 ---
 
-# 📚 3. Wiki Tecnica Pubblica
+# 📋 3. Scheda Ricetta
 
-Nella parte superiore della home page è disponibile il pulsante:
+Aprendo una ricetta vengono visualizzate:
 
-```text
-Esplora la Wiki & Linee Guida Tecniche
-```
+* descrizione;
+* ingredienti;
+* procedimento;
+* immagini;
+* tempi di lavorazione;
+* prefermenti;
+* strumenti associati.
 
-La Wiki è accessibile tramite:
-
-```text
-/wiki
-```
-
-e contiene:
-
-* tecniche di panificazione;
-* guide operative;
-* documentazione dell'arte bianca;
-* materiale di approfondimento.
+Tutte le informazioni vengono mostrate in modo ottimizzato sia su desktop che su smartphone.
 
 ---
 
-# 🧮 4. Calcolatore Dinamico delle Formule
+# 🧮 4. Calcolatore Dinamico
 
-Entrando in una ricetta si accede al simulatore professionale.
+Una delle funzionalità principali del sistema.
 
-Il sistema ricalcola automaticamente:
+Il calcolatore consente di adattare automaticamente la formula a nuove esigenze produttive.
 
-* grammature;
-* idratazione;
-* lieviti;
-* pezzature;
-* teglie;
-* prefermenti.
+È possibile:
+
+* aumentare le quantità;
+* diminuire le quantità;
+* modificare il peso totale impasto;
+* modificare il numero di pezzi;
+* adattare la ricetta a diverse teglie.
+
+---
+
+## Peso Totale Impasto
+
+Il sistema utilizza sempre il peso reale della ricetta salvata.
+
+La formula originale non viene modificata.
+
+Qualsiasi variazione effettuata dall'utente è temporanea e utilizzata esclusivamente per il calcolo.
 
 ---
 
 ## Gestione Pezzature
 
-L'utente può:
+È possibile specificare:
 
-* impostare il numero dei panetti;
-* definire il peso del singolo pezzo;
-* ottenere il nuovo totale impasto.
+* numero di panetti;
+* peso del singolo panetto.
+
+Il sistema ricalcola automaticamente tutti gli ingredienti mantenendo invariati i rapporti della ricetta originale.
+
+### Esempio
+
+Ricetta originale:
+
+```text
+4 panetti da 250 g
+```
+
+Nuova richiesta:
+
+```text
+8 panetti da 280 g
+```
+
+Tutti gli ingredienti verranno aggiornati automaticamente.
 
 ---
 
 ## Gestione Teglie
 
-Se la ricetta possiede teglie associate:
+Se la ricetta dispone di teglie associate, è possibile:
 
-* vengono mostrate automaticamente;
-* è possibile aumentare o diminuire le quantità;
-* il sistema ricalcola l'impasto necessario.
+* selezionare la teglia desiderata;
+* indicare il numero di teglie;
+* ottenere il nuovo peso impasto necessario.
 
----
-
-## Conversione Lieviti
-
-Supporto per:
-
-* lievito fresco;
-* lievito secco.
-
-La conversione viene effettuata automaticamente utilizzando il rapporto definito nelle impostazioni globali.
+Il sistema esegue il calcolo automaticamente.
 
 ---
 
-## Idratazione Dinamica
+# 💧 5. Idratazione
 
-Quando abilitata dalla ricetta:
+Le ricette che prevedono il controllo dell'idratazione consentono di:
 
-* l'idratazione può essere modificata tramite slider;
-* acqua e percentuali vengono aggiornate in tempo reale.
+* visualizzare la percentuale totale;
+* modificare il livello di idratazione;
+* aggiornare automaticamente la quantità di acqua.
+
+Tutti i valori vengono ricalcolati in tempo reale.
 
 ---
 
-## Visualizzazione Forza Farine (W)
+# 🧫 6. Prefermenti
 
-Le farine mostrano un badge dedicato contenente il valore:
+Il sistema supporta diverse tecniche di prefermentazione.
+
+---
+
+## Poolish
+
+Caratteristiche:
+
+* idratazione 100%;
+* sviluppo aromatico;
+* maggiore estensibilità.
+
+---
+
+## Biga
+
+Caratteristiche:
+
+* idratazione 44%;
+* maggiore struttura;
+* migliore conservabilità.
+
+---
+
+## Tangzhong
+
+Quando presente:
+
+* viene indicata la quantità di farina dedicata;
+* viene indicata la quantità di liquido necessaria;
+* viene mostrata la procedura di preparazione.
+
+---
+
+# 🧂 7. Ingredienti
+
+Ogni ingrediente può contenere informazioni aggiuntive.
+
+Per le farine viene visualizzato il valore:
 
 ```text
 W
 ```
 
-Gli ingredienti non classificati come farine non mostrano alcun badge.
+che rappresenta la forza della farina.
 
 ---
 
-# 🥣 5. Tangzhong
+# 📚 8. Wiki Tecnica
 
-Se la ricetta utilizza il modulo Tangzhong:
+La piattaforma include una Wiki dedicata all'arte bianca.
 
-* il sistema isola automaticamente una quota di farina;
-* viene calcolata la quantità di liquido necessaria;
-* viene mostrata la procedura di preparazione.
-
----
-
-# 🧫 6. Poolish e Biga
-
-Il sistema supporta:
-
-## Poolish
-
-* idratazione 100%.
-
-## Biga
-
-* idratazione 44%.
-
-Le quantità vengono automaticamente separate dal totale impasto.
-
----
-
-# 🔐 7. Accesso all'Area Amministrativa
-
-Per accedere al pannello di controllo:
+Accesso:
 
 ```text
-http://IP_DEL_SERVER:8080/admin/login
+/wiki
+```
+
+Contenuti disponibili:
+
+* tecniche di impasto;
+* lievitazione;
+* fermentazione;
+* utilizzo dei prefermenti;
+* gestione delle farine;
+* procedure operative.
+
+---
+
+# 🔐 9. Accesso Area Amministrativa
+
+L'accesso amministrativo è protetto da autenticazione.
+
+Percorso:
+
+```text
+/admin/login
 ```
 
 Inserire:
@@ -172,175 +223,121 @@ Inserire:
 * nome utente;
 * password.
 
-Una volta autenticati si accede al pannello amministrativo.
+Solo gli utenti autorizzati possono accedere al backend.
 
 ---
 
-# ⚙️ 8. Gestione Ricette
+# ⚙️ 10. Gestione Ricette
 
-La sezione più importante del sistema.
+Dal pannello amministrativo è possibile:
 
-Permette:
-
-* creazione formule;
-* modifica formule;
-* eliminazione formule;
-* gestione ingredienti;
-* gestione immagini;
-* configurazione moduli.
+* creare nuove ricette;
+* modificare ricette esistenti;
+* eliminare ricette;
+* pubblicare o nascondere ricette.
 
 ---
 
-## Editor Istruzioni (Quill.js)
+## Editor Procedimento
 
 Le istruzioni vengono inserite tramite editor visuale.
 
-Funzioni principali:
+Funzionalità disponibili:
 
-* testo formattato;
-* paragrafi;
+* grassetto;
+* corsivo;
 * elenchi;
-* allineamenti.
+* titoli;
+* paragrafi;
+* immagini.
 
-Al salvataggio il contenuto viene trasferito automaticamente al database.
-
----
-
-## Gestione Ingredienti
-
-Durante la compilazione della ricetta:
-
-* gli ingredienti vengono selezionati dall'anagrafica centrale;
-* il sistema recupera automaticamente il valore W;
-* i dati vengono storicizzati nella formula.
+Il contenuto viene automaticamente ottimizzato e salvato nel database.
 
 ---
 
-## Gestione Teglie
+# 🖼️ 11. Libreria Immagini Centralizzata
 
-È possibile associare una o più teglie ad una singola ricetta.
+Le immagini vengono gestite da un archivio unico.
 
-Le teglie vengono selezionate dalla flotta globale.
+Vantaggi:
 
----
-
-# 🖼️ 9. Libreria Immagini Centralizzata (Novità v2.2.0)
-
-La gestione immagini è stata completamente riprogettata.
-
----
-
-## Archivio Centrale
-
-Le immagini vengono archiviate una sola volta tramite:
-
-```text
-MasterImage
-```
-
-e possono essere riutilizzate da più ricette.
+* caricamento una sola volta;
+* riutilizzo su più ricette;
+* gestione centralizzata;
+* anteprima immediata.
 
 ---
 
-## Associazione Immagine
+## Associare un'Immagine
 
-Nel form della ricetta è presente un selettore dedicato.
-
-Procedura:
-
-1. Aprire il menu a tendina.
-2. Selezionare l'immagine desiderata.
-3. Premere:
-
-```text
-✓ Applica
-```
-
+1. Aprire la ricetta.
+2. Selezionare l'immagine dal menu.
+3. Premere "Applica".
 4. Salvare la ricetta.
 
 ---
 
-## Anteprima Dinamica
-
-Dopo la selezione:
-
-* compare immediatamente l'anteprima;
-* viene mostrata la miniatura;
-* l'associazione viene mantenuta dopo il salvataggio.
-
----
-
-## Scollegamento Immagine
-
-Per rimuovere l'immagine:
+## Rimuovere un'Immagine
 
 1. Aprire la ricetta.
-2. Premere:
-
-```text
-Scollega Immagine
-```
-
+2. Premere "Scollega Immagine".
 3. Salvare.
 
 ---
 
-# 🧾 10. Gestione Ingredienti (Master Ingredienti)
+# 🥣 12. Gestione Ingredienti
 
-Archivio globale degli ingredienti.
+L'archivio ingredienti centralizzato consente di definire:
 
-Campi principali:
-
-* Nome;
-* È una Farina;
-* È un Liquido;
-* Valore W.
-
----
-
-## Regola di Sicurezza
-
-Un ingrediente non può essere contemporaneamente:
-
-* farina;
-* liquido.
-
-Il controllo viene eseguito automaticamente tramite JavaScript.
+* nome ingrediente;
+* tipologia;
+* valore W;
+* classificazione farina;
+* classificazione liquido.
 
 ---
 
-# 🍕 11. Gestione Teglie (Master Bakery Pan)
+# 🍕 13. Gestione Teglie
 
-Archivio globale delle teglie.
-
-Ogni elemento possiede:
+L'archivio teglie permette di registrare:
 
 * nome;
 * tipologia;
-* capacità in grammi.
+* capacità impasto.
+
+Le teglie possono essere associate a più ricette.
 
 ---
 
-# 🎨 12. Impostazioni Globali
+# 🎨 14. Impostazioni Globali
 
-Permettono di configurare:
+Le impostazioni consentono di configurare:
 
-* nome sito;
-* descrizione sito;
-* rapporto lieviti;
+* nome del sito;
+* descrizione del sito;
+* tema grafico;
 * parametri Tangzhong;
-* tema grafico.
+* rapporto lievito fresco/secco.
 
 ---
 
-# 🔒 13. Sicurezza Account
+# 🔒 15. Sicurezza
 
-Permette di modificare:
+Le password vengono memorizzate esclusivamente tramite hash crittografico.
 
-* password amministrativa;
-* credenziali di accesso.
+Il sistema non conserva password in chiaro.
 
-Le password vengono salvate esclusivamente tramite hash crittografico.
+---
+
+# 🧹 16. Cache del Browser
+
+Dopo aggiornamenti importanti dell'applicazione può essere utile aggiornare la pagina con:
+
+```text
+CTRL + F5
+```
+
+per forzare il caricamento delle nuove risorse.
 
 ---
 
@@ -348,16 +345,16 @@ Le password vengono salvate esclusivamente tramite hash crittografico.
 
 Per ottenere il massimo dal sistema:
 
-1. Utilizzare immagini con sfondo chiaro.
-2. Mantenere descrizioni brevi.
-3. Verificare sempre i flag Farina/Liquido.
-4. Utilizzare nomi ricetta coerenti.
-5. Aggiornare regolarmente la libreria ingredienti.
+1. Utilizzare immagini di buona qualità.
+2. Compilare sempre le descrizioni.
+3. Mantenere aggiornata l'anagrafica ingredienti.
+4. Verificare i valori W delle farine.
+5. Salvare frequentemente durante la modifica delle ricette.
 
 ---
 
 # 👨‍💻 Credits
 
-Architettato e sviluppato da Tiziano Cassone.
+Architettato e sviluppato da **Tiziano Cassone**.
 
 © 2026 - Il Mio Ricettario
