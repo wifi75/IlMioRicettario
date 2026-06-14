@@ -8,4 +8,4 @@ __pycache__/
 .env
 
 # Instance locale
-instance/
+instance/data/database.db
