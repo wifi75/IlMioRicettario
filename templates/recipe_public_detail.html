@@ -11,6 +11,10 @@
         {% set has_dry_yeast.value = true %}
     {% endif %}
 {% endfor %}
+{% set recipe_original_total = namespace(value=0) %}
+{% for ing in ingredients %}
+    {% set recipe_original_total.value = recipe_original_total.value + (ing.quantity or 0) %}
+{% endfor %}
 
 <style>
     /* Dimensionamento fisso e proporzionato per l'immagine di testa nel dettaglio */
@@ -144,7 +148,7 @@
     <input type="number"
            id="calc-target-weight"
            class="form-control text-center fw-bold fs-5 rounded-3"
-           value="1000"
+           value="{{ recipe_original_total.value | round(1) }}"
            step="50"
            autocomplete="off">
 </div>
@@ -266,7 +270,7 @@
                 </div>
 
                 <div class="mt-3 p-3 bg-light rounded-3 text-dark border small fw-bold text-center" id="box-stringa-riepilogo" style="border-color: #e2e8f0 !important;">
-                    Target Peso Impasto Richiesto: 1000g
+                    Target Peso Impasto Richiesto: {{ recipe_original_total.value | round(1) }}g
                 </div>
             </div>
         </div>
@@ -750,7 +754,7 @@ document.addEventListener('DOMContentLoaded', function() {
             recipeTotalFlourBase = 1; 
         }
 
-        let targetTotalWeight = 1000;
+        let targetTotalWeight = recipeTotalWeightBase;
         const mode = scaleModeSelect ? scaleModeSelect.value : 'weight';
 
         if (mode === 'tray') {
@@ -782,13 +786,13 @@ document.addEventListener('DOMContentLoaded', function() {
             let weight = inputPiecesWeight ? parseFloat(inputPiecesWeight.value) || 0 : 0;
             
             targetTotalWeight = count * weight;
-            if (targetTotalWeight <= 0) targetTotalWeight = 1000;
+            if (targetTotalWeight <= 0) targetTotalWeight = recipeTotalWeightBase;
 
             if (stringaRiepilogo) {
                 stringaRiepilogo.textContent = `Configurazione: ${count} pezzi da ${weight}g · Totale Impasto: ${Math.round(targetTotalWeight)}g`;
             }
         } else {
-            targetTotalWeight = inputTargetWeight ? parseFloat(inputTargetWeight.value) || 1000 : 1000;
+            targetTotalWeight = inputTargetWeight ? parseFloat(inputTargetWeight.value) || recipeTotalWeightBase : recipeTotalWeightBase;
             if (stringaRiepilogo) {
                 stringaRiepilogo.textContent = `Target Peso Impasto Richiesto: ${Math.round(targetTotalWeight)}g`;
             }
