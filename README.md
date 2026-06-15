@@ -32,9 +32,7 @@ https://github.com/wifi75/IlMioRicettario
 
 # 📄 Licenza
 
-Progetto sviluppato da Tiziano Cassone.
-
-Tutti i diritti riservati.
+Progetto sviluppato da Tiziano Cassone
 
 ---
 
