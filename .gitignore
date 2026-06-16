@@ -1,11 +1,16 @@
-# Cache di Python
+# Cache Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
-# File di configurazione locale o segreti
+# Segreti e variabili locali
 .env
 
-# Instance locale
-instance/data/database.db
+# Configurazione istanza locale (mai in git)
+instance/
+
+# Database
+data/database.db
+data/*.db
+data/*.sqlite

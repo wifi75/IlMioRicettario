@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}Backup e Ripristino{% endblock %}
+{% block page_title %}🗄️ Backup e Ripristino{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+
+    <!-- Statistiche rapide -->
+    <div class="col-12">
+        <div class="row g-3">
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm text-center py-3">
+                    <div class="fs-2 fw-bold text-primary">{{ recipe_count }}</div>
+                    <div class="small text-muted">Ricette</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm text-center py-3">
+                    <div class="fs-2 fw-bold text-success">{{ ingredient_count }}</div>
+                    <div class="small text-muted">Ingredienti</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm text-center py-3">
+                    <div class="fs-2 fw-bold text-warning">{{ pan_count }}</div>
+                    <div class="small text-muted">Teglie</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm text-center py-3">
+                    <div class="fs-2 fw-bold text-info">{{ wiki_count }}</div>
+                    <div class="small text-muted">Wiki</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-dark text-white fw-bold py-3">
+                <i class="bi bi-download me-2"></i>Esporta Backup
+            </div>
+            <div class="card-body p-4">
+
+                <p class="text-muted small mb-4">
+                    Scarica i dati dell'applicazione in formato JSON o ZIP.
+                    I file di backup possono essere reimportati su qualsiasi installazione.
+                </p>
+
+                <div class="d-grid gap-3">
+
+                    <a href="{{ url_for('backup.export_recipes') }}"
+                       class="btn btn-outline-primary d-flex align-items-center gap-3 px-4 py-3 text-start rounded-3">
+                        <i class="bi bi-journal-richtext fs-4"></i>
+                        <div>
+                            <div class="fw-semibold">Esporta Ricette</div>
+                            <div class="small text-muted">{{ recipe_count }} ricette con ingredienti e moduli — formato .json</div>
+                        </div>
+                    </a>
+
+                    <a href="{{ url_for('backup.export_config') }}"
+                       class="btn btn-outline-success d-flex align-items-center gap-3 px-4 py-3 text-start rounded-3">
+                        <i class="bi bi-sliders fs-4"></i>
+                        <div>
+                            <div class="fw-semibold">Esporta Configurazione</div>
+                            <div class="small text-muted">Impostazioni, ingredienti, teglie e wiki — formato .json</div>
+                        </div>
+                    </a>
+
+                    <a href="{{ url_for('backup.export_full') }}"
+                       class="btn btn-dark d-flex align-items-center gap-3 px-4 py-3 text-start rounded-3">
+                        <i class="bi bi-file-zip fs-4"></i>
+                        <div>
+                            <div class="fw-semibold">Backup Completo</div>
+                            <div class="small" style="color: #94a3b8;">Ricette + configurazione + immagini caricate — formato .zip</div>
+                        </div>
+                    </a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-dark text-white fw-bold py-3">
+                <i class="bi bi-upload me-2"></i>Ripristina Backup
+            </div>
+            <div class="card-body p-4">
+
+                <p class="text-muted small mb-4">
+                    Carica un file <code>.json</code> o <code>.zip</code> precedentemente esportato
+                    per ripristinare ricette, configurazione o entrambi.
+                </p>
+
+                <form method="post" action="{{ url_for('backup.import_backup') }}" enctype="multipart/form-data">
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-dark small text-uppercase">File di backup</label>
+                        <input type="file" name="backup_file" class="form-control" accept=".json,.zip" required>
+                        <div class="form-text">Formati accettati: <code>.json</code> (ricette o configurazione) oppure <code>.zip</code> (backup completo).</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-dark small text-uppercase">Modalità importazione</label>
+                        <div class="d-flex flex-column gap-2">
+                            <div class="form-check p-3 border rounded-3 bg-light">
+                                <input class="form-check-input" type="radio" name="import_mode" id="modeMerge" value="merge" checked>
+                                <label class="form-check-label" for="modeMerge">
+                                    <div class="fw-semibold small">Aggiungi (Merge)</div>
+                                    <div class="text-muted" style="font-size: 0.8rem;">Aggiunge solo i dati non presenti. Quelli esistenti non vengono toccati.</div>
+                                </label>
+                            </div>
+                            <div class="form-check p-3 border rounded-3 bg-light">
+                                <input class="form-check-input" type="radio" name="import_mode" id="modeReplace" value="replace">
+                                <label class="form-check-label" for="modeReplace">
+                                    <div class="fw-semibold small text-danger">Sostituisci (Replace)</div>
+                                    <div class="text-muted" style="font-size: 0.8rem;">Elimina prima i dati esistenti, poi importa dal file. Operazione irreversibile.</div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-warning fw-bold py-2"
+                                onclick="return confirm('Confermi il ripristino? In modalità Sostituisci i dati attuali verranno eliminati.')">
+                            <i class="bi bi-upload me-2"></i>Avvia Ripristino
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info tecnica -->
+    <div class="col-12">
+        <div class="card border-0 shadow-sm bg-light">
+            <div class="card-body p-4">
+                <h6 class="fw-bold text-dark mb-3"><i class="bi bi-info-circle me-2"></i>Note sul sistema di backup</h6>
+                <div class="row g-3 small text-muted">
+                    <div class="col-md-4">
+                        <div class="fw-semibold text-dark mb-1">Portabilità</div>
+                        I file JSON esportati sono compatibili tra installazioni diverse dello stesso progetto. Utili per migrare da un server all'altro.
+                    </div>
+                    <div class="col-md-4">
+                        <div class="fw-semibold text-dark mb-1">Immagini</div>
+                        Le immagini delle ricette sono incluse solo nel backup <strong>completo ZIP</strong>. I backup JSON contengono solo i metadati.
+                    </div>
+                    <div class="col-md-4">
+                        <div class="fw-semibold text-dark mb-1">Frequenza consigliata</div>
+                        Esegui un backup completo prima di ogni aggiornamento dell'applicazione e almeno una volta a settimana in produzione.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

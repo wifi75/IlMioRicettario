@@ -1,9 +1,9 @@
-# PROGETTO: Il Mio Ricettario (V2.3.2)
+# PROGETTO: Il Mio Ricettario (V3.0.0)
 
 ## PANORAMICA
 
 * **Nome:** Il Mio Ricettario
-* **Versione Architetturale:** V2.3.2
+* **Versione Architetturale:** V3.0.0
 * **Stato:** Produzione Stabile
 * **Repository GitHub:** https://github.com/wifi75/IlMioRicettario
 * **Sviluppatore Principale:** Tiziano Cassone

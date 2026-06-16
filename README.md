@@ -1,6 +1,6 @@
 # 🧫 Il Mio Ricettario - Professional Baking Suite
 
-![Versione](https://img.shields.io/badge/version-v2.3.2-orange?style=for-the-badge)
+![Versione](https://img.shields.io/badge/version-v3.0.0-orange?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Python-3.13-blue?style=for-the-badge&logo=python)
 ![Framework](https://img.shields.io/badge/Framework-Flask-blue?style=for-the-badge&logo=flask)
 ![Database](https://img.shields.io/badge/Database-SQLite-green?style=for-the-badge&logo=sqlite)
@@ -36,7 +36,36 @@ Progetto sviluppato da Tiziano Cassone
 
 ---
 
-# 🚀 Novità della Serie 2.2
+# 🚀 Novità
+
+## v3.0.0
+
+### Web Installer
+
+* Wizard di installazione accessibile via browser (`python installer.py` → http://server:5000)
+* Generazione automatica di `instance/config.py` con PORT e SECRET_KEY
+* Se avviato come root: crea, abilita e avvia il servizio systemd in automatico
+* Mostra il file `.service` pronto da copiare con un click
+
+### Configurazione Istanza
+
+* Porta e SECRET_KEY configurabili in `instance/config.py` (mai in git)
+* `git pull` non genera mai più conflitti sulla porta
+* La variabile d'ambiente ha sempre priorità sul file istanza
+
+### Backup e Ripristino
+
+* Export ricette (JSON), configurazione (JSON), backup completo con immagini (ZIP)
+* Import con modalità Merge (aggiunge) o Replace (ripristino completo)
+* Accessibile da Admin → Manutenzione → Backup e Ripristino
+
+### Pannello Admin Riorganizzato
+
+* Sidebar suddivisa in quattro sezioni: Catalogo, Sistema, Account, Manutenzione
+* Aggiunta voce Conversione Lieviti (route `/admin/settings/yeast` prima mancante)
+* Aggiunta sezione Manutenzione con Backup e Ripristino
+
+---
 
 ## v2.3.2
 

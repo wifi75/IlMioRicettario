@@ -25,8 +25,8 @@ from models.bakery_pan import MasterBakeryPan
 from models.image import MasterImage
 
 from routes.recipes import recipes_bp
-# BLINDATO: Forza il caricamento del Blueprint corretto per evitare conflitti di sotto-cartelle
 from routes.admin import admin_bp
+from routes.backup import backup_bp
 
 
 app = Flask(__name__)
@@ -44,6 +44,7 @@ migrate = Migrate(app, db)
 # ==========================================================
 app.register_blueprint(admin_bp)
 app.register_blueprint(recipes_bp)
+app.register_blueprint(backup_bp)
 
 
 @login_manager.user_loader
@@ -414,6 +415,6 @@ for directory in [
 if __name__ == "__main__":
     app.run(
         host="0.0.0.0",
-        port=8080,
+        port=app.config.get("PORT", 8080),
         debug=False
     )

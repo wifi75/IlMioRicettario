@@ -246,29 +246,47 @@
                 </div>
             </div>
 
-            <div class="nav flex-column gap-1 mb-4">
-                <span class="text-uppercase tracking-wider fw-bold px-2 mb-2 opacity-25" style="font-size: 10px; color: #94a3b8;">Gestione Contenuti</span>
+            <!-- CATALOGO -->
+            <div class="nav flex-column gap-1 mb-3">
+                <span class="text-uppercase tracking-wider fw-bold px-2 mb-1 opacity-25" style="font-size: 10px; color: #94a3b8;">Catalogo</span>
                 <a href="{{ url_for('admin.recipes') }}" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 hover-sidebar">
                     <i class="bi bi-journal-richtext text-warning"></i><span>Ricette</span>
                 </a>
                 <a href="{{ url_for('admin.master_ingredients_view') }}" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 hover-sidebar">
-                    <i class="bi bi-egg-fried text-success"></i><span>Anagrafica Ingredienti</span>
+                    <i class="bi bi-egg-fried text-success"></i><span>Ingredienti</span>
                 </a>
                 <a href="{{ url_for('admin.master_pans_view') }}" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 hover-sidebar">
-                    <i class="bi bi-grid-fill text-purple" style="color: #c084fc !important;"></i><span>Anagrafica Teglie</span>
+                    <i class="bi bi-grid-fill" style="color: #c084fc !important;"></i><span>Teglie</span>
                 </a>
                 <a href="{{ url_for('admin.wiki_list') }}" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 hover-sidebar">
-                    <i class="bi bi-book text-info"></i><span>Wiki</span>
+                    <i class="bi bi-book text-info"></i><span>Wiki Tecnica</span>
                 </a>
             </div>
 
-            <div class="nav flex-column gap-1">
-                <span class="text-uppercase tracking-wider fw-bold px-2 mb-2 opacity-25" style="font-size: 10px; color: #94a3b8;">Configurazione</span>
-                <a href="{{ url_for('admin.settings_theme') }}" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 opacity-75 hover-sidebar">
-                    <i class="bi bi-palette-fill text-info"></i><span>Design e Temi Sito</span>
+            <!-- SISTEMA -->
+            <div class="nav flex-column gap-1 mb-3">
+                <span class="text-uppercase tracking-wider fw-bold px-2 mb-1 opacity-25" style="font-size: 10px; color: #94a3b8;">Sistema</span>
+                <a href="{{ url_for('admin.settings_theme') }}" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 hover-sidebar opacity-75">
+                    <i class="bi bi-palette-fill text-info"></i><span>Design e Temi</span>
                 </a>
-                <a href="{{ url_for('admin.change_password') }}" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 opacity-75 hover-sidebar">
-                    <i class="bi bi-shield-lock"></i><span>Sicurezza Account</span>
+                <a href="{{ url_for('admin.settings_yeast') }}" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 hover-sidebar opacity-75">
+                    <i class="bi bi-capsule text-warning"></i><span>Conversione Lieviti</span>
+                </a>
+            </div>
+
+            <!-- ACCOUNT -->
+            <div class="nav flex-column gap-1 mb-3">
+                <span class="text-uppercase tracking-wider fw-bold px-2 mb-1 opacity-25" style="font-size: 10px; color: #94a3b8;">Account</span>
+                <a href="{{ url_for('admin.change_password') }}" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 hover-sidebar opacity-75">
+                    <i class="bi bi-shield-lock text-danger"></i><span>Sicurezza e Password</span>
+                </a>
+            </div>
+
+            <!-- MANUTENZIONE -->
+            <div class="nav flex-column gap-1">
+                <span class="text-uppercase tracking-wider fw-bold px-2 mb-1 opacity-25" style="font-size: 10px; color: #94a3b8;">Manutenzione</span>
+                <a href="{{ url_for('backup.backup_page') }}" class="nav-link text-white rounded px-3 py-2 d-flex align-items-center gap-3 hover-sidebar opacity-75">
+                    <i class="bi bi-cloud-arrow-down text-success"></i><span>Backup e Ripristino</span>
                 </a>
             </div>
         </div>

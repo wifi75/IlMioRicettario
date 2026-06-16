@@ -1,3 +1,19 @@
+## v3.0.0 - 2026-06-16
+
+### Aggiunto
+
+* **Web Installer (`installer.py`):** Wizard di installazione guidata accessibile via browser su porta 5000. Genera automaticamente `instance/config.py` con PORT e SECRET_KEY. Se avviato come root crea, abilita e avvia il servizio systemd in automatico. Altrimenti mostra il file `.service` pronto da copiare con un click.
+
+* **`instance/config.py` — Configurazione Istanza Server:** La porta dell'applicazione e la SECRET_KEY possono ora essere definite in `instance/config.py`, file locale mai incluso in git. Elimina i conflitti tra `git pull` e modifiche locali alla porta. La variabile d'ambiente `SECRET_KEY` ha priorità su `instance/config.py`.
+
+* **Sistema Backup e Ripristino (`/admin/backup`):** Export e import completo di ricette, configurazione e immagini. Tre modalità di export: Ricette (JSON), Configurazione (JSON), Backup Completo (ZIP con immagini incluse). Import con due modalità: Merge (aggiunge senza sovrascrivere) e Replace (ripristino completo).
+
+* **Route Conversione Lieviti (`/admin/settings/yeast`):** Aggiunta la route mancante per il template `settings_yeast.html`. Il rapporto di conversione fresco/secco è ora accessibile dal menu admin.
+
+* **Riorganizzazione Sidebar Admin:** Il menu laterale è suddiviso in quattro sezioni tematiche — Catalogo, Sistema, Account, Manutenzione — per una navigazione più chiara e professionale.
+
+---
+
 ## v2.3.2 - 2026-06-16
 
 ### Modificato e Corretto

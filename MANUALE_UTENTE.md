@@ -1,4 +1,4 @@
-# 📖 Manuale Utente - Il Mio Ricettario (v2.3.2)
+# 📖 Manuale Utente - Il Mio Ricettario (v3.0.0)
 
 Benvenuto in **Il Mio Ricettario**, la piattaforma professionale per la gestione di ricette di panificazione, pizza, focaccia, grandi lievitati e arte bianca.
 
@@ -208,7 +208,60 @@ Contenuti disponibili:
 
 ---
 
-# 🔐 9. Accesso Area Amministrativa
+# 🛠️ 9. Installazione Guidata (Web Installer)
+
+L'applicazione include un wizard di installazione accessibile via browser.
+
+Avvio:
+
+```bash
+python installer.py
+# oppure, per abilitare il servizio systemd in automatico:
+sudo python installer.py
+```
+
+Aprire il browser su:
+
+```text
+http://localhost:5000
+```
+
+Il wizard guida l'utente nella configurazione di:
+
+* porta dell'applicazione
+* Secret Key crittografica (generata automaticamente)
+
+Al termine genera il file `instance/config.py` che non viene mai incluso in Git, eliminando i conflitti tra aggiornamenti e configurazioni locali.
+
+Se avviato come root, il servizio systemd viene creato, abilitato e avviato in automatico. Altrimenti viene mostrato il contenuto del file `.service` da copiare manualmente.
+
+---
+
+# 🗄️ 10. Backup e Ripristino
+
+Il pannello di backup è accessibile da:
+
+```text
+Admin → Manutenzione → Backup e Ripristino
+```
+
+## Export disponibili
+
+* **Esporta Ricette** — tutte le ricette con ingredienti e moduli attivi, formato `.json`
+* **Esporta Configurazione** — impostazioni, ingredienti, teglie e wiki, formato `.json`
+* **Backup Completo** — ricette, configurazione e immagini caricate, formato `.zip`
+
+## Import
+
+1. Selezionare il file `.json` o `.zip` da ripristinare.
+2. Scegliere la modalità:
+   * **Merge** — aggiunge solo i dati non presenti, preserva quelli esistenti.
+   * **Replace** — elimina prima i dati esistenti, poi importa. Operazione irreversibile.
+3. Premere **Avvia Ripristino**.
+
+---
+
+# 🔐 11. Accesso Area Amministrativa
 
 L'accesso amministrativo è protetto da autenticazione.
 
@@ -233,7 +286,7 @@ Alla prima installazione il sistema genera automaticamente una password sicura e
 
 ---
 
-# ⚙️ 10. Gestione Ricette
+# ⚙️ 12. Gestione Ricette
 
 Dal pannello amministrativo è possibile:
 
@@ -261,7 +314,7 @@ Il contenuto viene automaticamente ottimizzato e salvato nel database.
 
 ---
 
-# 🖼️ 11. Libreria Immagini Centralizzata
+# 🖼️ 13. Libreria Immagini Centralizzata
 
 Le immagini vengono gestite da un archivio unico.
 
@@ -291,7 +344,7 @@ Vantaggi:
 
 ---
 
-# 🥣 12. Gestione Ingredienti
+# 🥣 14. Gestione Ingredienti
 
 L'archivio ingredienti centralizzato consente di definire:
 
@@ -303,7 +356,7 @@ L'archivio ingredienti centralizzato consente di definire:
 
 ---
 
-# 🍕 13. Gestione Teglie
+# 🍕 15. Gestione Teglie
 
 L'archivio teglie permette di registrare:
 
@@ -315,7 +368,7 @@ Le teglie possono essere associate a più ricette.
 
 ---
 
-# 🎨 14. Impostazioni Globali
+# 🎨 16. Impostazioni Globali
 
 Le impostazioni consentono di configurare:
 
@@ -327,7 +380,7 @@ Le impostazioni consentono di configurare:
 
 ---
 
-# 🔒 15. Sicurezza
+# 🔒 17. Sicurezza
 
 Le password vengono memorizzate esclusivamente tramite hash crittografico (bcrypt).
 
@@ -357,7 +410,7 @@ Cambiare sempre la password subito dopo la prima installazione:
 
 ---
 
-# 🧹 16. Cache del Browser
+# 🧹 18. Cache del Browser
 
 Dopo aggiornamenti importanti dell'applicazione può essere utile aggiornare la pagina con:
 

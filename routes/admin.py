@@ -782,6 +782,28 @@ def settings_theme():
     return render_template("admin/settings_theme.html", setting=setting)
 
 
+@admin_bp.route("/settings/yeast", methods=["GET", "POST"])
+@login_required
+def settings_yeast():
+    setting = Setting.query.first()
+    if not setting:
+        setting = Setting(fresh_to_dry_ratio=3.0)
+        db.session.add(setting)
+        db.session.commit()
+
+    if request.method == "POST":
+        try:
+            fresh_val = float(request.form.get("yeast_fresh_val", "3").replace(",", "."))
+            setting.fresh_to_dry_ratio = fresh_val
+            db.session.commit()
+            flash("Rapporto di conversione lieviti aggiornato.", "success")
+        except ValueError:
+            flash("Valore non valido.", "danger")
+        return redirect(url_for("admin.settings_yeast"))
+
+    return render_template("admin/settings_yeast.html", setting=setting)
+
+
 @admin_bp.route("/change_password", methods=["GET", "POST"])
 @login_required
 def change_password():
