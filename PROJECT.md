@@ -387,53 +387,56 @@ Il database deve esistere esclusivamente nei sistemi locali o di produzione.
 
 # DEPLOY PRODUZIONE
 
-## Servizio Systemd
+## Installazione Guidata (Web Installer)
 
-Nome servizio:
-
-```text
-ilmioricettario.service
+```bash
+sudo python installer.py
+# → apri http://<server>:5000
 ```
 
-Funzioni:
+Il wizard genera `instance/config.py` con PORT e SECRET_KEY e,
+se avviato come root, crea e abilita il servizio systemd in automatico.
 
-* avvio automatico al boot;
-* riavvio automatico in caso di errore;
-* gestione tramite systemctl.
+## Configurazione Istanza
 
-La sezione `[Service]` deve includere obbligatoriamente:
+La porta e la SECRET_KEY vengono lette da `instance/config.py`:
 
-```ini
-Environment="SECRET_KEY=..."
+```python
+SECRET_KEY = "..."
+PORT = 8100
 ```
 
-Senza questa variabile l'applicazione non si avvia.
+Questo file non è mai in git. La variabile d'ambiente `SECRET_KEY` ha priorità su `instance/config.py`.
 
-## Comandi Principali
+## Aggiornamento
+
+```bash
+git pull origin main
+systemctl restart ilmioricettario
+```
+
+Nessun conflitto: `instance/config.py` non viene mai sovrascritto da git.
+
+## Comandi Systemd
 
 ```bash
 systemctl start ilmioricettario
 systemctl stop ilmioricettario
 systemctl restart ilmioricettario
 systemctl status ilmioricettario
-```
-
-## Log
-
-```bash
 journalctl -u ilmioricettario -f
 ```
 
 ---
 
-# ROADMAP V3
+# ROADMAP V3.x
 
-* media ponderata automatica del W;
+* media ponderata automatica del W delle farine;
 * gestione completa lievito madre;
-* statistiche avanzate;
-* backup automatici;
-* import/export ricette;
-* API REST pubbliche.
+* statistiche avanzate di utilizzo ricette;
+* backup automatici schedulati;
+* API REST pubbliche;
+* multi-utente con ruoli.
 
 ---
 

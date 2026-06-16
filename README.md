@@ -333,120 +333,66 @@ Supporto automatico:
 
 # 💻 Installazione Produzione Linux
 
-## Clonazione Repository
+## 1 — Clonazione Repository
 
 ```bash
 cd /var/www
-
 git clone https://github.com/wifi75/IlMioRicettario.git
-
 cd IlMioRicettario
 ```
 
 ---
 
-## Creazione Ambiente Virtuale
+## 2 — Ambiente Virtuale e Dipendenze
 
 ```bash
-apt update
-
-apt install python3 python3-venv python3-pip -y
-
+apt update && apt install python3 python3-venv python3-pip -y
 python3 -m venv venv
-
 source venv/bin/activate
-```
-
----
-
-## Installazione Dipendenze
-
-```bash
 pip install -r requirements.txt
 ```
 
 ---
 
-## Cartelle Automatiche
+## 3 — Installazione Guidata via Browser (Web Installer)
 
-Al primo avvio vengono create automaticamente:
-
-```text
-data/
-static/uploads/
-static/uploads/recipes/
-```
-
-Non è necessario creare manualmente alcuna cartella.
-
-> L'applicazione crea automaticamente le cartelle necessarie al primo avvio.
->
-> Se il database SQLite è già presente sul sistema, non è richiesta alcuna inizializzazione manuale.
-
----
-
-## Avvio Applicazione
+Avvia il wizard di installazione:
 
 ```bash
-python app.py
+sudo python installer.py
 ```
 
-Configurazione predefinita:
+Apri il browser su:
 
 ```text
-Host: 0.0.0.0
-Porta: 8100
+http://<indirizzo-server>:5000
 ```
+
+Il wizard chiede:
+
+* **Porta** dell'applicazione (es. 8100)
+* **Secret Key** (generata automaticamente con un click)
+
+Al termine genera `instance/config.py` con PORT e SECRET_KEY.
+Se avviato con `sudo`, crea e abilita il servizio systemd in automatico.
+
+> `instance/config.py` non è mai incluso in git: `git pull` non genererà mai conflitti sulla porta o sulla chiave.
 
 ---
 
-# ⚙️ Installazione come Servizio Systemd
+## 4 — Se il servizio NON è stato abilitato automaticamente
 
-Creare:
+Copia il contenuto mostrato nella pagina di successo dell'installer e salvalo in:
 
 ```bash
 nano /etc/systemd/system/ilmioricettario.service
 ```
 
-Contenuto:
-
-```ini
-[Unit]
-Description=Il Mio Ricettario Flask
-After=network.target
-
-[Service]
-User=root
-Group=root
-
-WorkingDirectory=/var/www/IlMioRicettario
-
-Environment="PATH=/var/www/IlMioRicettario/venv/bin"
-Environment="SECRET_KEY=inserisci-qui-una-stringa-casuale-lunga-almeno-32-caratteri"
-
-ExecStart=/var/www/IlMioRicettario/venv/bin/python /var/www/IlMioRicettario/app.py
-
-Restart=always
-RestartSec=5
-
-[Install]
-WantedBy=multi-user.target
-```
-
-> Generare una SECRET_KEY sicura con:
-> ```bash
-> python3 -c "import secrets; print(secrets.token_hex(32))"
-> ```
-
----
-
-## Attivazione Servizio
+Poi abilita e avvia:
 
 ```bash
 systemctl daemon-reload
-
 systemctl enable ilmioricettario
-
 systemctl start ilmioricettario
 ```
 
@@ -462,43 +408,26 @@ systemctl status ilmioricettario
 
 ```bash
 cd /var/www/IlMioRicettario
-
 git pull origin main
+systemctl restart ilmioricettario
 ```
 
-Aggiornare le dipendenze:
+> Nessun conflitto sulla porta: la configurazione è in `instance/config.py`, mai in git.
+
+Aggiornare le dipendenze solo se `requirements.txt` è cambiato:
 
 ```bash
 source venv/bin/activate
-
 pip install -r requirements.txt
-```
-
-Riavviare:
-
-```bash
-systemctl restart ilmioricettario
 ```
 
 ---
 
 ## Log
 
-Visualizzazione continua:
-
 ```bash
 journalctl -u ilmioricettario -f
-```
-
-Ultimi 100 eventi:
-
-```bash
 journalctl -u ilmioricettario -n 100 --no-pager
-```
-
-Errori:
-
-```bash
 journalctl -xeu ilmioricettario
 ```
 
@@ -512,12 +441,12 @@ Il progetto utilizza:
 * Autenticazione Flask-Login
 * Protezione amministrativa delle rotte
 * Gestione utenti sicura
-* SECRET_KEY letta da variabile d'ambiente (mai hardcoded)
+* SECRET_KEY configurabile via `instance/config.py` o variabile d'ambiente (mai hardcoded)
 * Password admin generata randomicamente alla prima installazione
 
 > La SECRET_KEY firma i cookie di sessione Flask ed è completamente separata dalla password amministratore.
 >
-> L'applicazione non si avvia se la variabile SECRET_KEY non è impostata nell'ambiente.
+> La variabile d'ambiente ha priorità su `instance/config.py`. L'applicazione non si avvia se SECRET_KEY non è configurata in nessuno dei due posti.
 
 ---
 
@@ -542,14 +471,14 @@ __pycache__/
 
 # 🛣️ Roadmap Futura
 
-## V3
+## V3.x
 
-* Media ponderata automatica del W
+* Media ponderata automatica del W delle farine
 * Gestione completa del lievito madre
-* Statistiche avanzate
-* Backup automatici
-* Import/Export ricette
+* Statistiche avanzate di utilizzo ricette
+* Backup automatici schedulati
 * API REST pubbliche
+* Multi-utente con ruoli
 
 ---
 
