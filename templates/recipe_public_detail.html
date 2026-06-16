@@ -122,6 +122,12 @@
         #calculated-ingredients-tbody td {
             font-size: 0.875rem;
         }
+        table thead th {
+            white-space: nowrap;
+            font-size: 0.75rem;
+        }
+        th.col-w  { width: 20% !important; }
+        th.col-grammi { width: 33% !important; }
         .detail-hero-img-wrapper {
             width: 100% !important;
             min-width: unset !important;
@@ -352,9 +358,9 @@
                             <thead>
                                 <tr class="table-light text-secondary small">
                                     <th class="ps-3">Materia Prima</th>
-                                    <th class="text-center" style="width: 18%;">Forza (W)</th>
+                                    <th class="text-center col-w"><span class="d-none d-md-inline">Forza </span>(W)</th>
                                     <th class="text-center d-none d-md-table-cell" style="width: 22%;">Percentuale Baker</th>
-                                    <th class="text-end text-primary fw-bold pe-3" style="width: 28%;">Grammi Necessari</th>
+                                    <th class="text-end text-primary fw-bold pe-3 col-grammi">Grammi<span class="d-none d-md-inline"> Necessari</span></th>
                                 </tr>
                             </thead>
                             <tbody id="calculated-ingredients-tbody">
@@ -393,8 +399,9 @@
                                 </tr>
 
                                 <tr class="table-light border-top border-dark-subtle fw-bold text-dark">
-                                    <td class="ps-3 py-3 fs-5" colspan="3">TOTAL IMPASTO</td>
-                                    <td class="text-end text-danger fw-bold fs-4 pe-3" id="dash-public-total-weight-row">0 g</td>
+                                    <td class="ps-3 py-3 fs-5" colspan="2">TOTAL IMPASTO</td>
+                                    <td class="d-none d-md-table-cell"></td>
+                                    <td class="text-end text-danger fw-bold fs-4 pe-2 pe-md-3" id="dash-public-total-weight-row">0 g</td>
                                 </tr>
                             </tbody>
                         </table>
