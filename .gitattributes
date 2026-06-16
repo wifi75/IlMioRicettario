@@ -1,0 +1,16 @@
+# Forza LF per tutti i file di testo (compatibile con il server Linux di produzione)
+* text=auto eol=lf
+
+# File binari — nessuna conversione
+*.db binary
+*.sqlite binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
