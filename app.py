@@ -1,6 +1,10 @@
 from flask import Flask
 from flask import redirect
 from flask import url_for
+from flask import session
+from flask import request
+
+from translations import TRANSLATIONS
 
 from werkzeug.security import generate_password_hash
 
@@ -55,7 +59,18 @@ else:
     @app.context_processor
     def inject_global_settings():
         setting_record = Setting.query.order_by(Setting.id.desc()).first()
-        return dict(settings_data=setting_record)
+        lang = session.get('lang', 'it')
+        return dict(
+            settings_data=setting_record,
+            T=TRANSLATIONS.get(lang, TRANSLATIONS['it']),
+            current_lang=lang
+        )
+
+    @app.route('/set-lang/<string:lang>')
+    def set_lang(lang):
+        if lang in ('it', 'en'):
+            session['lang'] = lang
+        return redirect(request.referrer or url_for('recipes.list_recipes'))
 
     @app.route("/")
     def index():

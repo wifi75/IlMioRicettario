@@ -13,7 +13,7 @@
            class="btn btn-sm btn-outline-primary px-4 py-2 rounded-3 fw-bold d-flex align-items-center gap-2 transition-all shadow-none"
            style="font-size: 14px;">
             <i class="bi bi-book"></i>
-            <span>Esplora la Wiki & Linee Guida Tecniche</span>
+            <span>{{ T.wiki_btn }}</span>
         </a>
     </div>
     
@@ -70,14 +70,14 @@
                                 {{ recipe.name }}
                             </h2>
                             <p class="lh-base text-muted mb-0 opacity-75 px-1 text-truncate-2 text-recipe-desc" style="font-weight: 500; min-height: 44px !important; max-height: 44px !important; display: flex; align-items: center; justify-content: center;">
-                                {{ recipe.description if recipe.description else "Formula tecnica bilanciata." }}
+                                {{ recipe.description if recipe.description else T.recipe_no_desc }}
                             </p>
                         </div>
 
                         <a href="{{ url_for('recipes.public_detail', slug=recipe.slug) }}" 
                            class="btn btn-outline-primary w-100 mt-auto fw-bold py-2.5 rounded-3 d-flex align-items-center justify-content-center gap-2 transition-all shadow-none"
                            style="font-size: 14px; height: 42px;">
-                            <span>🔬 Visualizza e Calcola</span>
+                            <span>{{ T.recipe_view_btn }}</span>
                             <i class="bi bi-arrow-right-short fs-5"></i>
                         </a>
                     </div>

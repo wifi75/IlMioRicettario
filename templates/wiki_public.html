@@ -84,7 +84,7 @@
     <a href="{{ url_for('recipes.list_recipes') }}"
        class="btn btn-sm btn-outline-secondary px-3 py-2 rounded-3 fw-semibold d-inline-flex align-items-center gap-2"
        style="font-size: 13px;">
-        <i class="bi bi-arrow-left"></i> Ricettario
+        <i class="bi bi-arrow-left"></i> {{ T.wiki_back }}
     </a>
 </div>
 
@@ -92,10 +92,10 @@
 <div class="wiki-hero d-flex align-items-center gap-4">
     <div style="font-size: 2.5rem; line-height: 1; flex-shrink: 0;">📖</div>
     <div>
-        <h1 class="h4 fw-bold text-white mb-1">Wiki Tecnica — Arte Bianca</h1>
+        <h1 class="h4 fw-bold text-white mb-1">{{ T.wiki_title }}</h1>
         <p class="mb-0 small" style="color: #94a3b8;">
-            Guide operative, tecniche di impasto e strumenti di calcolo spiegati nel dettaglio.
-            {% if articles %}{{ articles|length }} articoli disponibili.{% endif %}
+            {{ T.wiki_subtitle }}
+            {% if articles %}{{ articles|length }} {{ T.wiki_articles_count }}.{% endif %}
         </p>
     </div>
 </div>
@@ -103,7 +103,7 @@
 {% if not articles %}
 <div class="text-center py-5 text-muted">
     <i class="bi bi-journal-x" style="font-size: 3rem; opacity: 0.3;"></i>
-    <p class="mt-3">Nessun articolo disponibile. L'amministratore può aggiungerne dalla sezione Wiki del pannello admin.</p>
+    <p class="mt-3">{{ T.wiki_no_articles }}</p>
 </div>
 {% else %}
 
@@ -112,7 +112,7 @@
     <!-- Sidebar navigazione -->
     <div class="col-md-3 d-none d-md-block">
         <div class="card border-0 shadow-sm rounded-3 p-3" style="position: sticky; top: 20px;">
-            <div class="fw-bold text-dark small mb-2 px-1">Indice</div>
+            <div class="fw-bold text-dark small mb-2 px-1">{{ T.wiki_index }}</div>
             <nav class="wiki-sidebar-nav">
                 {% for category, cat_articles in categories.items() %}
                 <div class="wiki-category-label">{{ category }}</div>
@@ -141,7 +141,7 @@
                 {{ category }}
             </span>
             <div style="flex: 1; height: 1px; background: #e2e8f0;"></div>
-            <span class="text-muted" style="font-size: 0.75rem;">{{ cat_articles|length }} articoli</span>
+            <span class="text-muted" style="font-size: 0.75rem;">{{ cat_articles|length }} {{ T.wiki_articles_label }}</span>
         </div>
 
         {% for article in cat_articles %}

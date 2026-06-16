@@ -211,13 +211,12 @@
     <div class="d-md-none position-fixed top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center text-center px-4"
          style="background: #1e293b; z-index: 9999;">
         <i class="bi bi-display" style="font-size: 52px; color: #94a3b8;"></i>
-        <h4 class="text-white fw-bold mt-3 mb-2">Pannello Admin</h4>
+        <h4 class="text-white fw-bold mt-3 mb-2">{{ T.admin_mobile_title }}</h4>
         <p class="mb-4" style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">
-            Il pannello di amministrazione richiede un tablet o un computer.<br>
-            Utilizza uno schermo più grande per gestire le ricette.
+            {{ T.admin_mobile_msg }}<br>{{ T.admin_mobile_sub }}
         </p>
         <a href="/" class="btn btn-outline-light px-4 fw-semibold rounded-3">
-            <i class="bi bi-arrow-left-short fs-5 align-middle me-1"></i> Vai al sito pubblico
+            <i class="bi bi-arrow-left-short fs-5 align-middle me-1"></i> {{ T.admin_goto_public }}
         </a>
     </div>
 
@@ -244,58 +243,63 @@
 
             <!-- CATALOGO -->
             <div class="nav flex-column gap-1 mb-2">
-                <span class="text-uppercase tracking-wider fw-bold px-2 mb-1 opacity-25" style="font-size: 10px; color: #94a3b8;">Catalogo</span>
+                <span class="text-uppercase tracking-wider fw-bold px-2 mb-1 opacity-25" style="font-size: 10px; color: #94a3b8;">{{ T.sidebar_catalog }}</span>
                 <a href="{{ url_for('admin.recipes') }}" class="nav-link text-white rounded px-3 py-1 d-flex align-items-center gap-3 hover-sidebar">
-                    <i class="bi bi-journal-richtext text-warning"></i><span>Ricette</span>
+                    <i class="bi bi-journal-richtext text-warning"></i><span>{{ T.sidebar_recipes }}</span>
                 </a>
                 <a href="{{ url_for('admin.master_ingredients_view') }}" class="nav-link text-white rounded px-3 py-1 d-flex align-items-center gap-3 hover-sidebar">
-                    <i class="bi bi-egg-fried text-success"></i><span>Ingredienti</span>
+                    <i class="bi bi-egg-fried text-success"></i><span>{{ T.sidebar_ingredients }}</span>
                 </a>
                 <a href="{{ url_for('admin.master_pans_view') }}" class="nav-link text-white rounded px-3 py-1 d-flex align-items-center gap-3 hover-sidebar">
-                    <i class="bi bi-grid-fill" style="color: #c084fc !important;"></i><span>Teglie</span>
+                    <i class="bi bi-grid-fill" style="color: #c084fc !important;"></i><span>{{ T.sidebar_pans }}</span>
                 </a>
                 <a href="{{ url_for('admin.wiki_list') }}" class="nav-link text-white rounded px-3 py-1 d-flex align-items-center gap-3 hover-sidebar">
-                    <i class="bi bi-book text-info"></i><span>Wiki Tecnica</span>
+                    <i class="bi bi-book text-info"></i><span>{{ T.sidebar_wiki }}</span>
                 </a>
             </div>
 
             <!-- SISTEMA -->
             <div class="nav flex-column gap-1 mb-2">
-                <span class="text-uppercase tracking-wider fw-bold px-2 mb-1 opacity-25" style="font-size: 10px; color: #94a3b8;">Sistema</span>
+                <span class="text-uppercase tracking-wider fw-bold px-2 mb-1 opacity-25" style="font-size: 10px; color: #94a3b8;">{{ T.sidebar_system }}</span>
                 <a href="{{ url_for('admin.settings_theme') }}" class="nav-link text-white rounded px-3 py-1 d-flex align-items-center gap-3 hover-sidebar opacity-75">
-                    <i class="bi bi-palette-fill text-info"></i><span>Design e Temi</span>
+                    <i class="bi bi-palette-fill text-info"></i><span>{{ T.sidebar_design }}</span>
                 </a>
                 <a href="{{ url_for('admin.settings_yeast') }}" class="nav-link text-white rounded px-3 py-1 d-flex align-items-center gap-3 hover-sidebar opacity-75">
-                    <i class="bi bi-capsule text-warning"></i><span>Conversione Lieviti</span>
+                    <i class="bi bi-capsule text-warning"></i><span>{{ T.sidebar_yeast }}</span>
                 </a>
                 <a href="{{ url_for('admin.settings_port') }}" class="nav-link text-white rounded px-3 py-1 d-flex align-items-center gap-3 hover-sidebar opacity-75">
-                    <i class="bi bi-hdd-network text-primary"></i><span>Porta Applicazione</span>
+                    <i class="bi bi-hdd-network text-primary"></i><span>{{ T.sidebar_port }}</span>
                 </a>
             </div>
 
             <!-- ACCOUNT -->
             <div class="nav flex-column gap-1 mb-2">
-                <span class="text-uppercase tracking-wider fw-bold px-2 mb-1 opacity-25" style="font-size: 10px; color: #94a3b8;">Account</span>
+                <span class="text-uppercase tracking-wider fw-bold px-2 mb-1 opacity-25" style="font-size: 10px; color: #94a3b8;">{{ T.sidebar_account }}</span>
                 <a href="{{ url_for('admin.change_password') }}" class="nav-link text-white rounded px-3 py-1 d-flex align-items-center gap-3 hover-sidebar opacity-75">
-                    <i class="bi bi-shield-lock text-danger"></i><span>Sicurezza e Password</span>
+                    <i class="bi bi-shield-lock text-danger"></i><span>{{ T.sidebar_security }}</span>
                 </a>
             </div>
 
             <!-- MANUTENZIONE -->
             <div class="nav flex-column gap-1 mb-2">
-                <span class="text-uppercase tracking-wider fw-bold px-2 mb-1 opacity-25" style="font-size: 10px; color: #94a3b8;">Manutenzione</span>
+                <span class="text-uppercase tracking-wider fw-bold px-2 mb-1 opacity-25" style="font-size: 10px; color: #94a3b8;">{{ T.sidebar_maintenance }}</span>
                 <a href="{{ url_for('backup.backup_page') }}" class="nav-link text-white rounded px-3 py-1 d-flex align-items-center gap-3 hover-sidebar opacity-75">
-                    <i class="bi bi-cloud-arrow-down text-success"></i><span>Backup e Ripristino</span>
+                    <i class="bi bi-cloud-arrow-down text-success"></i><span>{{ T.sidebar_backup }}</span>
                 </a>
             </div>
         </div>
 
         <div class="pt-3 border-top border-secondary border-opacity-25 nav flex-column gap-1" style="flex-shrink: 0;">
+            <!-- Switcher lingua nella sidebar -->
+            <div class="d-flex gap-1 px-3 py-1">
+                <a href="{{ url_for('set_lang', lang='it') }}" class="btn btn-sm px-2 py-1 {% if current_lang == 'it' %}btn-light{% else %}btn-outline-secondary opacity-50{% endif %}" style="font-size: 18px; line-height:1;" title="Italiano">🇮🇹</a>
+                <a href="{{ url_for('set_lang', lang='en') }}" class="btn btn-sm px-2 py-1 {% if current_lang == 'en' %}btn-light{% else %}btn-outline-secondary opacity-50{% endif %}" style="font-size: 18px; line-height:1;" title="English">🇬🇧</a>
+            </div>
             <a href="{{ url_for('recipes.list_recipes') }}" target="_blank" class="nav-link text-info rounded px-3 py-2 d-flex align-items-center gap-3 hover-sidebar fw-semibold small">
-                <i class="bi bi-globe"></i><span>Vedi Sito Pubblico</span>
+                <i class="bi bi-globe"></i><span>{{ T.sidebar_public_site }}</span>
             </a>
             <a href="{{ url_for('admin.logout') }}" class="nav-link text-danger rounded px-3 py-2 d-flex align-items-center gap-3 hover-sidebar fw-semibold small">
-                <i class="bi bi-box-arrow-right"></i><span>Logout</span>
+                <i class="bi bi-box-arrow-right"></i><span>{{ T.sidebar_logout }}</span>
             </a>
         </div>
     </div>
@@ -303,7 +307,9 @@
     <div class="main-content" style="margin-left: 280px; padding: 40px; min-height: 100vh; background: #f8fafc;">
         <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom" style="border-color: #e2e8f0 !important;">
             <div><h2 class="fw-bold text-dark mb-0">{% block page_title %}{% endblock %}</h2></div>
-            <div><span class="badge bg-primary px-3 py-2">Pannello Amministrazione</span></div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-primary px-3 py-2">{{ T.admin_panel_badge }}</span>
+            </div>
         </div>
 
 {% elif current_user.is_authenticated and not request.path.startswith('/admin') %}
@@ -337,11 +343,14 @@
                 © 2026 {{ settings_data.site_name if settings_data and settings_data.site_name else "Il Mio Ricettario" }}
             </div>
             <div class="mb-3 small text-muted">
-                Architettato e sviluppato con passione da <strong class="text-dark">Tiziano Cassone</strong>
+                {{ T.footer_credit }} <strong class="text-dark">Tiziano Cassone</strong>
             </div>
-            
+            <div class="d-flex justify-content-center gap-2 mb-3">
+                <a href="{{ url_for('set_lang', lang='it') }}" class="btn btn-sm {% if current_lang == 'it' %}btn-dark{% else %}btn-outline-secondary opacity-60{% endif %} px-3" style="font-size: 15px;" title="Italiano">🇮🇹</a>
+                <a href="{{ url_for('set_lang', lang='en') }}" class="btn btn-sm {% if current_lang == 'en' %}btn-dark{% else %}btn-outline-secondary opacity-60{% endif %} px-3" style="font-size: 15px;" title="English">🇬🇧</a>
+            </div>
             <a href="{{ url_for('admin.login') }}" class="btn btn-sm btn-admin-footer px-4 py-2 shadow-sm fw-bold">
-                <i class="bi bi-sliders2-vertical me-2"></i> Pannello Controllo Admin
+                <i class="bi bi-sliders2-vertical me-2"></i> {{ T.footer_admin_btn }}
             </a>
         </div>
     </footer>

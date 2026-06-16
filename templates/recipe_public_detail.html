@@ -175,12 +175,12 @@
         <div class="col-lg-5">
             <div class="card bg-white p-4 border-0 shadow-sm rounded-4">
                 <h5 class="fw-bold mb-3 text-dark text-uppercase border-bottom pb-2 tracking-wide" style="font-size: 14px;">
-                    <i class="bi bi-sliders text-primary me-2"></i> Impostazioni Impasto
+                    <i class="bi bi-sliders text-primary me-2"></i> {{ T.recipe_settings }}
                 </h5>
 
                 <div class="mb-3">
     <label class="form-label small text-secondary fw-bold text-uppercase" style="font-size: 11px;">
-        Metodo di Calcolo
+        {{ T.calc_method }}
     </label>
 
     <select id="calc-scale-mode"
@@ -191,7 +191,7 @@
                 {% if recipe.pans|length == 0 and not feature.enable_piece_count %}
                 selected
                 {% endif %}>
-            ⚖️ Peso Impasto Desiderato
+            {{ T.calc_weight }}
         </option>
 
         {% if feature and feature.enable_piece_count %}
@@ -199,13 +199,13 @@
                 {% if recipe.pans|length == 0 %}
                 selected
                 {% endif %}>
-            🍔 Calcolo per N. Pezzi e Peso
+            {{ T.calc_pieces }}
         </option>
         {% endif %}
 
         {% if feature and feature.enable_pans and recipe.pans|length > 0 %}
         <option value="tray" selected>
-            📐 Calcolo per Teglie Assegnate
+            {{ T.calc_pans }}
         </option>
         {% endif %}
 
@@ -215,7 +215,7 @@
 <div id="wrapper-weight-input" class="mb-3 d-none">
     <label class="form-label small text-secondary fw-bold text-uppercase"
            style="font-size: 11px;">
-        Grammi Impasto Desiderati
+        {{ T.dough_grams }}
     </label>
 
     <input type="number"
@@ -231,7 +231,7 @@
 
     <label class="form-label small text-secondary fw-bold text-uppercase d-block mb-2"
            style="font-size: 11px;">
-        Pezzatura Impasto
+        {{ T.pieces_label }}
     </label>
 
     <div class="row g-2">
@@ -306,24 +306,24 @@
 
                 {% if feature and feature.enable_yeast_type %}
                 <div class="mb-3">
-                    <label class="form-label small text-secondary fw-bold text-uppercase" style="font-size: 11px;">Tipo di Lievito</label>
+                    <label class="form-label small text-secondary fw-bold text-uppercase" style="font-size: 11px;">{{ T.yeast_type }}</label>
                     <select id="calc-yeast-select" class="form-select fw-semibold rounded-3 text-dark" autocomplete="off">
-                        <option value="base" {% if not has_dry_yeast.value %}selected{% endif %}>Lievito fresco</option>
-                        <option value="dry" {% if has_dry_yeast.value %}selected{% endif %}>Lievito secco disidratato</option>
+                        <option value="base" {% if not has_dry_yeast.value %}selected{% endif %}>{{ T.yeast_fresh }}</option>
+                        <option value="dry" {% if has_dry_yeast.value %}selected{% endif %}>{{ T.yeast_dry }}</option>
                     </select>
                 </div>
                 {% else %}
                 <select id="calc-yeast-select" class="d-none" autocomplete="off">
-                    <option value="base" selected>Lievito fresco</option>
+                    <option value="base" selected>{{ T.yeast_fresh }}</option>
                 </select>
                 {% endif %}
 
                 {% if feature and feature.enable_tangzhong %}
                 <div class="mb-3">
-                    <label class="form-label small text-secondary fw-bold text-uppercase" style="font-size: 11px;">Tecnica Roux / Tangzhong</label>
+                    <label class="form-label small text-secondary fw-bold text-uppercase" style="font-size: 11px;">{{ T.tangzhong_label }}</label>
                     <select id="calc-tangzhong-select" class="form-select fw-semibold rounded-3" autocomplete="off">
                         <option value="no">Escludi Roux</option>
-                        <option value="yes" selected>Attiva Tangzhong</option>
+                        <option value="yes" selected>{{ T.tangzhong_on }}</option>
                     </select>
                 </div>
                 {% else %}
@@ -343,7 +343,7 @@
                 </div>
 
                 <div class="mt-3 p-3 bg-light rounded-3 text-dark border small fw-bold text-center" id="box-stringa-riepilogo" style="border-color: #e2e8f0 !important;">
-                    Target Peso Impasto Richiesto: {{ recipe_original_total.value | round(1) }}g
+                    {{ T.js_target_weight }}: {{ recipe_original_total.value | round(1) }}g
                 </div>
             </div>
         </div>
@@ -351,7 +351,7 @@
         <div class="col-lg-7">
             <div class="card border-0 shadow-sm mb-4 rounded-4 overflow-hidden">
                 <div class="card-body p-4">
-                    <h5 class="fw-bold mb-3 text-dark text-uppercase tracking-wide" style="font-size: 14px;">📋 Formula Calcolata</h5>
+                    <h5 class="fw-bold mb-3 text-dark text-uppercase tracking-wide" style="font-size: 14px;">{{ T.formula_title }}</h5>
                     
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
@@ -391,7 +391,7 @@
                                     data-is-liquid="false"
                                     data-is-yeast="true">
                                     <td class="fw-bold text-dark ps-3">
-                                        <span class="dynamic-ing-name" id="fallback-yeast-label-name">Lievito di Birra Fresco</span>
+                                        <span class="dynamic-ing-name" id="fallback-yeast-label-name">{{ T.js_yeast_fresh }}</span>
                                     </td>
                                     <td class="text-center"></td>
                                     <td class="text-center text-success fw-bold output-baker-pct d-none d-md-table-cell">0.3%</td>
@@ -413,13 +413,13 @@
                 <div class="card-header bg-white pb-0 pt-3 border-0">
                     <ul class="nav nav-tabs card-header-tabs border-bottom-0" id="publicProcessTabs" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active fw-bold small text-uppercase px-3 py-2" id="nav-base-tab" data-bs-toggle="tab" data-bs-target="#panel-base" type="button" role="tab">Impasto Finale</button>
+                            <button class="nav-link active fw-bold small text-uppercase px-3 py-2" id="nav-base-tab" data-bs-toggle="tab" data-bs-target="#panel-base" type="button" role="tab">{{ T.tab_final_dough }}</button>
                         </li>
                         <li class="nav-item {{ 'd-none' if not feature or (not feature.enable_biga and not feature.enable_poolish) }}" id="nav-li-preferment" role="presentation">
-                            <button class="nav-link fw-bold small text-uppercase text-info px-3 py-2" id="nav-pref-tab" data-bs-toggle="tab" data-bs-target="#panel-preferment" type="button" role="tab">🧫 Prefermento (Biga/Poolish)</button>
+                            <button class="nav-link fw-bold small text-uppercase text-info px-3 py-2" id="nav-pref-tab" data-bs-toggle="tab" data-bs-target="#panel-preferment" type="button" role="tab">{{ T.tab_preferment }}</button>
                         </li>
                         <li class="nav-item d-none" id="nav-li-tangzhong" role="presentation">
-                            <button class="nav-link fw-bold small text-uppercase text-warning px-3 py-2" id="nav-tz-tab" data-bs-toggle="tab" data-bs-target="#panel-tangzhong" type="button" role="tab">🥣 Roux / Tangzhong</button>
+                            <button class="nav-link fw-bold small text-uppercase text-warning px-3 py-2" id="nav-tz-tab" data-bs-toggle="tab" data-bs-target="#panel-tangzhong" type="button" role="tab">{{ T.tab_tangzhong }}</button>
                         </li>
                     </ul>
                 </div>
@@ -491,13 +491,13 @@
     <div class="row g-3 mb-4">
         <div class="col-6 col-md-3">
             <div class="card bg-white border-0 shadow-sm text-center py-3 rounded-4">
-                <small class="text-muted fw-bold text-uppercase tracking-wider" style="font-size: 11px;">Peso Totale Impasto</small>
+                <small class="text-muted fw-bold text-uppercase tracking-wider" style="font-size: 11px;">{{ T.total_dough }}</small>
                 <h4 class="mt-1 fw-bold text-primary mb-0" id="live-total-weight">0 g</h4>
             </div>
         </div>
         <div class="col-6 col-md-3">
             <div class="card bg-white border-0 shadow-sm text-center py-3 rounded-4">
-                <small class="text-muted fw-bold text-uppercase tracking-wider" style="font-size: 11px;">Farina Totale Reale</small>
+                <small class="text-muted fw-bold text-uppercase tracking-wider" style="font-size: 11px;">{{ T.total_flour }}</small>
                 <h4 class="mt-1 fw-bold text-dark mb-0" id="live-total-flour">0 g</h4>
             </div>
         </div>
@@ -561,7 +561,7 @@
 
     <div class="text-center mb-5">
         <a href="/" class="btn btn-outline-secondary px-4 fw-semibold rounded-3 shadow-none">
-            <i class="bi bi-arrow-left-short fs-5 align-middle me-1"></i> Ritorna al Catalogo Formule
+            <i class="bi bi-arrow-left-short fs-5 align-middle me-1"></i> {{ T.back_to_list }}
         </a>
     </div>
 
@@ -569,6 +569,16 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const _T = {
+        yeastFresh:   "{{ T.js_yeast_fresh }}",
+        yeastDry:     "{{ T.js_yeast_dry }}",
+        panConfig:    "{{ T.js_pan_config }}",
+        totalDough:   "{{ T.js_total_dough }}",
+        piecesConfig: "{{ T.js_pieces_config }}",
+        piecesOf:     "{{ T.js_pieces_of }}",
+        targetWeight: "{{ T.js_target_weight }}"
+    };
+
     const recipeSlug = "{{ recipe.slug }}";
     const storageKey = `recipe_settings_v3_${recipeSlug}`;
 
@@ -852,7 +862,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (stringaRiepilogo) {
                 if (reportSegments.length > 0) {
-                    stringaRiepilogo.textContent = `Configurazione Teglie: ${reportSegments.join(' + ')} · Totale Impasto: ${Math.round(targetTotalWeight)}g`;
+                    stringaRiepilogo.textContent = `${_T.panConfig}: ${reportSegments.join(' + ')} · ${_T.totalDough}: ${Math.round(targetTotalWeight)}g`;
                 } else {
                     stringaRiepilogo.textContent = "Seleziona almeno una teglia usando i tasti + e -";
                 }
@@ -860,17 +870,17 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (mode === 'pieces') {
             let count = inputPiecesCount ? parseInt(inputPiecesCount.value) || 0 : 0;
             let weight = inputPiecesWeight ? parseFloat(inputPiecesWeight.value) || 0 : 0;
-            
+
             targetTotalWeight = count * weight;
             if (targetTotalWeight <= 0) targetTotalWeight = recipeTotalWeightBase;
 
             if (stringaRiepilogo) {
-                stringaRiepilogo.textContent = `Configurazione: ${count} pezzi da ${weight}g · Totale Impasto: ${Math.round(targetTotalWeight)}g`;
+                stringaRiepilogo.textContent = `${_T.piecesConfig}: ${count} ${_T.piecesOf} ${weight}g · ${_T.totalDough}: ${Math.round(targetTotalWeight)}g`;
             }
         } else {
             targetTotalWeight = inputTargetWeight ? parseFloat(inputTargetWeight.value) || recipeTotalWeightBase : recipeTotalWeightBase;
             if (stringaRiepilogo) {
-                stringaRiepilogo.textContent = `Target Peso Impasto Richiesto: ${Math.round(targetTotalWeight)}g`;
+                stringaRiepilogo.textContent = `${_T.targetWeight}: ${Math.round(targetTotalWeight)}g`;
             }
         }
 
@@ -911,9 +921,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     const nameSpan = ing.rowElement.querySelector('.dynamic-ing-name');
                     if (nameSpan) {
                         if (targetYeastType === 'dry') {
-                            nameSpan.innerText = 'Lievito di Birra Secco';
+                            nameSpan.innerText = _T.yeastDry;
                         } else {
-                            nameSpan.innerText = 'Lievito di Birra Fresco';
+                            nameSpan.innerText = _T.yeastFresh;
                         }
                     }
                 } else {
