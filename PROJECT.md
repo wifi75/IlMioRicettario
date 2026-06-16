@@ -1,9 +1,9 @@
-# PROGETTO: Il Mio Ricettario (V3.0.0)
+# PROGETTO: Il Mio Ricettario (V3.0.2)
 
 ## PANORAMICA
 
 * **Nome:** Il Mio Ricettario
-* **Versione Architetturale:** V3.0.0
+* **Versione Architetturale:** V3.0.2
 * **Stato:** Produzione Stabile
 * **Repository GitHub:** https://github.com/wifi75/IlMioRicettario
 * **Sviluppatore Principale:** Tiziano Cassone
@@ -357,15 +357,12 @@ Interfaccia:
 
 ## 5. Sicurezza Configurazione
 
-La `SECRET_KEY` deve essere sempre letta da variabile d'ambiente.
+La `SECRET_KEY` non deve mai essere hardcoded nel sorgente.
 
-Non deve mai essere hardcoded nel sorgente.
+Viene letta da `instance/config.py` (generato dal Setup Wizard) o da variabile d'ambiente.
+La variabile d'ambiente ha priorità su `instance/config.py`.
 
-Comando per generare una chiave sicura:
-
-```bash
-python3 -c "import secrets; print(secrets.token_hex(32))"
-```
+Se `instance/config.py` non esiste, l'app entra in SETUP_MODE anziché crashare.
 
 La `SECRET_KEY` firma i cookie di sessione Flask ed è indipendente dalla password amministratore.
 
@@ -387,15 +384,18 @@ Il database deve esistere esclusivamente nei sistemi locali o di produzione.
 
 # DEPLOY PRODUZIONE
 
-## Installazione Guidata (Web Installer)
+## Installazione
 
-```bash
-sudo python installer.py
-# → apri http://<server>:5000
-```
+Guida completa: **INSTALL.md**
 
-Il wizard genera `instance/config.py` con PORT e SECRET_KEY e,
-se avviato come root, crea e abilita il servizio systemd in automatico.
+Riepilogo del flusso:
+
+1. `git clone` + `pip install -r requirements.txt`
+2. `cp ilmioricettario.service.example /etc/systemd/system/ilmioricettario.service`
+3. `systemctl enable ilmioricettario && systemctl start ilmioricettario`
+4. *(Solo se porta 8080 occupata)* `python set_port.py`
+5. Browser → `http://<server>:<porta>/setup` — Setup Wizard completa la configurazione
+6. `systemctl restart ilmioricettario`
 
 ## Configurazione Istanza
 

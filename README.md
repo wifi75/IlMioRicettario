@@ -1,6 +1,6 @@
 # 🧫 Il Mio Ricettario - Professional Baking Suite
 
-![Versione](https://img.shields.io/badge/version-v3.0.0-orange?style=for-the-badge)
+![Versione](https://img.shields.io/badge/version-v3.0.2-orange?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Python-3.13-blue?style=for-the-badge&logo=python)
 ![Framework](https://img.shields.io/badge/Framework-Flask-blue?style=for-the-badge&logo=flask)
 ![Database](https://img.shields.io/badge/Database-SQLite-green?style=for-the-badge&logo=sqlite)
@@ -38,7 +38,30 @@ Progetto sviluppato da Tiziano Cassone
 
 # 🚀 Novità
 
-## v3.0.0
+## v3.0.2
+
+### Gestione Porta dal Pannello Admin
+
+* Nuova pagina Admin → Sistema → Porta Applicazione
+* Permette di cambiare la porta di ascolto senza toccare file di configurazione a mano
+* Il salvataggio aggiorna `instance/config.py` preservando la SECRET_KEY esistente
+* Mostra il comando di riavvio con copia rapida
+
+### Script `set_port.py`
+
+* Script interattivo per impostare la porta prima del primo avvio
+* Utile se la porta 8080 è già occupata sul server
+* Crea `instance/config.py` con solo PORT — l'app entra comunque in SETUP_MODE sulla porta giusta
+
+### Guida Installazione Dedicata
+
+* Nuovo file `INSTALL.md` con guida step-by-step completa in 10 passi
+* Tutti i comandi pronti per il copia-incolla
+* Sezione risoluzione problemi e gestione post-installazione
+
+---
+
+## v3.0.1
 
 ### Setup Wizard Integrato
 
@@ -333,73 +356,36 @@ Supporto automatico:
 
 # 💻 Installazione Produzione Linux
 
-## 1 — Clonazione Repository
+> La guida completa passo-passo con tutti i comandi pronti per il copia-incolla è in:
+>
+> **[INSTALL.md](INSTALL.md)**
+
+Riepilogo rapido:
 
 ```bash
-cd /var/www
-git clone https://github.com/wifi75/IlMioRicettario.git
-cd IlMioRicettario
-```
+# 1. Clona il repository
+cd /var/www && git clone https://github.com/wifi75/IlMioRicettario.git && cd IlMioRicettario
 
----
+# 2. Ambiente virtuale
+python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt
 
-## 2 — Ambiente Virtuale e Dipendenze
-
-```bash
-apt update && apt install python3 python3-venv python3-pip -y
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-```
-
----
-
-## 3 — Servizio systemd
-
-Copia il file di esempio incluso nel repository:
-
-```bash
+# 3. Servizio systemd
 cp ilmioricettario.service.example /etc/systemd/system/ilmioricettario.service
-nano /etc/systemd/system/ilmioricettario.service
+# modifica WorkingDirectory e User se necessario
+systemctl daemon-reload && systemctl enable ilmioricettario && systemctl start ilmioricettario
+
+# 4. (Solo se porta 8080 occupata) Imposta una porta alternativa
+python set_port.py
+
+# 5. Apri il browser e completa la configurazione
+# http://<indirizzo-server>:8080/setup
+
+# 6. Riavvia dopo il wizard
+systemctl restart ilmioricettario
+
+# 7. Leggi la password admin dai log
+journalctl -u ilmioricettario -n 50 --no-pager
 ```
-
-Adatta `WorkingDirectory` e `User` al tuo ambiente, poi abilita e avvia:
-
-```bash
-systemctl daemon-reload
-systemctl enable ilmioricettario
-systemctl start ilmioricettario
-```
-
-Verifica:
-
-```bash
-systemctl status ilmioricettario
-```
-
----
-
-## 4 — Prima Configurazione via Browser (Setup Wizard)
-
-Al primo avvio, **senza** un file `instance/config.py`, l'app entra automaticamente in modalità setup.
-
-Apri il browser su:
-
-```text
-http://<indirizzo-server>:<porta>/setup
-```
-
-> La porta di default al primo avvio è **8080**. Se hai modificato `ExecStart` nel `.service`,
-> usa la porta specificata lì tramite variabile d'ambiente `PORT`.
-
-Il wizard chiede:
-
-* **Porta** dell'applicazione (es. 8100)
-* **Secret Key** (generata automaticamente con un click)
-
-Al termine genera `instance/config.py`. Segui le istruzioni a schermo per riavviare il servizio.
-
-> `instance/config.py` non è mai incluso in git: `git pull` non genera mai conflitti sulla porta o sulla chiave.
 
 ---
 
@@ -411,14 +397,7 @@ git pull origin main
 systemctl restart ilmioricettario
 ```
 
-> Nessun conflitto sulla porta: la configurazione è in `instance/config.py`, mai in git.
-
-Aggiornare le dipendenze solo se `requirements.txt` è cambiato:
-
-```bash
-source venv/bin/activate
-pip install -r requirements.txt
-```
+> Nessun conflitto sulla porta: `instance/config.py` non è mai in git.
 
 ---
 

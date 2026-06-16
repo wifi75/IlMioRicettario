@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Porta Applicazione — Admin{% endblock %}
+
+{% block page_title %}Porta Applicazione{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show border-0 rounded-3 mb-4" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <div class="card border-0 shadow-sm rounded-3 mb-4">
+            <div class="card-header bg-white border-bottom py-3">
+                <h6 class="fw-bold mb-0 d-flex align-items-center gap-2">
+                    <i class="bi bi-hdd-network text-primary"></i> Porta di Ascolto
+                </h6>
+            </div>
+            <div class="card-body p-4">
+
+                <div class="alert alert-info border-0 rounded-3 small mb-4">
+                    <i class="bi bi-info-circle me-1"></i>
+                    La porta definisce su quale indirizzo di rete è raggiungibile l'applicazione.
+                    <strong>Dopo il salvataggio è necessario riavviare il servizio</strong> per applicare la modifica.
+                </div>
+
+                <div class="mb-4 p-3 bg-light rounded-3 border">
+                    <div class="small text-muted mb-1">Porta attuale</div>
+                    <div class="fw-bold fs-4 text-dark font-monospace">{{ current_port }}</div>
+                    <div class="small text-muted mt-1">
+                        <i class="bi bi-globe me-1"></i>
+                        http://&lt;indirizzo-server&gt;:{{ current_port }}
+                    </div>
+                </div>
+
+                <form method="post" action="{{ url_for('admin.settings_port') }}">
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Nuova porta</label>
+                        <input type="number" name="port" class="form-control form-control-lg font-monospace"
+                               value="{{ current_port }}" min="1024" max="65535" required>
+                        <div class="form-text">Valori consentiti: da 1024 a 65535. Porte comuni da evitare: 80, 443, 3000, 5000, 8080 se già in uso.</div>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary fw-bold py-2">
+                            <i class="bi bi-floppy me-2"></i>Salva Porta
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header bg-white border-bottom py-3">
+                <h6 class="fw-bold mb-0 d-flex align-items-center gap-2">
+                    <i class="bi bi-terminal text-dark"></i> Riavvio Servizio
+                </h6>
+            </div>
+            <div class="card-body p-4">
+                <p class="small text-muted mb-3">
+                    Dopo aver salvato la nuova porta, esegui questo comando sul server per applicare la modifica:
+                </p>
+
+                <div class="position-relative">
+                    <pre class="bg-dark text-light rounded-3 p-3 mb-0 small font-monospace" id="cmdRestart">systemctl restart ilmioricettario</pre>
+                    <button class="btn btn-sm btn-light position-absolute top-0 end-0 m-2"
+                            onclick="copyCmd()" id="btnCopy">
+                        <i class="bi bi-clipboard me-1"></i>Copia
+                    </button>
+                </div>
+
+                <div class="mt-3">
+                    <p class="small text-muted mb-2">Verifica che il servizio sia attivo sulla nuova porta:</p>
+                    <pre class="bg-dark text-light rounded-3 p-3 mb-0 small font-monospace">systemctl status ilmioricettario</pre>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+function copyCmd() {
+    var text = document.getElementById('cmdRestart').innerText.trim();
+    navigator.clipboard.writeText(text).then(function () {
+        var btn = document.getElementById('btnCopy');
+        btn.innerHTML = '<i class="bi bi-clipboard-check me-1"></i>Copiato!';
+        setTimeout(function () {
+            btn.innerHTML = '<i class="bi bi-clipboard me-1"></i>Copia';
+        }, 2000);
+    });
+}
+</script>
+{% endblock %}

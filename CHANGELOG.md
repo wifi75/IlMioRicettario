@@ -1,3 +1,29 @@
+## v3.0.2 - 2026-06-16
+
+### Aggiunto
+
+* **Gestione Porta dal Pannello Admin (`/admin/settings/port`):** Nuova pagina nella sezione Sistema che permette di modificare la porta di ascolto dell'applicazione direttamente dal browser. Il salvataggio aggiorna `instance/config.py` preservando la SECRET_KEY esistente. La pagina mostra il comando `systemctl restart` con pulsante copia.
+
+* **Script `set_port.py`:** Script interattivo da riga di comando per impostare la porta prima del primo avvio, quando la porta 8080 è già occupata da un altro servizio. Crea `instance/config.py` con solo PORT — l'app entra comunque in SETUP_MODE sulla porta configurata, senza richiedere variabili d'ambiente o modifiche al file `.service`.
+
+* **`INSTALL.md` — Guida Installazione Dedicata:** Nuovo file con guida step-by-step in 10 passi per l'installazione su server Linux. Tutti i comandi sono evidenziati e pronti per il copia-incolla. Include sezione risoluzione problemi, gestione post-installazione e reset configurazione.
+
+---
+
+## v3.0.1 - 2026-06-16
+
+### Aggiunto
+
+* **Setup Wizard Integrato (`/setup`):** Sostituisce l'installer esterno `installer.py` (porta 5000). L'app rileva l'assenza di `instance/config.py` e entra in SETUP_MODE, reindirizzando tutte le rotte su `/setup`. Il wizard raccoglie porta e Secret Key, scrive `instance/config.py` e mostra le istruzioni per il riavvio.
+
+* **`ilmioricettario.service.example`:** Template del file systemd incluso nel repository, pronto da copiare in `/etc/systemd/system/`. Non contiene SECRET_KEY (gestita da `instance/config.py`).
+
+### Rimosso
+
+* **`installer.py` e `templates/installer/`:** Rimosso il wizard esterno su porta 5000, sostituito dal setup integrato.
+
+---
+
 ## v3.0.0 - 2026-06-16
 
 ### Aggiunto

@@ -804,6 +804,49 @@ def settings_yeast():
     return render_template("admin/settings_yeast.html", setting=setting)
 
 
+@admin_bp.route("/settings/port", methods=["GET", "POST"])
+@login_required
+def settings_port():
+    import importlib.util
+    from datetime import datetime
+
+    BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    INSTANCE_DIR = os.path.join(BASE_DIR, 'instance')
+    INSTANCE_CFG = os.path.join(INSTANCE_DIR, 'config.py')
+
+    current_port = 8080
+    current_secret = None
+    if os.path.exists(INSTANCE_CFG):
+        spec = importlib.util.spec_from_file_location("_inst_port", INSTANCE_CFG)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        current_port = getattr(mod, 'PORT', 8080)
+        current_secret = getattr(mod, 'SECRET_KEY', None)
+
+    if request.method == "POST":
+        port_raw = request.form.get("port", "8080").strip()
+        try:
+            port = int(port_raw)
+            if not (1024 <= port <= 65535):
+                raise ValueError
+        except ValueError:
+            flash("Porta non valida. Inserisci un numero tra 1024 e 65535.", "danger")
+            return redirect(url_for("admin.settings_port"))
+
+        os.makedirs(INSTANCE_DIR, exist_ok=True)
+        with open(INSTANCE_CFG, 'w', encoding='utf-8') as f:
+            f.write(f"# Il Mio Ricettario — aggiornato il {datetime.now().strftime('%Y-%m-%d %H:%M')}\n")
+            f.write("# Questo file non è mai incluso in git.\n\n")
+            if current_secret:
+                f.write(f'SECRET_KEY = "{current_secret}"\n')
+            f.write(f'PORT = {port}\n')
+
+        flash(f"Porta aggiornata a {port}. Riavvia il servizio per applicare la modifica.", "success")
+        return redirect(url_for("admin.settings_port"))
+
+    return render_template("admin/settings_port.html", current_port=current_port)
+
+
 @admin_bp.route("/change_password", methods=["GET", "POST"])
 @login_required
 def change_password():
