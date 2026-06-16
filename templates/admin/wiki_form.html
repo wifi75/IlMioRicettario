@@ -1,107 +1,116 @@
 {% extends "base.html" %}
 
-{% block title %}Nuovo Articolo Wiki{% endblock %}
+{% block title %}{% if article %}Modifica Articolo Wiki{% else %}Nuovo Articolo Wiki{% endif %}{% endblock %}
+{% block page_title %}{% if article %}Modifica: {{ article.title }}{% else %}Nuovo Articolo Wiki{% endif %}{% endblock %}
+
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+<style>
+    .ql-editor    { min-height: 280px; font-size: 15px; color: #334155; background: #fff; }
+    .ql-toolbar   { background: #f8fafc; border-top-left-radius: 8px; border-top-right-radius: 8px; border-color: #cbd5e1; }
+    .ql-container { border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; border-color: #cbd5e1; }
+</style>
 
 {% block content %}
 
-<div class="card mb-4">
-
-    <div class="card-body">
-
-        <h2 class="fw-bold mb-0">
-            📚 Scrivi Articolo Tecnico Wiki
-        </h2>
-
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }} alert-dismissible fade show border-0 rounded-3 mb-4" role="alert">
+        {{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
+    {% endfor %}
+{% endif %}
+{% endwith %}
 
-</div>
-
-<div class="card shadow-sm border-0">
-
+<div class="card shadow-sm border-0 rounded-3">
     <div class="card-body p-4">
 
-        <form method="post" action="/admin/wiki/new">
+        <form method="post"
+              action="{{ url_for('admin.wiki_edit', id=article.id) if article else url_for('admin.wiki_new') }}"
+              id="wiki-form">
 
             <div class="mb-3">
-
-                <label class="form-label fw-bold">Titolo Articolo</label>
-
-                <input type="text"
-                       name="title"
-                       id="wiki-title"
-                       class="form-control text-dark fw-bold"
-                       placeholder="es. Tangzhong (Roux)"
-                       required>
-
+                <label class="form-label fw-semibold">Titolo</label>
+                <input type="text" name="title" id="wiki-title" class="form-control"
+                       value="{{ article.title if article else '' }}"
+                       placeholder="es. Tangzhong — Tecnica del Roux" required>
             </div>
 
-            <div class="row g-3">
-
-                <div class="col-md-6 mb-3">
-
-                    <label class="form-label fw-bold">Slug URL (Automatico)</label>
-
-                    <input type="text"
-                           name="slug"
-                           id="wiki-slug"
-                           class="form-control text-muted"
-                           placeholder="es. tangzhong-roux"
-                           required>
-
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Slug URL</label>
+                    <input type="text" name="slug" id="wiki-slug" class="form-control font-monospace text-muted"
+                           value="{{ article.slug if article else '' }}"
+                           placeholder="es. tangzhong-roux" required>
+                    <div class="form-text">Generato automaticamente dal titolo. Modificabile manualmente.</div>
                 </div>
-
-                <div class="col-md-6 mb-3">
-
-                    <label class="form-label fw-bold">Categoria</label>
-
-                    <select name="category" class="form-select fw-bold">
-                        <option value="Tecniche" selected>Tecniche d'impasto</option>
-                        <option value="Lieviti">Lievitazione e Fermentazione</option>
-                        <option value="Ingredienti">Analisi Ingredienti</option>
-                        <option value="Generale">Generale</option>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Categoria</label>
+                    <select name="category" class="form-select">
+                        {% set cat = article.category if article else 'Guida' %}
+                        <option value="Guida"    {% if cat == 'Guida'    %}selected{% endif %}>Guida</option>
+                        <option value="Tecnica"  {% if cat == 'Tecnica'  %}selected{% endif %}>Tecnica</option>
+                        <option value="Generale" {% if cat == 'Generale' %}selected{% endif %}>Generale</option>
                     </select>
-
                 </div>
-
             </div>
 
             <div class="mb-4">
-
-                <label class="form-label fw-bold">Contenuto Scientifico / Guida</label>
-
-                <textarea name="content"
-                          class="form-control text-dark"
-                          rows="12"
-                          placeholder="Inserisci la spiegazione chimica o tecnica approfondita..."
-                          required></textarea>
-
+                <label class="form-label fw-semibold">Contenuto</label>
+                <div id="wiki-editor"></div>
+                <input type="hidden" name="content" id="wiki-content-hidden"
+                       value="{{ article.content if article else '' }}">
             </div>
 
-            <div class="d-flex justify-content-between">
-
-                <a href="/admin/wiki" class="btn btn-outline-secondary px-4 py-2">
-                    Annulla
+            <div class="d-flex justify-content-between align-items-center gap-3">
+                <a href="{{ url_for('admin.wiki_list') }}" class="btn btn-outline-secondary px-4">
+                    <i class="bi bi-arrow-left me-1"></i>Annulla
                 </a>
-
-                <button type="submit" class="btn btn-primary px-5 fw-bold shadow-sm">
-                    ✍ Publica nella Wiki
+                <button type="submit" class="btn btn-primary fw-bold px-5">
+                    <i class="bi bi-floppy me-2"></i>
+                    {% if article %}Salva Modifiche{% else %}Pubblica Articolo{% endif %}
                 </button>
-
             </div>
 
         </form>
-
     </div>
-
 </div>
 
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script>
-document.getElementById('wiki-title').addEventListener('input', function() {
-    const slug = this.value.toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-');
-    document.getElementById('wiki-slug').value = slug;
+document.addEventListener('DOMContentLoaded', function () {
+
+    var quill = new Quill('#wiki-editor', {
+        modules: { toolbar: [
+            ['bold', 'italic', 'underline'],
+            [{ 'header': [2, 3, false] }],
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+            ['clean']
+        ]},
+        theme: 'snow',
+        placeholder: 'Scrivi il contenuto dell\'articolo...'
+    });
+
+    var existing = document.getElementById('wiki-content-hidden').value;
+    if (existing) quill.root.innerHTML = existing;
+
+    document.getElementById('wiki-form').addEventListener('submit', function () {
+        document.getElementById('wiki-content-hidden').value = quill.root.innerHTML;
+    });
+
+    document.getElementById('wiki-title').addEventListener('input', function () {
+        if ({{ 'true' if not article else 'false' }}) {
+            document.getElementById('wiki-slug').value = this.value
+                .toLowerCase()
+                .normalize('NFD').replace(/[̀-ͯ]/g, '')
+                .replace(/[^a-z0-9\s-]/g, '')
+                .trim()
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-');
+        }
+    });
+
 });
 </script>
 

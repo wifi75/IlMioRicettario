@@ -670,6 +670,23 @@ def wiki_new():
     )
 
 
+@admin_bp.route("/wiki/edit/<int:id>", methods=["GET", "POST"])
+@login_required
+def wiki_edit(id):
+    article = WikiArticle.query.get_or_404(id)
+
+    if request.method == "POST":
+        article.title    = request.form["title"].strip()
+        article.slug     = request.form["slug"].strip()
+        article.category = request.form.get("category", "Generale")
+        article.content  = request.form["content"]
+        db.session.commit()
+        flash("Articolo Wiki aggiornato con successo.", "success")
+        return redirect(url_for("admin.wiki_list"))
+
+    return render_template("admin/wiki_form.html", article=article)
+
+
 @admin_bp.route("/wiki/delete/<int:id>")
 @login_required
 def wiki_delete(id):
