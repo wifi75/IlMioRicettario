@@ -90,21 +90,26 @@ with app.app_context():
     ).first()
 
     if not admin:
+        import secrets
+        import string
+        alphabet = string.ascii_letters + string.digits + "!#$%&*+"
+        generated_password = ''.join(secrets.choice(alphabet) for _ in range(16))
 
         admin = User(
             username="admin",
-            password_hash=generate_password_hash(
-                "admin123"
-            ),
+            password_hash=generate_password_hash(generated_password),
             is_admin=True
         )
 
         db.session.add(admin)
         db.session.commit()
 
-        print("Admin creato")
-        print("Username: admin")
-        print("Password: admin123")
+        print("=" * 50)
+        print("ADMIN CREATO — PRIMA INSTALLAZIONE")
+        print(f"Username: admin")
+        print(f"Password: {generated_password}")
+        print("Accedi e cambiala subito da /admin/change_password")
+        print("=" * 50)
 
     if MasterBakeryPan.query.count() == 0:
         default_pans = [

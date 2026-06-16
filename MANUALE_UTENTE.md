@@ -1,4 +1,4 @@
-# 📖 Manuale Utente - Il Mio Ricettario (v2.2.3)
+# 📖 Manuale Utente - Il Mio Ricettario (v2.3.0)
 
 Benvenuto in **Il Mio Ricettario**, la piattaforma professionale per la gestione di ricette di panificazione, pizza, focaccia, grandi lievitati e arte bianca.
 
@@ -225,6 +225,12 @@ Inserire:
 
 Solo gli utenti autorizzati possono accedere al backend.
 
+Alla prima installazione il sistema genera automaticamente una password sicura e la mostra una sola volta via console. Cambiare immediatamente la password dal pannello:
+
+```text
+/admin/change_password
+```
+
 ---
 
 # ⚙️ 10. Gestione Ricette
@@ -323,9 +329,31 @@ Le impostazioni consentono di configurare:
 
 # 🔒 15. Sicurezza
 
-Le password vengono memorizzate esclusivamente tramite hash crittografico.
+Le password vengono memorizzate esclusivamente tramite hash crittografico (bcrypt).
 
 Il sistema non conserva password in chiaro.
+
+## Chiave di Sessione (SECRET_KEY)
+
+L'applicazione richiede una variabile d'ambiente `SECRET_KEY` per firmare i cookie di sessione.
+
+Questa chiave è completamente separata dalla password amministratore e non viene mai salvata nel database.
+
+## Password Amministratore
+
+Alla prima installazione il sistema genera automaticamente una password sicura a 16 caratteri e la mostra in console.
+
+Cambiare sempre la password subito dopo la prima installazione:
+
+```text
+/admin/change_password
+```
+
+## Buone Pratiche
+
+* Non condividere mai la password di accesso.
+* Cambiare la password periodicamente.
+* Non accedere al pannello da reti pubbliche non sicure.
 
 ---
 

@@ -1,9 +1,9 @@
-# PROGETTO: Il Mio Ricettario (V2.2.3)
+# PROGETTO: Il Mio Ricettario (V2.3.0)
 
 ## PANORAMICA
 
 * **Nome:** Il Mio Ricettario
-* **Versione Architetturale:** V2.2.3
+* **Versione Architetturale:** V2.3.0
 * **Stato:** Produzione Stabile
 * **Repository GitHub:** https://github.com/wifi75/IlMioRicettario
 * **Sviluppatore Principale:** Tiziano Cassone
@@ -350,10 +350,26 @@ Interfaccia:
 
 * responsive;
 * Bootstrap nativo;
-* sidebar amministrativa scura;
+* sidebar amministrativa scura con hamburger menu su mobile;
+* overlay scuro al tocco per chiudere la sidebar;
+* area pubblica ottimizzata per smartphone;
 * layout ottimizzato mobile.
 
-## 5. Database Mai Versionato
+## 5. Sicurezza Configurazione
+
+La `SECRET_KEY` deve essere sempre letta da variabile d'ambiente.
+
+Non deve mai essere hardcoded nel sorgente.
+
+Comando per generare una chiave sicura:
+
+```bash
+python3 -c "import secrets; print(secrets.token_hex(32))"
+```
+
+La `SECRET_KEY` firma i cookie di sessione Flask ed è indipendente dalla password amministratore.
+
+## 6. Database Mai Versionato
 
 Il database SQLite non deve essere pubblicato nel repository Git.
 
@@ -384,6 +400,14 @@ Funzioni:
 * avvio automatico al boot;
 * riavvio automatico in caso di errore;
 * gestione tramite systemctl.
+
+La sezione `[Service]` deve includere obbligatoriamente:
+
+```ini
+Environment="SECRET_KEY=..."
+```
+
+Senza questa variabile l'applicazione non si avvia.
 
 ## Comandi Principali
 

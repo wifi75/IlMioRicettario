@@ -207,7 +207,15 @@
 <body class="{% if not request.path.startswith('/admin') and settings_data %}{{ settings_data.theme_active }}{% endif %}">
 
 {% if current_user.is_authenticated and request.path.startswith('/admin') %}
-    <div class="sidebar d-flex flex-column justify-content-between p-4" 
+
+    <button class="admin-hamburger" id="sidebarToggle" aria-label="Apri menu">
+        <i class="bi bi-list" id="hamburgerIcon"></i>
+    </button>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="sidebar d-flex flex-column justify-content-between p-4"
+         id="adminSidebar"
          style="width: 280px; position: fixed; height: 100vh; background: #1e293b; color: #fff; z-index: 1000;">
         <div>
             <div class="mb-4 pb-2 border-bottom border-secondary border-opacity-25">
@@ -288,7 +296,7 @@
 </div>
 
 {% if current_user.is_authenticated and request.path.startswith('/admin') %}
-    <div class="container-fluid mt-4 text-center text-muted pt-3 border-top" style="border-color: #e2e8f0 !important; margin-left: 280px; max-width: calc(100% - 280px);">
+    <div class="container-fluid mt-4 text-center text-muted pt-3 border-top footer-admin-responsive" style="border-color: #e2e8f0 !important; margin-left: 280px; max-width: calc(100% - 280px);">
         <div class="mb-1" style="font-size: 13px;">Architettato e sviluppato da <strong class="text-dark">Tiziano Cassone</strong></div>
         <small style="font-size: 11px; opacity: 0.7;">© 2026 Il Mio Ricettario</small>
     </div>
@@ -308,6 +316,42 @@
         </div>
     </footer>
 {% endif %}
+
+
+<script>
+(function () {
+    var sidebar       = document.getElementById('adminSidebar');
+    var overlay       = document.getElementById('sidebarOverlay');
+    var toggleBtn     = document.getElementById('sidebarToggle');
+    var hamburgerIcon = document.getElementById('hamburgerIcon');
+
+    if (!sidebar || !toggleBtn) return;
+
+    function openSidebar() {
+        sidebar.classList.add('sidebar-open');
+        overlay.classList.add('active');
+        hamburgerIcon.className = 'bi bi-x-lg';
+    }
+
+    function closeSidebar() {
+        sidebar.classList.remove('sidebar-open');
+        overlay.classList.remove('active');
+        hamburgerIcon.className = 'bi bi-list';
+    }
+
+    toggleBtn.addEventListener('click', function () {
+        sidebar.classList.contains('sidebar-open') ? closeSidebar() : openSidebar();
+    });
+
+    overlay.addEventListener('click', closeSidebar);
+
+    sidebar.querySelectorAll('a').forEach(function (link) {
+        link.addEventListener('click', function () {
+            if (window.innerWidth < 992) closeSidebar();
+        });
+    });
+}());
+</script>
 
 </body>
 </html>

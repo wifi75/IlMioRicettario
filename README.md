@@ -1,6 +1,6 @@
 # 🧫 Il Mio Ricettario - Professional Baking Suite
 
-![Versione](https://img.shields.io/badge/version-v2.2.3-orange?style=for-the-badge)
+![Versione](https://img.shields.io/badge/version-v2.3.0-orange?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Python-3.13-blue?style=for-the-badge&logo=python)
 ![Framework](https://img.shields.io/badge/Framework-Flask-blue?style=for-the-badge&logo=flask)
 ![Database](https://img.shields.io/badge/Database-SQLite-green?style=for-the-badge&logo=sqlite)
@@ -37,6 +37,28 @@ Progetto sviluppato da Tiziano Cassone
 ---
 
 # 🚀 Novità della Serie 2.2
+
+## v2.3.0
+
+### Sicurezza
+
+* SECRET_KEY rimossa dal codice sorgente: letta da variabile d'ambiente
+* Password admin di default eliminata: generata randomicamente alla prima installazione
+* L'applicazione non si avvia se SECRET_KEY non è impostata
+
+### Mobile Responsive
+
+* Pulsante hamburger per la sidebar admin su smartphone e tablet
+* Overlay scuro con chiusura al tocco
+* Titoli e padding ottimizzati nella scheda ricetta pubblica su mobile
+* Tab procedimento scorrevoli orizzontalmente su smartphone
+* Tabella ingredienti correttamente scrollabile su mobile
+
+### Correzioni
+
+* Allineamento newline POSIX in tutti i file modificati
+
+---
 
 ## v2.2.3
 
@@ -347,6 +369,7 @@ Group=root
 WorkingDirectory=/var/www/IlMioRicettario
 
 Environment="PATH=/var/www/IlMioRicettario/venv/bin"
+Environment="SECRET_KEY=inserisci-qui-una-stringa-casuale-lunga-almeno-32-caratteri"
 
 ExecStart=/var/www/IlMioRicettario/venv/bin/python /var/www/IlMioRicettario/app.py
 
@@ -356,6 +379,11 @@ RestartSec=5
 [Install]
 WantedBy=multi-user.target
 ```
+
+> Generare una SECRET_KEY sicura con:
+> ```bash
+> python3 -c "import secrets; print(secrets.token_hex(32))"
+> ```
 
 ---
 
@@ -427,10 +455,16 @@ journalctl -xeu ilmioricettario
 
 Il progetto utilizza:
 
-* Hashing password Werkzeug
+* Hashing password Werkzeug (bcrypt)
 * Autenticazione Flask-Login
 * Protezione amministrativa delle rotte
 * Gestione utenti sicura
+* SECRET_KEY letta da variabile d'ambiente (mai hardcoded)
+* Password admin generata randomicamente alla prima installazione
+
+> La SECRET_KEY firma i cookie di sessione Flask ed è completamente separata dalla password amministratore.
+>
+> L'applicazione non si avvia se la variabile SECRET_KEY non è impostata nell'ambiente.
 
 ---
 

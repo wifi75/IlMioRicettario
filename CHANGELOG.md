@@ -1,3 +1,41 @@
+## v2.3.0 - 2026-06-16
+
+### Aggiunto
+
+* **Sidebar Amministrativa Responsive:** Introdotto il pulsante hamburger per aprire e chiudere il menu laterale admin su smartphone e tablet. La sidebar si nasconde automaticamente su schermi con larghezza inferiore a 992 px e scorre dal bordo sinistro con animazione fluida.
+
+* **Overlay Mobile Sidebar:** Aggiunto uno strato scuro semitrasparente che oscura il contenuto quando la sidebar è aperta su mobile, con chiusura al tocco.
+
+* **Ottimizzazione Leggibilità Ricette su Mobile:** Ridimensionati i titoli H1, ridotti i padding interni delle card e resi i tab del procedimento scorrevoli orizzontalmente su smartphone, con scrollbar nascosta per un aspetto pulito.
+
+* **Tabella Ingredienti Scorrevole in Amministrazione:** La tabella ingredienti nel form di modifica ricetta attiva correttamente lo scroll orizzontale su dispositivi mobili tramite `min-width: 580px`.
+
+* **Password Admin Randomizzata alla Prima Installazione:** Il sistema genera automaticamente una password sicura a 16 caratteri alla prima installazione e la mostra via console. Non esistono più credenziali default nel codice sorgente.
+
+---
+
+### Modificato e Corretto
+
+* **SECRET_KEY Sicura:** Rimossa la chiave segreta hardcoded da `config.py`. La `SECRET_KEY` viene ora letta esclusivamente dalla variabile d'ambiente omonima. L'applicazione si rifiuta di avviarsi con un `RuntimeError` esplicito se la variabile non è impostata.
+
+* **Allineamento Newline POSIX:** Aggiunti i caratteri di fine riga mancanti in `app.py`, `static/css/admin.css`, `templates/base.html`, `templates/recipe_public_detail.html`.
+
+* **Configurazione Systemd:** Il servizio deve ora includere la voce `Environment="SECRET_KEY=..."` nella sezione `[Service]`.
+
+---
+
+### Note Tecniche
+
+* Nessuna nuova dipendenza Python introdotta.
+
+* La `SECRET_KEY` firma i cookie di sessione Flask (HMAC) ed è completamente separata dalla password dell'utente amministratore.
+
+* La password admin è sempre salvata come hash bcrypt nella tabella `users` — la `SECRET_KEY` non la riguarda.
+
+* Tecnologia hamburger: CSS `transform: translateX(-100%)` + JavaScript vanilla IIFE, senza nuove librerie.
+
+---
+
 ## v2.2.0 - 2026-06-10
 
 ### Aggiunto

@@ -196,3 +196,73 @@ h1, h2, h3, h4, h5 {
     object-fit: cover !important;
     background-color: #ffffff !important; /* Sfondo bianco puro per vedere bene i PNG trasparenti */
 }
+
+/* ==========================================================================
+   RESPONSIVE ADMIN — SIDEBAR MOBILE
+   ========================================================================== */
+
+/* Pulsante hamburger: visibile solo su mobile */
+.admin-hamburger {
+    display: none;
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 1100;
+    background: #1e293b;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+/* Overlay scuro dietro la sidebar aperta su mobile */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 999;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+@media (max-width: 991.98px) {
+
+    .admin-hamburger {
+        display: flex;
+    }
+
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.28s ease;
+        z-index: 1000;
+    }
+
+    .sidebar.sidebar-open {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0 !important;
+        padding: 20px 16px !important;
+    }
+
+    /* Spazio a sinistra nel titolo di pagina per non finire sotto l'hamburger */
+    .main-content .d-flex.justify-content-between {
+        padding-left: 56px;
+    }
+
+    /* Footer admin: larghezza piena su mobile */
+    .footer-admin-responsive {
+        margin-left: 0 !important;
+        max-width: 100% !important;
+    }
+}
