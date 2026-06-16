@@ -114,9 +114,7 @@
         .form-select {
             font-size: 16px !important;
         }
-        .forza-w-col {
-            display: none !important;
-        }
+
         .output-final-weight,
         #dash-public-total-weight-row {
             padding-right: 0.5rem !important;
@@ -354,7 +352,7 @@
                             <thead>
                                 <tr class="table-light text-secondary small">
                                     <th class="ps-3">Materia Prima</th>
-                                    <th class="text-center forza-w-col" style="width: 18%;">Forza (W)</th>
+                                    <th class="text-center d-none d-md-table-cell" style="width: 18%;">Forza (W)</th>
                                     <th class="text-center d-none d-md-table-cell" style="width: 22%;">Percentuale Baker</th>
                                     <th class="text-end text-primary fw-bold pe-3" style="width: 28%;">Grammi Necessari</th>
                                 </tr>
@@ -370,7 +368,7 @@
                                     <td class="fw-bold text-dark ps-3">
                                         <span class="dynamic-ing-name">{{ ing.name }}</span>
                                     </td>
-                                    <td class="text-center forza-w-col">
+                                    <td class="text-center d-none d-md-table-cell">
                                         {% if ing.is_flour and ing.w_value and ing.w_value > 0 %}
                                             <span class="badge bg-dark text-warning fw-bold px-2 py-1" style="font-size: 11px; border: 1px solid rgba(211, 107, 57, 0.2);">{{ ing.w_value }} W</span>
                                         {% endif %}
@@ -389,7 +387,7 @@
                                     <td class="fw-bold text-dark ps-3">
                                         <span class="dynamic-ing-name" id="fallback-yeast-label-name">Lievito di Birra Fresco</span>
                                     </td>
-                                    <td class="text-center forza-w-col"></td>
+                                    <td class="text-center d-none d-md-table-cell"></td>
                                     <td class="text-center text-success fw-bold output-baker-pct d-none d-md-table-cell">0.3%</td>
                                     <td class="text-end text-primary fw-bold fs-5 output-final-weight pe-3">0 g</td>
                                 </tr>
