@@ -198,6 +198,18 @@ h1, h2, h3, h4, h5 {
 }
 
 /* ==========================================================================
+   SIDEBAR — SCROLL INVISIBILE
+   ========================================================================== */
+
+.sidebar-nav-scroll {
+    scrollbar-width: none;       /* Firefox */
+    -ms-overflow-style: none;    /* IE / Edge */
+}
+.sidebar-nav-scroll::-webkit-scrollbar {
+    display: none;               /* Chrome / Safari */
+}
+
+/* ==========================================================================
    RESPONSIVE ADMIN — SIDEBAR MOBILE
    ========================================================================== */
 

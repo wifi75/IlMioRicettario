@@ -230,19 +230,15 @@
     <div class="sidebar d-flex flex-column p-3"
          id="adminSidebar"
          style="width: 280px; position: fixed; height: 100vh; overflow: hidden; background: #1e293b; color: #fff; z-index: 1000;">
-        <div style="overflow-y: auto; min-height: 0; flex: 1 1 auto;">
+        <div class="sidebar-nav-scroll" style="overflow-y: auto; min-height: 0; flex: 1 1 auto;">
             <div class="mb-3 pb-2 border-bottom border-secondary border-opacity-25">
-                <h3 class="mb-1 text-white fw-bold">🍞 Ricettario</h3>
-                <small class="text-uppercase tracking-wider fw-semibold opacity-50" style="font-size: 10px; color: #94a3b8;">Pannello Amministrazione</small>
-            </div>
-
-            <div class="mb-3 p-2 d-flex align-items-center gap-3" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px;">
-                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" style="width: 38px; height: 38px; font-size: 14px;">
-                    {{ current_user.username[:2].upper() }}
-                </div>
-                <div>
-                    <div style="font-size: 11px; color: #94a3b8;" class="text-uppercase fw-bold opacity-50">Utente</div>
-                    <div class="fw-bold text-white small">{{ current_user.username }}</div>
+                <h5 class="mb-1 text-white fw-bold">🍞 Il Mio Ricettario</h5>
+                <div class="d-flex align-items-center gap-2 mt-1">
+                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center text-white fw-bold"
+                         style="width: 20px; height: 20px; font-size: 9px; flex-shrink: 0;">
+                        {{ current_user.username[:1].upper() }}
+                    </div>
+                    <small style="color: #94a3b8; font-size: 11px;">{{ current_user.username }}</small>
                 </div>
             </div>
 
