@@ -3,15 +3,12 @@
 {% block title %}{% if article %}Modifica Articolo Wiki{% else %}Nuovo Articolo Wiki{% endif %}{% endblock %}
 {% block page_title %}{% if article %}Modifica: {{ article.title }}{% else %}Nuovo Articolo Wiki{% endif %}{% endblock %}
 
-<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-
+{% block content %}
 <style>
     .ql-editor    { min-height: 280px; font-size: 15px; color: #334155; background: #fff; }
     .ql-toolbar   { background: #f8fafc; border-top-left-radius: 8px; border-top-right-radius: 8px; border-color: #cbd5e1; }
     .ql-container { border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; border-color: #cbd5e1; }
 </style>
-
-{% block content %}
 
 {% with messages = get_flashed_messages(with_categories=true) %}
 {% if messages %}
