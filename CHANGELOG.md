@@ -1,3 +1,61 @@
+## v3.0.7 - 2026-06-16
+
+### Aggiunto
+
+* **Footer Versione e Link GitHub:** Il footer del sito pubblico mostra ora la versione dell'applicazione (letta da `config.py` via context processor) e un link al repository GitHub con icona Bootstrap Icons.
+
+* **Bilingue IT/EN Completo — Tutti i Template Admin:** Completamento del supporto bilingue su tutti i template del pannello admin: `backup.html`, `wiki_list.html`, `wiki_form.html`, `recipe_form.html`, `recipe_detail.html`, `recipes.html`, `dashboard.html`, `ingredients_master.html`, `pans_master.html`, `settings_theme.html`, `settings_yeast.html`, `settings_port.html`, `change_password.html`.
+
+* **`config.py` — Costante `APP_VERSION`:** Aggiunta la costante `APP_VERSION = 'v3.0.7'` in `Config`, iniettata globalmente dal context processor come `app_version`.
+
+* **`CLAUDE.md` — Documentazione Interna Espansa:** Aggiunte e ampliate le sezioni _Stato attuale del progetto_ (con modelli, context processor, debito tecnico) e _Cronologia decisioni_.
+
+---
+
+## v3.0.6 - 2026-06-16
+
+### Aggiunto
+
+* **Sistema Bilingue IT/EN (`translations.py`):** Introdotto il dizionario di traduzioni con oltre 150 chiavi organizzate per sezione (sidebar, admin condivisi, statistiche, dashboard, lista ricette, form ricetta, ingredienti, teglie, tema, lieviti, porta, password, backup, wiki). Il pannello admin e il frontend pubblico sono disponibili in italiano e in inglese.
+
+* **Switcher Lingua con Bandierine:** Pulsanti 🇮🇹 / 🇬🇧 nella sidebar admin e nel footer pubblico per cambiare lingua a runtime. La preferenza viene salvata nella sessione Flask via `/set-lang/<lang>`.
+
+* **Context Processor Globalizzato:** Le chiavi `T`, `current_lang` e `settings_data` sono ora disponibili in tutti i template senza passaggi espliciti nelle singole rotte.
+
+* **Template Pubblici Aggiornati:** `recipes_list.html`, `recipe_public_detail.html`, `wiki_public.html` aggiornati con `{{ T.* }}` per tutte le stringhe statiche visibili all'utente. Le stringhe dinamiche JS sono iniettate via oggetto `_T` Jinja2.
+
+---
+
+## v3.0.5 - 2026-06-16
+
+### Modificato
+
+* **Titoli Pagina Admin Coerenti con Sidebar:** I titoli `{% block title %}` e `{% block page_title %}` di tutti i template admin sono ora allineati alle voci della sidebar, eliminando discrepanze tra voce di menu, intestazione pagina e titolo del browser.
+
+---
+
+## v3.0.4 - 2026-06-16
+
+### Corretto
+
+* **Wiki — Seeding Upsert per Slug:** Il seeding degli articoli wiki all'avvio usa ora `filter_by(slug=...)` per evitare la duplicazione delle voci su database già esistenti. Il primo avvio su un database vuoto popola correttamente i 9 articoli tecnici dell'arte bianca.
+
+* **Fix Stile Editor Quill — Wiki Admin:** Corretti i bordi e il padding dell'editor Quill nella pagina di creazione e modifica articoli wiki. Il tema `snow` è ora applicato correttamente.
+
+---
+
+## v3.0.3 - 2026-06-16
+
+### Aggiunto
+
+* **Modifica Articoli Wiki dall'Admin (`/admin/wiki/<id>/edit`):** Aggiunta la route e il template per la modifica degli articoli wiki esistenti. In precedenza era possibile solo creare nuovi articoli.
+
+* **Editor Quill.js per Articoli Wiki:** L'editor rich text Quill.js è ora disponibile nel form di creazione e modifica degli articoli wiki, con barra degli strumenti identica a quella usata per le istruzioni delle ricette (grassetto, corsivo, sottolineato, intestazioni H2/H3, liste).
+
+* **Slug Autogenerato nel Form Wiki:** Il campo slug viene generato automaticamente in JavaScript dal titolo durante la creazione. In modifica rimane bloccato per non invalidare i link esistenti.
+
+---
+
 ## v3.0.2 - 2026-06-16
 
 ### Aggiunto

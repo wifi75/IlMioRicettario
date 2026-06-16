@@ -30,3 +30,4 @@ class Config:
         f"sqlite:///{os.path.join(BASE_DIR, 'data', 'database.db')}"
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    APP_VERSION = 'v3.0.7'

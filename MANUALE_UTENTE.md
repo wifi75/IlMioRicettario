@@ -1,4 +1,4 @@
-# 📖 Manuale Utente - Il Mio Ricettario (v3.0.0)
+# 📖 Manuale Utente - Il Mio Ricettario (v3.0.7)
 
 Benvenuto in **Il Mio Ricettario**, la piattaforma professionale per la gestione di ricette di panificazione, pizza, focaccia, grandi lievitati e arte bianca.
 
@@ -208,32 +208,35 @@ Contenuti disponibili:
 
 ---
 
-# 🛠️ 9. Installazione Guidata (Web Installer)
+# 🛠️ 9. Prima Configurazione (Setup Wizard Integrato)
 
-L'applicazione include un wizard di installazione accessibile via browser.
+L'applicazione include un wizard di prima configurazione integrato, accessibile direttamente via browser sulla porta principale dell'applicazione.
 
-Avvio:
+Se `instance/config.py` non è presente o non contiene una `SECRET_KEY`, l'app si avvia automaticamente in **SETUP_MODE** e reindirizza tutte le rotte su `/setup`.
+
+Il wizard guida nella configurazione di:
+
+* porta di ascolto dell'applicazione
+* Secret Key crittografica
+
+Al termine genera il file `instance/config.py` (mai incluso in Git) e mostra le istruzioni per il riavvio del servizio systemd.
 
 ```bash
-python installer.py
-# oppure, per abilitare il servizio systemd in automatico:
-sudo python installer.py
+# Dopo il wizard, riavviare il servizio:
+systemctl restart ilmioricettario
 ```
 
-Aprire il browser su:
+La porta può essere modificata anche in seguito dal pannello admin:
 
 ```text
-http://localhost:5000
+Admin → Sistema → Porta Applicazione
 ```
 
-Il wizard guida l'utente nella configurazione di:
+Oppure tramite lo script da riga di comando (utile prima del primo avvio se la porta 8080 è occupata):
 
-* porta dell'applicazione
-* Secret Key crittografica (generata automaticamente)
-
-Al termine genera il file `instance/config.py` che non viene mai incluso in Git, eliminando i conflitti tra aggiornamenti e configurazioni locali.
-
-Se avviato come root, il servizio systemd viene creato, abilitato e avviato in automatico. Altrimenti viene mostrato il contenuto del file `.service` da copiare manualmente.
+```bash
+python set_port.py
+```
 
 ---
 
@@ -261,7 +264,20 @@ Admin → Manutenzione → Backup e Ripristino
 
 ---
 
-# 🔐 11. Accesso Area Amministrativa
+# 🌐 11. Lingua dell'Interfaccia
+
+L'applicazione è disponibile in **italiano** e **inglese**.
+
+Lo switcher lingua è disponibile:
+
+* nel **footer del sito pubblico** — bandierine 🇮🇹 / 🇬🇧
+* nella **sidebar del pannello admin** — stesse bandierine in fondo al menu
+
+La preferenza viene salvata nella sessione del browser e rimane attiva fino alla chiusura.
+
+---
+
+# 🔐 12. Accesso Area Amministrativa
 
 L'accesso amministrativo è protetto da autenticazione.
 
@@ -286,7 +302,7 @@ Alla prima installazione il sistema genera automaticamente una password sicura e
 
 ---
 
-# ⚙️ 12. Gestione Ricette
+# ⚙️ 13. Gestione Ricette
 
 Dal pannello amministrativo è possibile:
 
@@ -314,7 +330,7 @@ Il contenuto viene automaticamente ottimizzato e salvato nel database.
 
 ---
 
-# 🖼️ 13. Libreria Immagini Centralizzata
+# 🖼️ 14. Libreria Immagini Centralizzata
 
 Le immagini vengono gestite da un archivio unico.
 
@@ -344,7 +360,7 @@ Vantaggi:
 
 ---
 
-# 🥣 14. Gestione Ingredienti
+# 🥣 15. Gestione Ingredienti
 
 L'archivio ingredienti centralizzato consente di definire:
 
@@ -356,7 +372,7 @@ L'archivio ingredienti centralizzato consente di definire:
 
 ---
 
-# 🍕 15. Gestione Teglie
+# 🍕 16. Gestione Teglie
 
 L'archivio teglie permette di registrare:
 
@@ -368,7 +384,7 @@ Le teglie possono essere associate a più ricette.
 
 ---
 
-# 🎨 16. Impostazioni Globali
+# 🎨 17. Impostazioni Globali
 
 Le impostazioni consentono di configurare:
 
@@ -380,7 +396,7 @@ Le impostazioni consentono di configurare:
 
 ---
 
-# 🔒 17. Sicurezza
+# 🔒 18. Sicurezza
 
 Le password vengono memorizzate esclusivamente tramite hash crittografico (bcrypt).
 
@@ -410,7 +426,7 @@ Cambiare sempre la password subito dopo la prima installazione:
 
 ---
 
-# 🧹 18. Cache del Browser
+# 🧹 19. Cache del Browser
 
 Dopo aggiornamenti importanti dell'applicazione può essere utile aggiornare la pagina con:
 

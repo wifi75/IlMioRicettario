@@ -63,7 +63,8 @@ else:
         return dict(
             settings_data=setting_record,
             T=TRANSLATIONS.get(lang, TRANSLATIONS['it']),
-            current_lang=lang
+            current_lang=lang,
+            app_version=app.config.get('APP_VERSION', '')
         )
 
     @app.route('/set-lang/<string:lang>')

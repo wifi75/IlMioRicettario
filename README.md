@@ -1,6 +1,6 @@
 # 🧫 Il Mio Ricettario - Professional Baking Suite
 
-![Versione](https://img.shields.io/badge/version-v3.0.2-orange?style=for-the-badge)
+![Versione](https://img.shields.io/badge/version-v3.0.7-orange?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Python-3.13-blue?style=for-the-badge&logo=python)
 ![Framework](https://img.shields.io/badge/Framework-Flask-blue?style=for-the-badge&logo=flask)
 ![Database](https://img.shields.io/badge/Database-SQLite-green?style=for-the-badge&logo=sqlite)
@@ -37,6 +37,61 @@ Progetto sviluppato da Tiziano Cassone
 ---
 
 # 🚀 Novità
+
+## v3.0.7
+
+### Footer Versione e Link GitHub
+
+* Il footer del sito pubblico mostra ora la versione dell'applicazione e un link diretto al repository GitHub
+* La versione è letta da `config.py` (costante `APP_VERSION`) e iniettata nel template via context processor
+
+### Bilingue IT/EN Completo — Tutti i Template Admin
+
+* Completamento del supporto bilingue su tutti i template del pannello admin: `backup`, `wiki_list`, `wiki_form`, `recipe_form`, `recipe_detail`, `recipes`, `dashboard`, `ingredients_master`, `pans_master`, `settings_theme`, `settings_yeast`, `settings_port`, `change_password`
+
+### CLAUDE.md Aggiornato
+
+* Aggiunte sezioni Stato attuale del progetto e Cronologia decisioni con architettura completa, modelli, debito tecnico e decisioni storiche
+
+---
+
+## v3.0.6
+
+### Sistema Bilingue IT/EN
+
+* Introdotto `translations.py` con oltre 150 chiavi organizzate per sezione (sidebar, admin, pubblico, JS)
+* Switcher lingua 🇮🇹 / 🇬🇧 nella sidebar admin e nel footer pubblico
+* La preferenza lingua viene salvata nella sessione Flask via `/set-lang/<lang>`
+* Context processor globalizzato: `T`, `current_lang` e `settings_data` disponibili in tutti i template
+* Template pubblici aggiornati: `recipes_list.html`, `recipe_public_detail.html`, `wiki_public.html`
+
+---
+
+## v3.0.5
+
+### Admin — Titoli Pagina Coerenti
+
+* I titoli delle pagine del pannello admin sono ora coerenti con le voci della sidebar e il titolo del browser
+
+---
+
+## v3.0.4
+
+### Wiki — Fix Seeding e Editor
+
+* Il seeding degli articoli wiki all'avvio usa ora `filter_by(slug=...)` per evitare duplicazioni su database esistenti
+* Corretti bordi e padding dell'editor Quill nella pagina modifica articoli wiki
+
+---
+
+## v3.0.3
+
+### Wiki Admin — Modifica Articoli e Editor Quill
+
+* Aggiunta la route e il template per la modifica degli articoli wiki esistenti (`/admin/wiki/<id>/edit`)
+* Editor rich text Quill.js disponibile anche nel form articoli wiki
+
+---
 
 ## v3.0.2
 

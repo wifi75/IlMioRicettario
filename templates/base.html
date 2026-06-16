@@ -345,6 +345,14 @@
             <div class="mb-3 small text-muted">
                 {{ T.footer_credit }} <strong class="text-dark">Tiziano Cassone</strong>
             </div>
+            <div class="d-flex justify-content-center align-items-center gap-3 mb-3 flex-wrap">
+                <span class="badge bg-secondary opacity-75 fw-normal" style="font-size: 11px;">{{ app_version }}</span>
+                <a href="https://github.com/wifi75/IlMioRicettario" target="_blank" rel="noopener"
+                   class="text-muted small text-decoration-none d-flex align-items-center gap-1"
+                   style="font-size: 12px;">
+                    <i class="bi bi-github"></i> {{ T.footer_github }}
+                </a>
+            </div>
             <div class="d-flex justify-content-center gap-2 mb-3">
                 <a href="{{ url_for('set_lang', lang='it') }}" class="btn btn-sm {% if current_lang == 'it' %}btn-dark{% else %}btn-outline-secondary opacity-60{% endif %} px-3" style="font-size: 15px;" title="Italiano">🇮🇹</a>
                 <a href="{{ url_for('set_lang', lang='en') }}" class="btn btn-sm {% if current_lang == 'en' %}btn-dark{% else %}btn-outline-secondary opacity-60{% endif %} px-3" style="font-size: 15px;" title="English">🇬🇧</a>

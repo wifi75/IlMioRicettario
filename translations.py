@@ -273,6 +273,7 @@ TRANSLATIONS = {
         # --- Footer ---
         'footer_credit':      'Architettato e sviluppato con passione da',
         'footer_admin_btn':   'Pannello Controllo Admin',
+        'footer_github':      'Sorgente su GitHub',
     },
     'en': {
         # --- Admin sidebar ---
@@ -548,5 +549,6 @@ TRANSLATIONS = {
         # --- Footer ---
         'footer_credit':      'Designed and developed with passion by',
         'footer_admin_btn':   'Admin Control Panel',
+        'footer_github':      'Source on GitHub',
     }
 }

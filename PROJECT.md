@@ -1,9 +1,9 @@
-# PROGETTO: Il Mio Ricettario (V3.0.2)
+# PROGETTO: Il Mio Ricettario (V3.0.7)
 
 ## PANORAMICA
 
 * **Nome:** Il Mio Ricettario
-* **Versione Architetturale:** V3.0.2
+* **Versione Architetturale:** V3.0.7
 * **Stato:** Produzione Stabile
 * **Repository GitHub:** https://github.com/wifi75/IlMioRicettario
 * **Sviluppatore Principale:** Tiziano Cassone
@@ -26,7 +26,8 @@ A differenza di un semplice archivio statico, ogni ricetta può attivare moduli 
 * libreria immagini centralizzata;
 * Wiki tecnica pubblica;
 * calcolo dinamico del peso impasto;
-* frontend responsive per consultazione pubblica.
+* frontend responsive per consultazione pubblica;
+* interfaccia bilingue IT/EN con switcher lingua.
 
 ---
 
@@ -59,6 +60,11 @@ A differenza di un semplice archivio statico, ogni ricetta può attivare moduli 
 ## Template Engine
 
 * Jinja2
+
+## Internazionalizzazione
+
+* Dizionario Python nativo (`translations.py`) — IT/EN
+* Context processor Flask per iniezione globale
 
 ---
 
