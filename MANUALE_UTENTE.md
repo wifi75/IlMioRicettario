@@ -1,4 +1,4 @@
-# 📖 Manuale Utente - Il Mio Ricettario (v2.3.1)
+# 📖 Manuale Utente - Il Mio Ricettario (v2.3.2)
 
 Benvenuto in **Il Mio Ricettario**, la piattaforma professionale per la gestione di ricette di panificazione, pizza, focaccia, grandi lievitati e arte bianca.
 

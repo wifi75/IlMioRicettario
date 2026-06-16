@@ -1,3 +1,17 @@
+## v2.3.2 - 2026-06-16
+
+### Modificato e Corretto
+
+* **Layout Tabella Formula su Mobile:** Intestazioni con `white-space: nowrap` per evitare il testo a capo. Header "Forza (W)" abbreviato in "(W)" su smartphone, "Grammi Necessari" abbreviato in "Grammi". Larghezze colonne ottimizzate tramite classi `col-w` (20%) e `col-grammi` (33%).
+
+* **Riga TOTAL IMPASTO:** Corretto `colspan` a 2 con cella vuota hidden per la colonna Percentuale Baker, garantendo rendering corretto su tutti i breakpoint.
+
+* **Admin Panel Bloccato su Smartphone:** Overlay full-screen su schermi < 768 px che informa l'utente che il pannello richiede tablet o computer, con link diretto al sito pubblico. Admin pienamente funzionante su tablet e desktop.
+
+* **Wiki Tecnica — 9 Voci Seminate:** Aggiunte al database all'avvio (solo se la wiki è vuota) le voci che documentano il funzionamento del calcolatore, le tecniche di panificazione (Tangzhong, Biga, Poolish, percentuale baker, idratazione, valore W) e le guide operative (pezzature, teglie, conversione lieviti).
+
+---
+
 ## v2.3.1 - 2026-06-16
 
 ### Modificato e Corretto

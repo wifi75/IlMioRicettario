@@ -1,6 +1,6 @@
 # 🧫 Il Mio Ricettario - Professional Baking Suite
 
-![Versione](https://img.shields.io/badge/version-v2.3.1-orange?style=for-the-badge)
+![Versione](https://img.shields.io/badge/version-v2.3.2-orange?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Python-3.13-blue?style=for-the-badge&logo=python)
 ![Framework](https://img.shields.io/badge/Framework-Flask-blue?style=for-the-badge&logo=flask)
 ![Database](https://img.shields.io/badge/Database-SQLite-green?style=for-the-badge&logo=sqlite)
@@ -37,6 +37,17 @@ Progetto sviluppato da Tiziano Cassone
 ---
 
 # 🚀 Novità della Serie 2.2
+
+## v2.3.2
+
+### Mobile Responsive
+
+* Tabella formula con 3 colonne ottimizzate su smartphone: Materia Prima, (W), Grammi
+* Intestazioni tabella abbreviate su mobile, senza testo a capo
+* Admin panel bloccato su smartphone con overlay e messaggio esplicativo
+* Wiki tecnica pre-popolata con 9 voci al primo avvio
+
+---
 
 ## v2.3.1
 
