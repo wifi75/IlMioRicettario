@@ -164,7 +164,7 @@
         </div>
     </div>
 
-    <div class="row g-4 mb-4">
+    <div class="row gx-0 gx-lg-4 gy-4 mb-4">
         
         <div class="col-lg-5">
             <div class="card bg-white p-4 border-0 shadow-sm rounded-4">
@@ -352,7 +352,7 @@
                             <thead>
                                 <tr class="table-light text-secondary small">
                                     <th class="ps-3">Materia Prima</th>
-                                    <th class="text-center d-none d-md-table-cell" style="width: 18%;">Forza (W)</th>
+                                    <th class="text-center" style="width: 18%;">Forza (W)</th>
                                     <th class="text-center d-none d-md-table-cell" style="width: 22%;">Percentuale Baker</th>
                                     <th class="text-end text-primary fw-bold pe-3" style="width: 28%;">Grammi Necessari</th>
                                 </tr>
@@ -368,7 +368,7 @@
                                     <td class="fw-bold text-dark ps-3">
                                         <span class="dynamic-ing-name">{{ ing.name }}</span>
                                     </td>
-                                    <td class="text-center d-none d-md-table-cell">
+                                    <td class="text-center">
                                         {% if ing.is_flour and ing.w_value and ing.w_value > 0 %}
                                             <span class="badge bg-dark text-warning fw-bold px-2 py-1" style="font-size: 11px; border: 1px solid rgba(211, 107, 57, 0.2);">{{ ing.w_value }} W</span>
                                         {% endif %}
@@ -387,7 +387,7 @@
                                     <td class="fw-bold text-dark ps-3">
                                         <span class="dynamic-ing-name" id="fallback-yeast-label-name">Lievito di Birra Fresco</span>
                                     </td>
-                                    <td class="text-center d-none d-md-table-cell"></td>
+                                    <td class="text-center"></td>
                                     <td class="text-center text-success fw-bold output-baker-pct d-none d-md-table-cell">0.3%</td>
                                     <td class="text-end text-primary fw-bold fs-5 output-final-weight pe-3">0 g</td>
                                 </tr>
