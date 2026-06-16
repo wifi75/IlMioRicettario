@@ -1,4 +1,5 @@
 import os
+import secrets
 import importlib.util
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -15,23 +16,17 @@ def _load_instance():
 
 
 _inst = _load_instance()
+_secret = os.environ.get("SECRET_KEY") or _inst.get("SECRET_KEY")
+
+# Se non c'è una chiave configurata l'app entra in modalità setup
+SETUP_MODE = not bool(_secret)
 
 
 class Config:
-    SECRET_KEY = os.environ.get("SECRET_KEY") or _inst.get("SECRET_KEY")
-
-    if not SECRET_KEY:
-        raise RuntimeError(
-            "SECRET_KEY non configurata.\n"
-            "Opzione 1 — file instance/config.py:  SECRET_KEY = \"la-tua-chiave\"\n"
-            "Opzione 2 — variabile d'ambiente nel .service di systemd: Environment=\"SECRET_KEY=...\"\n"
-            "Genera una chiave sicura con: python -c \"import secrets; print(secrets.token_hex(32))\""
-        )
-
+    SECRET_KEY = _secret if _secret else secrets.token_hex(32)
+    SETUP_MODE = SETUP_MODE
     PORT = int(_inst.get("PORT", os.environ.get("PORT", 8080)))
-
     SQLALCHEMY_DATABASE_URI = (
         f"sqlite:///{os.path.join(BASE_DIR, 'data', 'database.db')}"
     )
-
     SQLALCHEMY_TRACK_MODIFICATIONS = False

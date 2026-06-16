@@ -40,12 +40,12 @@ Progetto sviluppato da Tiziano Cassone
 
 ## v3.0.0
 
-### Web Installer
+### Setup Wizard Integrato
 
-* Wizard di installazione accessibile via browser (`python installer.py` → http://server:5000)
-* Generazione automatica di `instance/config.py` con PORT e SECRET_KEY
-* Se avviato come root: crea, abilita e avvia il servizio systemd in automatico
-* Mostra il file `.service` pronto da copiare con un click
+* Wizard di prima configurazione accessibile via browser direttamente sulla porta principale
+* Se `instance/config.py` non esiste, l'app parte in SETUP_MODE e reindirizza tutto su `/setup`
+* Il wizard genera `instance/config.py` con PORT e SECRET_KEY — nessun tool esterno richiesto
+* Incluso `ilmioricettario.service.example` pronto da copiare per il servizio systemd
 
 ### Configurazione Istanza
 
@@ -354,41 +354,16 @@ pip install -r requirements.txt
 
 ---
 
-## 3 — Installazione Guidata via Browser (Web Installer)
+## 3 — Servizio systemd
 
-Avvia il wizard di installazione:
-
-```bash
-sudo python installer.py
-```
-
-Apri il browser su:
-
-```text
-http://<indirizzo-server>:5000
-```
-
-Il wizard chiede:
-
-* **Porta** dell'applicazione (es. 8100)
-* **Secret Key** (generata automaticamente con un click)
-
-Al termine genera `instance/config.py` con PORT e SECRET_KEY.
-Se avviato con `sudo`, crea e abilita il servizio systemd in automatico.
-
-> `instance/config.py` non è mai incluso in git: `git pull` non genererà mai conflitti sulla porta o sulla chiave.
-
----
-
-## 4 — Se il servizio NON è stato abilitato automaticamente
-
-Copia il contenuto mostrato nella pagina di successo dell'installer e salvalo in:
+Copia il file di esempio incluso nel repository:
 
 ```bash
+cp ilmioricettario.service.example /etc/systemd/system/ilmioricettario.service
 nano /etc/systemd/system/ilmioricettario.service
 ```
 
-Poi abilita e avvia:
+Adatta `WorkingDirectory` e `User` al tuo ambiente, poi abilita e avvia:
 
 ```bash
 systemctl daemon-reload
@@ -401,6 +376,30 @@ Verifica:
 ```bash
 systemctl status ilmioricettario
 ```
+
+---
+
+## 4 — Prima Configurazione via Browser (Setup Wizard)
+
+Al primo avvio, **senza** un file `instance/config.py`, l'app entra automaticamente in modalità setup.
+
+Apri il browser su:
+
+```text
+http://<indirizzo-server>:<porta>/setup
+```
+
+> La porta di default al primo avvio è **8080**. Se hai modificato `ExecStart` nel `.service`,
+> usa la porta specificata lì tramite variabile d'ambiente `PORT`.
+
+Il wizard chiede:
+
+* **Porta** dell'applicazione (es. 8100)
+* **Secret Key** (generata automaticamente con un click)
+
+Al termine genera `instance/config.py`. Segui le istruzioni a schermo per riavviare il servizio.
+
+> `instance/config.py` non è mai incluso in git: `git pull` non genera mai conflitti sulla porta o sulla chiave.
 
 ---
 
@@ -446,7 +445,7 @@ Il progetto utilizza:
 
 > La SECRET_KEY firma i cookie di sessione Flask ed è completamente separata dalla password amministratore.
 >
-> La variabile d'ambiente ha priorità su `instance/config.py`. L'applicazione non si avvia se SECRET_KEY non è configurata in nessuno dei due posti.
+> La variabile d'ambiente ha priorità su `instance/config.py`. Se SECRET_KEY non è configurata in nessuno dei due posti, l'app parte in SETUP_MODE e reindirizza tutto su `/setup` per la prima configurazione.
 
 ---
 

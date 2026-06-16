@@ -1,0 +1,14 @@
+[Unit]
+Description=Il Mio Ricettario — Professional Baking Suite
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/var/www/IlMioRicettario
+ExecStart=/var/www/IlMioRicettario/venv/bin/python app.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Configurazione completata — Il Mio Ricettario</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        body { background: #f1f5f9; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
+        .setup-card { max-width: 560px; width: 100%; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,0.10); overflow: hidden; }
+        .setup-header { background: linear-gradient(135deg, #15803d 0%, #16a34a 100%); padding: 2rem; color: #fff; }
+        .setup-body { padding: 2rem; }
+        .cmd-block { font-family: monospace; font-size: 0.85rem; background: #1e293b; color: #e2e8f0; border-radius: 8px; padding: 0.9rem 1rem; }
+        .step-num { width: 24px; height: 24px; border-radius: 50%; background: #1e293b; color: #fff; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+    </style>
+</head>
+<body>
+
+<div class="setup-card">
+
+    <div class="setup-header">
+        <div class="d-flex align-items-center gap-3 mb-2">
+            <i class="bi bi-check-circle-fill" style="font-size: 2rem;"></i>
+            <div>
+                <h5 class="fw-bold mb-0 text-white">Configurazione salvata</h5>
+                <small style="color: #bbf7d0;">instance/config.py creato correttamente</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="setup-body">
+
+        <div class="alert alert-warning border-0 rounded-3 mb-4 small">
+            <i class="bi bi-arrow-clockwise me-1"></i>
+            <strong>Riavvia il servizio</strong> per applicare la configurazione e avviare l'app sulla porta <strong>{{ port }}</strong>.
+        </div>
+
+        <div class="mb-4">
+            <div class="d-flex align-items-start gap-3 mb-3">
+                <span class="step-num">1</span>
+                <div class="w-100">
+                    <div class="fw-semibold small mb-1">Riavvia il servizio</div>
+                    <div class="cmd-block position-relative" id="cmd1">systemctl restart ilmioricettario
+                        <button class="btn btn-sm btn-light position-absolute top-0 end-0 m-1" onclick="copy('cmd1', this)" style="font-size: 11px; padding: 2px 8px;">Copia</button>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex align-items-start gap-3 mb-3">
+                <span class="step-num">2</span>
+                <div>
+                    <div class="fw-semibold small mb-1">Verifica che sia attivo</div>
+                    <div class="cmd-block">systemctl status ilmioricettario</div>
+                </div>
+            </div>
+            <div class="d-flex align-items-start gap-3">
+                <span class="step-num">3</span>
+                <div>
+                    <div class="fw-semibold small mb-1">Apri il sito nel browser</div>
+                    <div class="cmd-block">http://&lt;indirizzo-server&gt;:{{ port }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-3 bg-light rounded-3 border small">
+            <div class="fw-semibold text-dark mb-1"><i class="bi bi-person-fill me-1"></i>Primo accesso admin</div>
+            <div class="text-muted">Al riavvio l'app crea automaticamente l'utente admin con una password sicura generata casualmente. La password viene mostrata nei log del servizio:</div>
+            <div class="cmd-block mt-2">journalctl -u ilmioricettario -n 30 --no-pager</div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+function copy(id, btn) {
+    var text = document.getElementById(id).innerText.replace('Copia', '').trim();
+    navigator.clipboard.writeText(text).then(function () {
+        btn.textContent = 'Copiato!';
+        setTimeout(function () { btn.textContent = 'Copia'; }, 2000);
+    });
+}
+</script>
+</body>
+</html>

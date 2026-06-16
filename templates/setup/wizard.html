@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Configurazione — Il Mio Ricettario</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        body { background: #f1f5f9; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
+        .setup-card { max-width: 540px; width: 100%; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,0.10); overflow: hidden; }
+        .setup-header { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 2rem 2rem 1.5rem; color: #fff; }
+        .setup-body { padding: 2rem; }
+        .key-field { font-family: monospace; font-size: 0.82rem; background: #f8fafc; }
+        .step-dot { width: 26px; height: 26px; border-radius: 50%; background: #3b82f6; color: #fff; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    </style>
+</head>
+<body>
+
+<div class="setup-card">
+
+    <div class="setup-header">
+        <div class="d-flex align-items-center gap-3 mb-3">
+            <span style="font-size: 2.2rem;">🍞</span>
+            <div>
+                <h5 class="fw-bold mb-0 text-white">Il Mio Ricettario</h5>
+                <small style="color: #94a3b8;">Prima configurazione</small>
+            </div>
+        </div>
+        <p class="mb-0 small" style="color: #94a3b8; line-height: 1.6;">
+            Benvenuto. Configura porta e chiave di sicurezza per avviare l'applicazione.
+            Questa schermata scompare automaticamente dopo il primo salvataggio.
+        </p>
+    </div>
+
+    <div class="setup-body">
+
+        {% if errors %}
+        <div class="alert alert-danger border-0 rounded-3 mb-4 py-2 small">
+            {% for e in errors %}<div><i class="bi bi-x-circle me-1"></i>{{ e }}</div>{% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="post" action="/setup">
+
+            <div class="mb-4">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="step-dot">1</span>
+                    <label class="form-label fw-bold mb-0 small text-uppercase">Porta dell'applicazione</label>
+                </div>
+                <input type="number" name="port" class="form-control"
+                       value="{{ form.get('port', '8080') }}"
+                       min="1024" max="65535" required>
+                <div class="form-text small">La porta su cui sarà raggiungibile il sito. Default: 8080.</div>
+            </div>
+
+            <div class="mb-4">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="step-dot">2</span>
+                    <label class="form-label fw-bold mb-0 small text-uppercase">Secret Key</label>
+                </div>
+                <div class="input-group">
+                    <input type="text" name="secret_key" id="secretKeyField"
+                           class="form-control key-field"
+                           value="{{ form.get('secret_key', generated_key) }}"
+                           required minlength="32">
+                    <button type="button" class="btn btn-outline-secondary" id="btnGen">
+                        <i class="bi bi-arrow-clockwise"></i> Genera
+                    </button>
+                </div>
+                <div class="form-text small">Chiave crittografica per i cookie di sessione. Non cambiarla dopo l'installazione.</div>
+            </div>
+
+            <div class="alert alert-info border-0 rounded-3 small mb-4 py-2">
+                <i class="bi bi-info-circle me-1"></i>
+                Dopo il salvataggio l'app mostrerà un messaggio con il comando per riavviarla.
+                Il primo admin viene creato automaticamente al riavvio.
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary fw-bold py-2">
+                    <i class="bi bi-check-lg me-2"></i>Salva Configurazione
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<script>
+document.getElementById('btnGen').addEventListener('click', function () {
+    fetch('/setup/generate-key')
+        .then(r => r.json())
+        .then(d => { document.getElementById('secretKeyField').value = d.key; });
+});
+</script>
+</body>
+</html>

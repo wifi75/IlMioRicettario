@@ -27,48 +27,39 @@ from models.image import MasterImage
 from routes.recipes import recipes_bp
 from routes.admin import admin_bp
 from routes.backup import backup_bp
+from routes.setup import setup_bp
 
 
 app = Flask(__name__)
-
 app.config.from_object(Config)
 
 db.init_app(app)
 login_manager.init_app(app)
-
-# INIZIALIZZAZIONE DEL MOTORE DI MIGRAZIONE DEL DATABASE
 migrate = Migrate(app, db)
 
-# ==========================================================
-# CRITICO: NUOVO ORDINE DI REGISTRAZIONE BLUEPRINT
-# ==========================================================
-app.register_blueprint(admin_bp)
-app.register_blueprint(recipes_bp)
-app.register_blueprint(backup_bp)
+if app.config.get('SETUP_MODE'):
+    app.register_blueprint(setup_bp)
+    print("=" * 50)
+    print("MODALITA' SETUP — aprire il browser su:")
+    print(f"  http://<indirizzo-server>:{app.config.get('PORT', 8080)}/setup")
+    print("=" * 50)
+else:
+    app.register_blueprint(admin_bp)
+    app.register_blueprint(recipes_bp)
+    app.register_blueprint(backup_bp)
 
+    @login_manager.user_loader
+    def load_user(user_id):
+        return db.session.get(User, int(user_id))
 
-@login_manager.user_loader
-def load_user(user_id):
-    return db.session.get(
-        User,
-        int(user_id)
-    )
+    @app.context_processor
+    def inject_global_settings():
+        setting_record = Setting.query.order_by(Setting.id.desc()).first()
+        return dict(settings_data=setting_record)
 
-
-# CORRETTO: Ordiniamo per ID decrescente per prendere SICURAMENTE l'ultimo record attivo e aggiornato
-@app.context_processor
-def inject_global_settings():
-    setting_record = Setting.query.order_by(Setting.id.desc()).first()
-    return dict(
-        settings_data=setting_record
-    )
-
-
-@app.route("/")
-def index():
-    return redirect(
-        url_for("recipes.list_recipes")
-    )
+    @app.route("/")
+    def index():
+        return redirect(url_for("recipes.list_recipes"))
 
 
 with app.app_context():
