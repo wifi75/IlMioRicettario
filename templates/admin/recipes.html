@@ -1,14 +1,13 @@
 {% extends "base.html" %}
 
-{% block title %}Ricette{% endblock %}
-
+{% block title %}{{ T.sidebar_recipes }}{% endblock %}
 {% block page_title %}Gestione Ricette{% endblock %}
 
 {% block content %}
 
 <div class="d-flex justify-content-end align-items-center mb-4">
     <a href="/admin/recipes/new" class="btn btn-success btn-lg">
-        ➕ Nuova Ricetta
+        {{ T.a_new_recipe }}
     </a>
 </div>
 
@@ -32,11 +31,11 @@
 
                 {% if recipe.is_published %}
                 <span class="badge bg-success">
-                    Pubblicata
+                    {{ T.a_published }}
                 </span>
                 {% else %}
                 <span class="badge bg-secondary">
-                    Bozza
+                    {{ T.a_draft }}
                 </span>
                 {% endif %}
 
@@ -51,20 +50,20 @@
             </div>
 
             <small class="text-muted">
-                {{ recipe.ingredient_count() }} ingredienti
+                {{ recipe.ingredient_count() }} {{ T.a_ingredients_count }}
             </small>
 
             <div class="mt-3">
 
                 <a href="/admin/recipe/edit/{{ recipe.id }}"
                    class="btn btn-warning btn-sm">
-                    Modifica
+                    {{ T.a_edit }}
                 </a>
 
                 <a href="/admin/recipes/delete/{{ recipe.id }}"
                    class="btn btn-danger btn-sm"
-                   onclick="return confirm('Eliminare la ricetta?');">
-                    Elimina
+                   onclick="return confirm('{{ T.a_confirm_del_recipe }}');">
+                    {{ T.a_delete }}
                 </a>
 
             </div>
@@ -86,16 +85,16 @@
 <div class="card-body text-center p-5">
 
     <h3>
-        Nessuna ricetta presente
+        {{ T.a_no_recipes }}
     </h3>
 
     <p class="text-muted">
-        Inizia creando la tua prima ricetta.
+        {{ T.a_no_recipes_hint }}
     </p>
 
     <a href="/admin/recipes/new"
        class="btn btn-success">
-        ➕ Crea Ricetta
+        {{ T.a_create_recipe }}
     </a>
 
 </div>

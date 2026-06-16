@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% block title %}Porta Applicazione — Admin{% endblock %}
-
 {% block page_title %}Porta Applicazione{% endblock %}
 
 {% block content %}
@@ -22,7 +21,7 @@
         <div class="card border-0 shadow-sm rounded-3 mb-4">
             <div class="card-header bg-white border-bottom py-3">
                 <h6 class="fw-bold mb-0 d-flex align-items-center gap-2">
-                    <i class="bi bi-hdd-network text-primary"></i> Porta di Ascolto
+                    <i class="bi bi-hdd-network text-primary"></i> {{ T.a_port_listen }}
                 </h6>
             </div>
             <div class="card-body p-4">
@@ -34,7 +33,7 @@
                 </div>
 
                 <div class="mb-4 p-3 bg-light rounded-3 border">
-                    <div class="small text-muted mb-1">Porta attuale</div>
+                    <div class="small text-muted mb-1">{{ T.a_port_current }}</div>
                     <div class="fw-bold fs-4 text-dark font-monospace">{{ current_port }}</div>
                     <div class="small text-muted mt-1">
                         <i class="bi bi-globe me-1"></i>
@@ -44,14 +43,14 @@
 
                 <form method="post" action="{{ url_for('admin.settings_port') }}">
                     <div class="mb-4">
-                        <label class="form-label fw-semibold">Nuova porta</label>
+                        <label class="form-label fw-semibold">{{ T.a_port_new }}</label>
                         <input type="number" name="port" class="form-control form-control-lg font-monospace"
                                value="{{ current_port }}" min="1024" max="65535" required>
                         <div class="form-text">Valori consentiti: da 1024 a 65535. Porte comuni da evitare: 80, 443, 3000, 5000, 8080 se già in uso.</div>
                     </div>
                     <div class="d-grid">
                         <button type="submit" class="btn btn-primary fw-bold py-2">
-                            <i class="bi bi-floppy me-2"></i>Salva Porta
+                            <i class="bi bi-floppy me-2"></i>{{ T.a_port_save }}
                         </button>
                     </div>
                 </form>
@@ -61,7 +60,7 @@
         <div class="card border-0 shadow-sm rounded-3">
             <div class="card-header bg-white border-bottom py-3">
                 <h6 class="fw-bold mb-0 d-flex align-items-center gap-2">
-                    <i class="bi bi-terminal text-dark"></i> Riavvio Servizio
+                    <i class="bi bi-terminal text-dark"></i> {{ T.a_port_restart }}
                 </h6>
             </div>
             <div class="card-body p-4">
@@ -73,7 +72,7 @@
                     <pre class="bg-dark text-light rounded-3 p-3 mb-0 small font-monospace" id="cmdRestart">systemctl restart ilmioricettario</pre>
                     <button class="btn btn-sm btn-light position-absolute top-0 end-0 m-2"
                             onclick="copyCmd()" id="btnCopy">
-                        <i class="bi bi-clipboard me-1"></i>Copia
+                        <i class="bi bi-clipboard me-1"></i>{{ T.a_port_copy }}
                     </button>
                 </div>
 
@@ -92,9 +91,9 @@ function copyCmd() {
     var text = document.getElementById('cmdRestart').innerText.trim();
     navigator.clipboard.writeText(text).then(function () {
         var btn = document.getElementById('btnCopy');
-        btn.innerHTML = '<i class="bi bi-clipboard-check me-1"></i>Copiato!';
+        btn.innerHTML = '<i class="bi bi-clipboard-check me-1"></i>{{ T.a_port_copied }}';
         setTimeout(function () {
-            btn.innerHTML = '<i class="bi bi-clipboard me-1"></i>Copia';
+            btn.innerHTML = '<i class="bi bi-clipboard me-1"></i>{{ T.a_port_copy }}';
         }, 2000);
     });
 }

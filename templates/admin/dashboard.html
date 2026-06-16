@@ -5,111 +5,54 @@
 {% block content %}
 
 <div class="mb-4">
-
-    <h1 class="fw-bold">
-        Dashboard
-    </h1>
-
-    <p class="text-muted mb-0">
-        Benvenuto nel pannello di amministrazione
-    </p>
-
+    <h1 class="fw-bold">Dashboard</h1>
+    <p class="text-muted mb-0">{{ T.a_dashboard_welcome }}</p>
 </div>
 
 <div class="row g-4">
 
     <div class="col-lg-3">
-
         <div class="card stat-card">
-
             <div class="card-body">
-
-                <div class="text-muted">
-                    Ricette
-                </div>
-
-                <h1 class="fw-bold mt-2">
-                    {{ recipes_count }}
-                </h1>
-
+                <div class="text-muted">{{ T.a_stat_recipes }}</div>
+                <h1 class="fw-bold mt-2">{{ recipes_count }}</h1>
             </div>
-
         </div>
-
     </div>
 
     <div class="col-lg-3">
-
         <div class="card stat-card">
-
             <div class="card-body">
-
-                <div class="text-muted">
-                    Moduli
-                </div>
-
-                <h1 class="fw-bold mt-2">
-                    5
-                </h1>
-
+                <div class="text-muted">{{ T.a_stat_modules }}</div>
+                <h1 class="fw-bold mt-2">5</h1>
             </div>
-
         </div>
-
     </div>
 
     <div class="col-lg-3">
-
         <div class="card stat-card">
-
             <div class="card-body">
-
-                <div class="text-muted">
-                    Wiki
-                </div>
-
-                <h1 class="fw-bold mt-2">
-                    0
-                </h1>
-
+                <div class="text-muted">{{ T.a_stat_wiki }}</div>
+                <h1 class="fw-bold mt-2">0</h1>
             </div>
-
         </div>
-
     </div>
 
     <div class="col-lg-3">
-
         <div class="card stat-card">
-
             <div class="card-body">
-
-                <div class="text-muted">
-                    Versione
-                </div>
-
-                <h1 class="fw-bold mt-2">
-                    V1
-                </h1>
-
+                <div class="text-muted">{{ T.a_stat_version }}</div>
+                <h1 class="fw-bold mt-2">V1</h1>
             </div>
-
         </div>
-
     </div>
 
 </div>
 
 <div class="card mt-4">
-
     <div class="card-body">
-
-        <h4 class="fw-bold mb-3">
-            Roadmap
-        </h4>
-
+        <h4 class="fw-bold mb-3">Roadmap</h4>
         <ul class="mb-0">
-
             <li>✅ Gestione utenti admin</li>
             <li>✅ Gestione ricette</li>
             <li>✅ Gestione ingredienti</li>
@@ -118,11 +61,8 @@
             <li>🔄 Conversione lieviti</li>
             <li>🔄 Wiki integrata</li>
             <li>🔄 Frontend pubblico</li>
-
         </ul>
-
     </div>
-
 </div>
 
 {% endblock %}

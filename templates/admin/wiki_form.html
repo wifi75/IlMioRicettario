@@ -28,7 +28,7 @@
               id="wiki-form">
 
             <div class="mb-3">
-                <label class="form-label fw-semibold">Titolo</label>
+                <label class="form-label fw-semibold">{{ T.a_wiki_title_lbl }}</label>
                 <input type="text" name="title" id="wiki-title" class="form-control"
                        value="{{ article.title if article else '' }}"
                        placeholder="es. Tangzhong — Tecnica del Roux" required>
@@ -36,14 +36,14 @@
 
             <div class="row g-3 mb-3">
                 <div class="col-md-6">
-                    <label class="form-label fw-semibold">Slug URL</label>
+                    <label class="form-label fw-semibold">{{ T.a_wiki_slug_lbl }}</label>
                     <input type="text" name="slug" id="wiki-slug" class="form-control font-monospace text-muted"
                            value="{{ article.slug if article else '' }}"
                            placeholder="es. tangzhong-roux" required>
-                    <div class="form-text">Generato automaticamente dal titolo. Modificabile manualmente.</div>
+                    <div class="form-text">{{ T.a_wiki_slug_hint }}</div>
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label fw-semibold">Categoria</label>
+                    <label class="form-label fw-semibold">{{ T.a_wiki_cat_lbl }}</label>
                     <select name="category" class="form-select">
                         {% set cat = article.category if article else 'Guida' %}
                         <option value="Guida"    {% if cat == 'Guida'    %}selected{% endif %}>Guida</option>
@@ -54,7 +54,7 @@
             </div>
 
             <div class="mb-4">
-                <label class="form-label fw-semibold">Contenuto</label>
+                <label class="form-label fw-semibold">{{ T.a_wiki_content_lbl }}</label>
                 <div id="wiki-editor"></div>
                 <input type="hidden" name="content" id="wiki-content-hidden"
                        value="{{ article.content if article else '' }}">
@@ -62,11 +62,11 @@
 
             <div class="d-flex justify-content-between align-items-center gap-3">
                 <a href="{{ url_for('admin.wiki_list') }}" class="btn btn-outline-secondary px-4">
-                    <i class="bi bi-arrow-left me-1"></i>Annulla
+                    <i class="bi bi-arrow-left me-1"></i>{{ T.a_cancel }}
                 </a>
                 <button type="submit" class="btn btn-primary fw-bold px-5">
                     <i class="bi bi-floppy me-2"></i>
-                    {% if article %}Salva Modifiche{% else %}Pubblica Articolo{% endif %}
+                    {% if article %}{{ T.a_wiki_save_edit }}{% else %}{{ T.a_wiki_publish }}{% endif %}
                 </button>
             </div>
 

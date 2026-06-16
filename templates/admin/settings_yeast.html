@@ -8,27 +8,27 @@
     <div class="col-lg-6">
         <div class="card shadow-sm border-0 bg-white rounded-3">
             <div class="card-header bg-dark text-white fw-bold py-3">
-                🎛️ Regolazione Proporzioni di Conversione
+                {{ T.a_yeast_header }}
             </div>
             <div class="card-body p-4">
                 <form method="post" action="{{ url_for('admin.settings_yeast') }}">
                     <div class="mb-3">
-                        <label class="form-label fw-bold text-dark text-uppercase small">🧪 Se la formula prevede (Lievito Fresco):</label>
+                        <label class="form-label fw-bold text-dark text-uppercase small">{{ T.a_yeast_fresh_lbl }}</label>
                         <div class="input-group">
                             <input type="text" name="yeast_fresh_val" class="form-control text-center fw-bold text-primary fs-5" value="{{ (setting.fresh_to_dry_ratio if setting else 3.0)|round(1)|string|replace('.', ',') }}" required autocomplete="off">
-                            <span class="input-group-text bg-light fw-bold text-secondary">Grammi</span>
+                            <span class="input-group-text bg-light fw-bold text-secondary">{{ T.a_yeast_grams }}</span>
                         </div>
                     </div>
-                    <div class="text-center my-3 fw-bold text-muted small">EQUIVALE A:</div>
+                    <div class="text-center my-3 fw-bold text-muted small">{{ T.a_yeast_equiv }}</div>
                     <div class="mb-4">
-                        <label class="form-label fw-bold text-dark text-uppercase small">📦 Questo quantitativo di (Lievito Secco):</label>
+                        <label class="form-label fw-bold text-dark text-uppercase small">{{ T.a_yeast_dry_lbl }}</label>
                         <div class="input-group">
                             <input type="text" name="yeast_dry_val" class="form-control text-center fw-bold text-success fs-5" value="1" required autocomplete="off" readonly>
-                            <span class="input-group-text bg-light fw-bold text-secondary">Grammo</span>
+                            <span class="input-group-text bg-light fw-bold text-secondary">{{ T.a_yeast_gram }}</span>
                         </div>
                     </div>
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-success fw-bold py-2 shadow-sm">💾 Registra Coefficiente Matematico</button>
+                        <button type="submit" class="btn btn-success fw-bold py-2 shadow-sm">{{ T.a_yeast_save }}</button>
                     </div>
                 </form>
             </div>

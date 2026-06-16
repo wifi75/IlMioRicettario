@@ -60,3 +60,59 @@ Rispondi sempre in italiano, in ogni risposta e in ogni commento nel codice.
 - `static/css/admin.css` — stile admin
 - `static/uploads/recipes/` — immagini caricate
 - `migrations/` — migrazioni Alembic
+
+## Stato attuale del progetto
+
+**Versione:** v3.0.6
+
+### Funzionalità implementate
+- Ricettario dinamico con calcolatore matematico (peso totale, teglie, pezzatura)
+- Pannello admin completo con Flask-Login (ricette, ingredienti, teglie, wiki, backup)
+- Ingredienti master con autocomplete datalist e badge W/Farina/Liquido
+- Teglie master con selezione per ricetta e calcolo capacità
+- Wiki tecnica con editor Quill.js e slug autogenerato
+- Setup wizard integrato: SETUP_MODE automatico se `instance/config.py` è assente o manca SECRET_KEY
+- Gestione porta applicazione via pannello admin (`set_port.py` + `instance/config.py`)
+- Backup e ripristino dati in formato JSON (ricette, config) e ZIP (completo con immagini)
+- Gestore immagini: dropdown con preview dinamico e upload locale (max 2 MB)
+- Sistema bilingue IT/EN con switcher bandierine in sidebar admin (v3.0.6)
+- Tema grafico pubblico configurabile (6 temi) da pannello admin
+- Conversione lieviti fresco/secco configurabile da pannello admin
+- Responsive mobile: admin bloccato su tablet/desktop, frontend pubblico ottimizzato
+
+### Architettura Blueprint
+- `admin_bp` (`routes/admin.py`) — gestione contenuti e impostazioni
+- `recipes_bp` (`routes/recipes.py`) — frontend pubblico
+- `backup_bp` (`routes/backup.py`) — export/import JSON e ZIP
+- `setup_bp` (`routes/setup.py`) — wizard prima configurazione
+
+### Deploy
+- Linux con systemd (`ilmioricettario.service`)
+- `instance/config.py` escluso da git: contiene solo `PORT` e `SECRET_KEY`
+- Porta configurabile dal pannello admin (script `set_port.py`)
+- `gh` CLI non disponibile su Windows: release GitHub create manualmente
+
+### Internazionalizzazione (v3.0.6)
+- `translations.py`: dizionario Python `{'it': {...}, 'en': {...}}`
+- Context processor in `app.py`: inietta `T` e `current_lang` in tutti i template
+- Chiavi admin con prefisso `a_` (es. `a_cancel`, `a_rd_name`)
+- Chiavi JS iniettate come oggetto `_T` via Jinja2 nei template che le usano
+- Lingua salvata in sessione Flask via `/set-lang/<lang>`
+
+## Cronologia decisioni
+
+- **SQLite invece di PostgreSQL** — deploy standalone su server Linux senza dipendenze DB esterne. Adatto per uso monoutente/piccola community.
+
+- **Blueprint Flask separati** — organizzazione in `admin_bp`, `recipes_bp`, `backup_bp`, `setup_bp` per separare responsabilità e semplificare la manutenzione.
+
+- **SECRET_KEY in `instance/config.py`** (non in git) — sicurezza operativa per repository pubblico su GitHub. L'app entra in SETUP_MODE se il file è assente.
+
+- **Sistema bilingue con dizionario Python** invece di Flask-Babel — soluzione senza dipendenze aggiuntive, con prefisso `a_` per chiavi admin, iniettato globalmente dal context processor.
+
+- **Quill.js 1.3.6 via CDN** — editor rich text per istruzioni ricette e articoli wiki, senza dipendenze Python lato server.
+
+- **Setup wizard integrato** (v3.0.1) — eliminato installer esterno. Se SECRET_KEY manca in `instance/config.py`, l'app avvia automaticamente in SETUP_MODE.
+
+- **Gestore immagini con dropdown + preview** — adottato per gestire librerie con molte immagini senza confusione nella selezione.
+
+- **`fermentation_type` come nome campo** nel form ricetta (vs `preferment_type` in recipe_detail) — eredità storica: i due template usano nomi diversi per lo stesso concetto. Da unificare in futuro.

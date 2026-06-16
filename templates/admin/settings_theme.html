@@ -8,45 +8,41 @@
     <div class="col-lg-6">
         <div class="card shadow-sm border-0 bg-white rounded-3 mb-3">
             <div class="card-header bg-dark text-white fw-bold py-3">
-                🎨 Configurazione Estetica e Contenuti Home
+                {{ T.a_theme_header }}
             </div>
             <div class="card-body p-4">
                 <form method="post" action="{{ url_for('admin.settings_theme') }}">
-                    
-                    <!-- DIAGNOSTICA DB -->
+
                     <div class="mb-3 bg-light p-2 rounded border">
                         <span class="small text-muted fw-bold d-block" style="font-size: 11px;">VALORE REGISTRATO ORA NEL CODICE DB:</span>
                         <input type="text" class="form-control form-control-sm fw-bold text-danger border-0 bg-transparent p-0 shadow-none" value="{{ setting.theme_active if setting else 'Nessun record trovato' }}" readonly>
                     </div>
 
-                    <!-- NUOVO: EDIT DEL TITOLO HOME -->
                     <div class="mb-3">
-                        <label class="form-label fw-bold text-dark text-uppercase small">Titolo del Ricettario (Home):</label>
-                        <input type="text" name="site_name" class="form-control fw-bold bg-white border shadow-none" 
+                        <label class="form-label fw-bold text-dark text-uppercase small">{{ T.a_theme_site_name }}</label>
+                        <input type="text" name="site_name" class="form-control fw-bold bg-white border shadow-none"
                                value="{{ setting.site_name if setting and setting.site_name else '' }}" placeholder="Es. L'Arte Bianca - Ricettario Dinamico">
                     </div>
 
-                    <!-- NUOVO: EDIT DELLA DESCRIZIONE HOME -->
                     <div class="mb-3">
-                        <label class="form-label fw-bold text-dark text-uppercase small">Descrizione o Sottotitolo:</label>
-                        <textarea name="site_description" class="form-control bg-white border shadow-none small" rows="3" placeholder="Es. Esplora le nostre antiche formule bilanciate... Built with love.">{{ setting.site_description if setting and setting.site_description else '' }}</textarea>
+                        <label class="form-label fw-bold text-dark text-uppercase small">{{ T.a_theme_site_desc }}</label>
+                        <textarea name="site_description" class="form-control bg-white border shadow-none small" rows="3" placeholder="Es. Esplora le nostre antiche formule bilanciate...">{{ setting.site_description if setting and setting.site_description else '' }}</textarea>
                     </div>
 
-                    <!-- SELEZIONE TEMA -->
                     <div class="mb-4">
-                        <label class="form-label fw-bold text-dark text-uppercase small">Modifica l'atmosfera del Frontend pubblico:</label>
+                        <label class="form-label fw-bold text-dark text-uppercase small">{{ T.a_theme_select }}</label>
                         <select name="theme_active" class="form-select form-select-md fw-bold text-dark bg-white border shadow-none">
-                            <option value="modern" {% if setting and setting.theme_active == 'modern' %}selected="selected"{% endif %}>1. Moderno Pulito (Originale Tecnico)</option>
-                            <option value="antica_panetteria" {% if setting and setting.theme_active == 'antica_panetteria' %}selected="selected"{% endif %}>2. Antica Panetteria (Vintage Terracotta e Crema)</option>
-                            <option value="mulino_storico" {% if setting and setting.theme_active == 'mulino_storico' %}selected="selected"{% endif %}>3. Mulino Storico (Rustico Avana e Lavagna)</option>
-                            <option value="forno_paese" {% if setting and setting.theme_active == 'forno_paese' %}selected="selected"{% endif %}>4. Forno di Paese (Nostalgico Azzurro Polvere e Ocra)</option>
-                            <option value="borgo_antico" {% if setting and setting.theme_active == 'borgo_antico' %}selected="selected"{% endif %}>5. Borgo Antico (Caldo Uovo e Zucca)</option>
-                            <option value="pizzeria_industriale" {% if setting and setting.theme_active == 'pizzeria_industriale' %}selected="selected"{% endif %}>6. Pizzeria Industriale (Antracite e Ferro Battuto)</option>
+                            <option value="modern" {% if setting and setting.theme_active == 'modern' %}selected="selected"{% endif %}>{{ T.a_theme_1 }}</option>
+                            <option value="antica_panetteria" {% if setting and setting.theme_active == 'antica_panetteria' %}selected="selected"{% endif %}>{{ T.a_theme_2 }}</option>
+                            <option value="mulino_storico" {% if setting and setting.theme_active == 'mulino_storico' %}selected="selected"{% endif %}>{{ T.a_theme_3 }}</option>
+                            <option value="forno_paese" {% if setting and setting.theme_active == 'forno_paese' %}selected="selected"{% endif %}>{{ T.a_theme_4 }}</option>
+                            <option value="borgo_antico" {% if setting and setting.theme_active == 'borgo_antico' %}selected="selected"{% endif %}>{{ T.a_theme_5 }}</option>
+                            <option value="pizzeria_industriale" {% if setting and setting.theme_active == 'pizzeria_industriale' %}selected="selected"{% endif %}>{{ T.a_theme_6 }}</option>
                         </select>
                     </div>
 
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-primary fw-bold py-2 shadow-sm">💾 Cambia Aspetto e Salva Testi</button>
+                        <button type="submit" class="btn btn-primary fw-bold py-2 shadow-sm">{{ T.a_theme_save }}</button>
                     </div>
                 </form>
             </div>

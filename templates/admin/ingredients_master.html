@@ -7,30 +7,30 @@
 <div class="row g-4">
     <div class="col-md-4">
         <div class="card shadow-sm border-0 bg-white p-4 rounded-4">
-            <h5 class="fw-bold mb-3 text-dark text-uppercase" style="font-size: 14px;">➕ Nuovo Ingrediente</h5>
+            <h5 class="fw-bold mb-3 text-dark text-uppercase" style="font-size: 14px;">{{ T.a_ing_new }}</h5>
             <form method="post" action="{{ url_for('admin.master_ingredient_add') }}">
                 <div class="mb-3">
-                    <label class="form-label small fw-bold text-secondary text-uppercase" style="font-size: 11px;">Nome Ingrediente</label>
+                    <label class="form-label small fw-bold text-secondary text-uppercase" style="font-size: 11px;">{{ T.a_ing_name }}</label>
                     <input type="text" name="name" class="form-control fw-semibold rounded-3" placeholder="es. Farina di Segale" required>
                 </div>
-                
+
                 <div class="form-check form-switch mb-2 shadow-none">
                     <input class="form-check-input" type="checkbox" name="is_flour" id="master_is_flour">
-                    <label class="form-check-label small fw-bold text-dark" for="master_is_flour">È una Farina</label>
+                    <label class="form-check-label small fw-bold text-dark" for="master_is_flour">{{ T.a_ing_is_flour }}</label>
                 </div>
 
                 <div class="mb-3 d-none" id="wrapper_w_value">
-                    <label class="form-label small fw-bold text-secondary text-uppercase" style="font-size: 11px;">Valore di Forza (W)</label>
+                    <label class="form-label small fw-bold text-secondary text-uppercase" style="font-size: 11px;">{{ T.a_ing_w_value }}</label>
                     <input type="number" name="w_value" id="master_w_value" class="form-control fw-bold text-warning rounded-3" placeholder="es. 240" min="0" value="0">
                     <div class="form-text small text-muted" style="font-size: 11px;">Lascia 0 se non conosci la forza specifica della farina.</div>
                 </div>
 
                 <div class="form-check form-switch mb-4 shadow-none">
                     <input class="form-check-input" type="checkbox" name="is_liquid" id="master_is_liquid">
-                    <label class="form-check-label small fw-bold text-dark" for="master_is_liquid">È un Liquido</label>
+                    <label class="form-check-label small fw-bold text-dark" for="master_is_liquid">{{ T.a_ing_is_liquid }}</label>
                 </div>
 
-                <button type="submit" class="btn btn-primary w-100 fw-bold rounded-3 py-2">💾 Salva nel Database</button>
+                <button type="submit" class="btn btn-primary w-100 fw-bold rounded-3 py-2">{{ T.a_save_db }}</button>
             </form>
         </div>
     </div>
@@ -42,10 +42,10 @@
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr class="small text-secondary" style="font-size: 13px;">
-                                <th class="ps-4">Nome nel Database</th>
-                                <th class="text-center" style="width: 20%;">Forza (W)</th>
-                                <th class="text-center" style="width: 20%;">Tipo</th>
-                                <th class="text-center" style="width: 10%;">Azione</th>
+                                <th class="ps-4">{{ T.a_col_db_name }}</th>
+                                <th class="text-center" style="width: 20%;">{{ T.a_col_force }}</th>
+                                <th class="text-center" style="width: 20%;">{{ T.a_col_type }}</th>
+                                <th class="text-center" style="width: 10%;">{{ T.a_col_actions }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -53,7 +53,7 @@
                                 {% for ing in master_ingredients_list %}
                                 <tr class="border-bottom">
                                     <td class="ps-4 fw-semibold text-dark">{{ ing.name }}</td>
-                                    
+
                                     <td class="text-center fw-bold text-secondary">
                                         {% if ing.is_flour and ing.w_value and ing.w_value > 0 %}
                                             <span class="text-warning">{{ ing.w_value }} W</span>
@@ -64,11 +64,11 @@
 
                                     <td class="text-center">
                                         {% if ing.is_flour %}
-                                            <span class="badge bg-warning text-dark px-2.5 py-1.5 rounded-2 fw-bold" style="font-size: 10px;">FARINA</span>
+                                            <span class="badge bg-warning text-dark px-2.5 py-1.5 rounded-2 fw-bold" style="font-size: 10px;">{{ T.a_badge_flour }}</span>
                                         {% elif ing.is_liquid %}
-                                            <span class="badge bg-info text-dark px-2.5 py-1.5 rounded-2 fw-bold" style="font-size: 10px;">LIQUIDO</span>
+                                            <span class="badge bg-info text-dark px-2.5 py-1.5 rounded-2 fw-bold" style="font-size: 10px;">{{ T.a_badge_liquid }}</span>
                                         {% else %}
-                                            <span class="badge bg-secondary px-2.5 py-1.5 rounded-2 fw-bold" style="font-size: 10px;">ALTRO</span>
+                                            <span class="badge bg-secondary px-2.5 py-1.5 rounded-2 fw-bold" style="font-size: 10px;">{{ T.a_badge_other }}</span>
                                         {% endif %}
                                     </td>
                                     <td class="text-center pe-3">
@@ -80,7 +80,7 @@
                                 {% endfor %}
                             {% else %}
                                 <tr>
-                                    <td colspan="4" class="text-center text-muted py-4 fw-medium">Nessun ingrediente presente nel DB.</td>
+                                    <td colspan="4" class="text-center text-muted py-4 fw-medium">{{ T.a_ing_empty }}</td>
                                 </tr>
                             {% endif %}
                         </tbody>
@@ -97,9 +97,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const checkLiquid = document.getElementById('master_is_liquid');
     const wrapperWValue = document.getElementById('wrapper_w_value');
     const inputWValue = document.getElementById('master_w_value');
-    
+
     if (checkFlour && checkLiquid) {
-        // Controllo e visibilità dinamica del campo W quando cambia lo stato di "È una Farina"
         checkFlour.addEventListener('change', function() {
             if (this.checked) {
                 checkLiquid.checked = false;
@@ -109,7 +108,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (inputWValue) inputWValue.value = "0";
             }
         });
-        
+
         checkLiquid.addEventListener('change', function() {
             if (this.checked) {
                 checkFlour.checked = false;

@@ -16,9 +16,9 @@
 {% endwith %}
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <div class="text-muted small">{{ articles|length }} articoli presenti</div>
+    <div class="text-muted small">{{ articles|length }} {{ T.a_wiki_count }}</div>
     <a href="{{ url_for('admin.wiki_new') }}" class="btn btn-primary fw-bold px-4">
-        <i class="bi bi-plus-lg me-2"></i>Nuovo Articolo
+        <i class="bi bi-plus-lg me-2"></i>{{ T.a_wiki_new }}
     </a>
 </div>
 
@@ -28,10 +28,10 @@
             <table class="table table-hover align-middle mb-0">
                 <thead>
                     <tr style="background: #1e293b; color: #fff; font-size: 13px;">
-                        <th class="ps-4 py-3">Titolo</th>
-                        <th class="py-3">Slug</th>
-                        <th class="py-3">Categoria</th>
-                        <th class="pe-4 py-3 text-end">Azioni</th>
+                        <th class="ps-4 py-3">{{ T.a_wiki_col_title }}</th>
+                        <th class="py-3">{{ T.a_wiki_col_slug }}</th>
+                        <th class="py-3">{{ T.a_wiki_col_cat }}</th>
+                        <th class="pe-4 py-3 text-end">{{ T.a_col_actions }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -53,12 +53,12 @@
                                 <div class="d-flex justify-content-end gap-2">
                                     <a href="{{ url_for('admin.wiki_edit', id=article.id) }}"
                                        class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-pencil me-1"></i>Modifica
+                                        <i class="bi bi-pencil me-1"></i>{{ T.a_wiki_edit }}
                                     </a>
                                     <a href="{{ url_for('admin.wiki_delete', id=article.id) }}"
                                        class="btn btn-sm btn-outline-danger"
-                                       onclick="return confirm('Eliminare questo articolo dalla Wiki?');">
-                                        <i class="bi bi-trash me-1"></i>Elimina
+                                       onclick="return confirm('{{ T.a_wiki_confirm_del }}');">
+                                        <i class="bi bi-trash me-1"></i>{{ T.a_wiki_delete }}
                                     </a>
                                 </div>
                             </td>
@@ -68,8 +68,8 @@
                         <tr>
                             <td colspan="4" class="text-center py-5 text-muted">
                                 <i class="bi bi-journal-x" style="font-size: 2.5rem; opacity: 0.3;"></i>
-                                <p class="mt-3 mb-1">Nessun articolo nella Wiki.</p>
-                                <small>Clicca "Nuovo Articolo" per iniziare.</small>
+                                <p class="mt-3 mb-1">{{ T.a_wiki_empty }}</p>
+                                <small>{{ T.a_wiki_empty_hint }}</small>
                             </td>
                         </tr>
                     {% endif %}
