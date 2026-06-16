@@ -1,6 +1,6 @@
 # 🧫 Il Mio Ricettario - Professional Baking Suite
 
-![Versione](https://img.shields.io/badge/version-v2.3.0-orange?style=for-the-badge)
+![Versione](https://img.shields.io/badge/version-v2.3.1-orange?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Python-3.13-blue?style=for-the-badge&logo=python)
 ![Framework](https://img.shields.io/badge/Framework-Flask-blue?style=for-the-badge&logo=flask)
 ![Database](https://img.shields.io/badge/Database-SQLite-green?style=for-the-badge&logo=sqlite)
@@ -37,6 +37,19 @@ Progetto sviluppato da Tiziano Cassone
 ---
 
 # 🚀 Novità della Serie 2.2
+
+## v2.3.1
+
+### Mobile Responsive
+
+* Tabella ingredienti ridotta a 2 colonne su smartphone (Materia Prima + Grammi)
+* Eliminato scroll orizzontale nella pagina ricetta su mobile
+* Pulsanti teglie con area di tocco minima 44 × 44 px
+* Prevenzione zoom automatico iOS su input e select
+* Hero image ricetta espansa a larghezza intera su smartphone
+* Line-height istruzioni ottimizzato per la lettura su piccoli schermi
+
+---
 
 ## v2.3.0
 

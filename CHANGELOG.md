@@ -1,3 +1,21 @@
+## v2.3.1 - 2026-06-16
+
+### Modificato e Corretto
+
+* **Tabella Ingredienti Mobile — Layout a 2 Colonne:** Su smartphone (< 768 px) la tabella ingredienti mostra ora sole due colonne — Materia Prima e Grammi Necessari — eliminando lo scroll orizzontale e la troncatura del testo. Le colonne Forza (W) e Percentuale Baker restano visibili su tablet e desktop.
+
+* **Fix Overflow Orizzontale Pagina Ricetta:** Rimosso il doppio nesting del container Bootstrap nella pagina dettaglio ricetta. L'involucro esterno era già fornito da `base.html`; il secondo `container py-4` interno causava un doppio padding laterale che riduceva la larghezza utile di 24 px e generava overflow su schermi da 375 px.
+
+* **Pulsanti Teglie con Area di Tocco 44 px:** I pulsanti `−` e `+` per la gestione delle teglie rispettano ora il minimo touch target di 44 × 44 px raccomandato da Apple e Google.
+
+* **Prevenzione Zoom Automatico iOS:** Gli `input[type="number"]` e i `select` hanno ora `font-size: 16px` su mobile, soglia minima richiesta da Safari per non attivare lo zoom automatico della pagina al tocco.
+
+* **Hero Image Ricetta Espansa su Mobile:** Corretti i conflitti `!important` che impedivano al media query mobile di ridimensionare correttamente l'immagine di testa della ricetta. Su smartphone l'immagine occupa ora la larghezza intera disponibile.
+
+* **Riduzione Line-Height Istruzioni su Mobile:** Il testo delle istruzioni passa da `line-height: 2` a `line-height: 1.65` su mobile, riducendo lo scroll verticale mantenendo la leggibilità.
+
+---
+
 ## v2.3.0 - 2026-06-16
 
 ### Aggiunto
