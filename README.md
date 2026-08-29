@@ -49,7 +49,7 @@ Progetto sviluppato da Tiziano Cassone
 
 * Completamento del supporto bilingue su tutti i template del pannello admin: `backup`, `wiki_list`, `wiki_form`, `recipe_form`, `recipe_detail`, `recipes`, `dashboard`, `ingredients_master`, `pans_master`, `settings_theme`, `settings_yeast`, `settings_port`, `change_password`
 
-### CLAUDE.md Aggiornato
+### AGENTS.md Aggiornato
 
 * Aggiunte sezioni Stato attuale del progetto e Cronologia decisioni con architettura completa, modelli, debito tecnico e decisioni storiche
 

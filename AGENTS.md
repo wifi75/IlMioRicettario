@@ -1,4 +1,4 @@
-# CLAUDE.md — Il Mio Ricettario
+# AGENTS.md — Il Mio Ricettario
 
 ## Lingua
 

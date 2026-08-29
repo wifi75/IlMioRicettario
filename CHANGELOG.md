@@ -8,7 +8,7 @@
 
 * **`config.py` — Costante `APP_VERSION`:** Aggiunta la costante `APP_VERSION = 'v3.0.7'` in `Config`, iniettata globalmente dal context processor come `app_version`.
 
-* **`CLAUDE.md` — Documentazione Interna Espansa:** Aggiunte e ampliate le sezioni _Stato attuale del progetto_ (con modelli, context processor, debito tecnico) e _Cronologia decisioni_.
+* **`AGENTS.md` — Documentazione Interna Espansa:** Aggiunte e ampliate le sezioni _Stato attuale del progetto_ (con modelli, context processor, debito tecnico) e _Cronologia decisioni_.
 
 ---
 
